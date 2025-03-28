@@ -38,3 +38,5 @@ out/
 
 ### api ###
 /api/**/data.sql
+
+/docker-compose.yml
