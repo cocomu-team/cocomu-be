@@ -43,13 +43,13 @@
 
 ### DevOps 아키텍쳐
 
-<div style="display: flex;">
-  <div style="flex: 1; text-align: center;">
-    <img src="https://github.com/user-attachments/assets/bf26a14b-d392-4523-bafe-6ba675d21805" style="max-height: 300px; max-width: 100%;" />
-  </div>
-  <div style="flex: 1; text-align: center;">
-    <img src="https://github.com/user-attachments/assets/abc28949-6a0d-4c4f-97b2-018611b66767" style="max-height: 300px; max-width: 100%;" />
-  </div>
+<div align="center">
+  <table>
+    <tr>
+      <td><img src="https://github.com/user-attachments/assets/bf26a14b-d392-4523-bafe-6ba675d21805" width="400" height="300"></td>
+      <td><img src="https://github.com/user-attachments/assets/abc28949-6a0d-4c4f-97b2-018611b66767" width="400" height="300"></td>
+    </tr>
+  </table>
 </div>
 
 ---
