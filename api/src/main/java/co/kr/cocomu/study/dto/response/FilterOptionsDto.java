@@ -1,5 +1,6 @@
 package co.kr.cocomu.study.dto.response;
 
+import co.kr.cocomu.workbook.service.dto.WorkbookDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 

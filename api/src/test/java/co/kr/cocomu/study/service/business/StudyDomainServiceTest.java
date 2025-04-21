@@ -1,4 +1,4 @@
-package co.kr.cocomu.study.service;
+package co.kr.cocomu.study.service.business;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -15,6 +15,7 @@ import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.repository.jpa.StudyRepository;
 import co.kr.cocomu.study.repository.jpa.StudyUserRepository;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -106,6 +107,31 @@ class StudyDomainServiceTest {
         assertThatThrownBy(() -> studyDomainService.getStudyUserWithThrow(1L, 1L))
             .isInstanceOf(NotFoundException.class)
             .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.NOT_FOUND_STUDY_USER);
+    }
+
+    @Test
+    void 스터디_생성시_문제집_정보가_비어있으면_예외가_발생한다() {
+        // given
+        List<Long> workbookIds = List.of();
+        CreatePublicStudyDto mockDto = mock(CreatePublicStudyDto.class);
+        when(mockDto.workbooks()).thenReturn(workbookIds);
+
+        // when & then
+        assertThatThrownBy(() -> studyDomainService.validateCreateStudy(mockDto))
+            .isInstanceOf(BadRequestException.class)
+            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.WORKBOOK_IS_REQUIRED_VALUE);
+    }
+
+    @Test
+    void 스터디_생성시_문제집_정보는_필수이다() {
+        // given
+        List<Long> workbookIds = List.of(1L);
+        CreatePublicStudyDto mockDto = mock(CreatePublicStudyDto.class);
+        when(mockDto.workbooks()).thenReturn(workbookIds);
+
+        // when & then
+        assertThatCode(() -> studyDomainService.validateCreateStudy(mockDto))
+            .doesNotThrowAnyException();
     }
 
 }

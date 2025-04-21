@@ -1,24 +1,24 @@
-package co.kr.cocomu.study.service;
+package co.kr.cocomu.study.service.query;
 
 import co.kr.cocomu.codingspace.service.CodingSpaceQueryService;
 import co.kr.cocomu.common.exception.domain.NotFoundException;
 import co.kr.cocomu.study.domain.Language;
 import co.kr.cocomu.study.domain.Study;
-import co.kr.cocomu.study.domain.Workbook;
+import co.kr.cocomu.study.dto.page.StudyDetailPageDto;
 import co.kr.cocomu.study.dto.request.GetAllStudyFilterDto;
 import co.kr.cocomu.study.dto.request.StudyUserFilterDto;
 import co.kr.cocomu.study.dto.response.AllStudyCardDto;
 import co.kr.cocomu.study.dto.response.LanguageDto;
 import co.kr.cocomu.study.dto.response.LeaderDto;
 import co.kr.cocomu.study.dto.response.StudyCardDto;
-import co.kr.cocomu.study.dto.page.StudyDetailPageDto;
 import co.kr.cocomu.study.dto.response.StudyMemberDto;
-import co.kr.cocomu.study.dto.response.WorkbookDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.repository.jpa.LanguageRepository;
 import co.kr.cocomu.study.repository.jpa.StudyRepository;
 import co.kr.cocomu.study.repository.jpa.StudyUserRepository;
-import co.kr.cocomu.study.repository.jpa.WorkbookRepository;
+import co.kr.cocomu.study.repository.query.StudyWorkbookQueryRepository;
+import co.kr.cocomu.study.service.business.StudyDomainService;
+import co.kr.cocomu.workbook.service.dto.WorkbookDto;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +32,9 @@ public class StudyQueryService {
 
     private final StudyDomainService studyDomainService;
     private final CodingSpaceQueryService codingSpaceQueryService;
+    private final StudyWorkbookQueryRepository studyWorkbookQuery;
     private final StudyRepository studyQuery;
     private final StudyUserRepository studyUserQuery;
-    private final WorkbookRepository workbookQuery;
     private final LanguageRepository languageQuery;
 
     public AllStudyCardDto getAllStudyCard(final GetAllStudyFilterDto dto, final Long userId) {
@@ -50,18 +50,11 @@ public class StudyQueryService {
         return studyQuery.findStudyPagesByStudyId(studyId, userId)
             .map(studyPage -> {
                 studyPage.setLanguages(languageQuery.findLanguageByStudyId(studyId));
-                studyPage.setWorkbooks(workbookQuery.findWorkbookByStudyId(studyId));
+                studyPage.setWorkbooks(studyWorkbookQuery.findWorkbookByStudyId(studyId));
                 studyPage.setLeader(studyUserQuery.findLeaderByStudyId(studyId));
                 return studyPage;
             })
             .orElseThrow(() -> new NotFoundException(StudyExceptionCode.NOT_FOUND_STUDY));
-    }
-
-    public List<WorkbookDto> getAllWorkbooks() {
-        final List<Workbook> workbooks = workbookQuery.findAll();
-        return workbooks.stream()
-            .map(Workbook::toDto)
-            .toList();
     }
 
     public List<LanguageDto> getAllLanguages() {
@@ -101,7 +94,7 @@ public class StudyQueryService {
 
     private void setStudyInformation(final List<Long> studyIds, final List<StudyCardDto> studyPages) {
         final Map<Long, List<LanguageDto>> languageByStudies = languageQuery.findLanguageByStudies(studyIds);
-        final Map<Long, List<WorkbookDto>> workbookByStudies = workbookQuery.findWorkbookByStudies(studyIds);
+        final Map<Long, List<WorkbookDto>> workbookByStudies = studyWorkbookQuery.findWorkbookByStudies(studyIds);
         final Map<Long, LeaderDto> LeaderByStudies = studyUserQuery.findLeaderByStudies(studyIds);
 
         for (StudyCardDto studyPage: studyPages) {

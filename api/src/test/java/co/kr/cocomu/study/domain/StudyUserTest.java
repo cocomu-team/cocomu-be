@@ -153,7 +153,7 @@ class StudyUserTest {
         StudyUser studyUser = StudyUser.createLeader(mockStudy, mockUser);
 
         // when
-        studyUser.editPublicStudy(dto, List.of(), List.of());
+        studyUser.editPublicStudy(dto, List.of());
 
         // then
         verify(mockStudy).changeToPublic();
@@ -168,7 +168,7 @@ class StudyUserTest {
         StudyUser studyUser = StudyUser.createLeader(mockStudy, mockUser);
 
         // when
-        studyUser.editPrivateStudy(dto, List.of(), List.of(), "pass");
+        studyUser.editPrivateStudy(dto, List.of(), "pass");
 
         // then
         verify(mockStudy).changeToPrivate("pass");

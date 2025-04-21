@@ -105,28 +105,21 @@ public class StudyUser extends TimeBaseEntity {
         }
     }
 
-    public void editPublicStudy(
-        final EditStudyDto dto,
-        final List<Workbook> workbooks,
-        final List<Language> languages
-    ) {
+    public void editPublicStudy(final EditStudyDto dto, final List<Language> languages) {
         validateLeaderRole();
         study.updateStudyInfo(dto.name(), dto.description(), dto.totalUserCount());
         study.changeToPublic();
-        study.addWorkBooks(workbooks);
         study.addLanguages(languages);
     }
 
     public void editPrivateStudy(
         final EditStudyDto dto,
-        final List<Workbook> workbooks,
         final List<Language> languages,
         final String newPassword
     ) {
         validateLeaderRole();
         study.updateStudyInfo(dto.name(), dto.description(), dto.totalUserCount());
         study.changeToPrivate(newPassword);
-        study.addWorkBooks(workbooks);
         study.addLanguages(languages);
     }
 

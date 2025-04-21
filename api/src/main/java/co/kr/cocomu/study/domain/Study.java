@@ -7,7 +7,6 @@ import static co.kr.cocomu.study.domain.vo.StudyStatus.REMOVE;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.common.repository.TimeBaseEntity;
 import co.kr.cocomu.study.domain.vo.StudyStatus;
-import co.kr.cocomu.study.domain.vo.StudyUserStatus;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
@@ -28,7 +27,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "cocomu_study")
@@ -60,9 +58,6 @@ public class Study extends TimeBaseEntity {
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudyUser> studyUsers = new ArrayList<>();
-
-    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StudyWorkbook> workbooks = new ArrayList<>();
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudyLanguage> languages = new ArrayList<>();
@@ -133,14 +128,6 @@ public class Study extends TimeBaseEntity {
         increaseCurrentUserCount();
 
         return memberUser;
-    }
-
-    public void addWorkBooks(final List<Workbook> workbooks) {
-        this.workbooks.clear();
-        for (final Workbook workBook : workbooks) {
-            final StudyWorkbook studyWorkbook = StudyWorkbook.of(this, workBook);
-            this.workbooks.add(studyWorkbook);
-        }
     }
 
     public void addLanguages(final List<Language> languages) {

@@ -1,9 +1,5 @@
 package co.kr.cocomu.study.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-
 import co.kr.cocomu.common.BaseExecutorControllerTest;
 import co.kr.cocomu.common.api.Api;
 import co.kr.cocomu.common.api.NoContent;
@@ -12,28 +8,25 @@ import co.kr.cocomu.common.template.PostRequestTemplate;
 import co.kr.cocomu.study.controller.code.StudyApiCode;
 import co.kr.cocomu.study.dto.page.StudyDetailPageDto;
 import co.kr.cocomu.study.dto.page.StudyPageDto;
-import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
-import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
-import co.kr.cocomu.study.dto.request.EditStudyDto;
-import co.kr.cocomu.study.dto.request.GetAllStudyFilterDto;
-import co.kr.cocomu.study.dto.request.JoinPrivateStudyDto;
-import co.kr.cocomu.study.dto.request.StudyUserFilterDto;
-import co.kr.cocomu.study.dto.response.AllStudyCardDto;
-import co.kr.cocomu.study.dto.response.FilterOptionsDto;
-import co.kr.cocomu.study.dto.response.LanguageDto;
-import co.kr.cocomu.study.dto.response.StudyCardDto;
-import co.kr.cocomu.study.dto.response.StudyMemberDto;
-import co.kr.cocomu.study.dto.response.WorkbookDto;
-import co.kr.cocomu.study.service.StudyCommandService;
-import co.kr.cocomu.study.service.StudyQueryService;
+import co.kr.cocomu.study.dto.request.*;
+import co.kr.cocomu.study.dto.response.*;
+import co.kr.cocomu.study.service.command.StudyCommandService;
+import co.kr.cocomu.study.service.query.StudyQueryService;
+import co.kr.cocomu.workbook.service.WorkbookQueryService;
+import co.kr.cocomu.workbook.service.dto.WorkbookDto;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.module.mockmvc.response.ValidatableMockMvcResponse;
-import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 @WebMvcTest(StudyController.class)
 class StudyExecutorControllerTest extends BaseExecutorControllerTest {
@@ -42,6 +35,7 @@ class StudyExecutorControllerTest extends BaseExecutorControllerTest {
 
     @MockBean private StudyCommandService studyCommandService;
     @MockBean private StudyQueryService studyQueryService;
+    @MockBean private WorkbookQueryService workbookQueryService;
 
     @Test
     void 공개방_생성_요청이_성공한다() {
@@ -126,7 +120,7 @@ class StudyExecutorControllerTest extends BaseExecutorControllerTest {
         AllStudyCardDto mockStudyCards = new AllStudyCardDto(10L, List.of());
         StudyPageDto mockResult = new StudyPageDto(mockWorkbooks, mockLanguages, mockStudyCards);
 
-        when(studyQueryService.getAllWorkbooks()).thenReturn(mockWorkbooks);
+        when(workbookQueryService.getAllWorkbooks()).thenReturn(mockWorkbooks);
         when(studyQueryService.getAllLanguages()).thenReturn(mockLanguages);
         when(studyQueryService.getAllStudyCard(noFilter, null)).thenReturn(mockStudyCards);
 
@@ -162,7 +156,7 @@ class StudyExecutorControllerTest extends BaseExecutorControllerTest {
     void 스터디_작성_페이지_조회_요청이_성공한다() {
         // given
         when(studyQueryService.getAllLanguages()).thenReturn(List.of());
-        when(studyQueryService.getAllWorkbooks()).thenReturn(List.of());
+        when(workbookQueryService.getAllWorkbooks()).thenReturn(List.of());
 
         // when
         String path = PATH_PREFIX + "/filter-options";

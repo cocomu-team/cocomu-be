@@ -1,21 +1,22 @@
 package co.kr.cocomu.study.repository.query.impl;
 
-import static co.kr.cocomu.study.domain.QStudyWorkbook.studyWorkbook;
-import static co.kr.cocomu.study.domain.QWorkbook.workbook;
-
-import co.kr.cocomu.study.dto.response.WorkbookDto;
-import co.kr.cocomu.study.repository.query.WorkbookQueryRepository;
+import co.kr.cocomu.study.repository.query.StudyWorkbookQueryRepository;
+import co.kr.cocomu.workbook.service.dto.WorkbookDto;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
+
+import static co.kr.cocomu.study.domain.QStudyWorkbook.studyWorkbook;
+import static co.kr.cocomu.workbook.domain.QWorkbook.workbook;
+
 @Repository
 @RequiredArgsConstructor
-public class WorkbookRepositoryImpl implements WorkbookQueryRepository {
+public class StudyWorkbookRepositoryImpl implements StudyWorkbookQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
@@ -23,7 +24,10 @@ public class WorkbookRepositoryImpl implements WorkbookQueryRepository {
         return queryFactory.select(studyWorkbook.study.id, workbook)
             .from(studyWorkbook)
             .join(workbook).on(studyWorkbook.workbook.id.eq(workbook.id))
-            .where(studyWorkbook.study.id.in(studyIds))
+            .where(
+                studyWorkbook.study.id.in(studyIds),
+                studyWorkbook.deleted.isFalse()
+            )
             .transform(GroupBy.groupBy(studyWorkbook.study.id)
                 .as(GroupBy.list(
                     Projections.fields(
@@ -46,7 +50,10 @@ public class WorkbookRepositoryImpl implements WorkbookQueryRepository {
                 ))
             .from(studyWorkbook)
             .join(workbook).on(studyWorkbook.workbook.id.eq(workbook.id))
-            .where(studyWorkbook.study.id.eq(studyId))
+            .where(
+                studyWorkbook.study.id.eq(studyId),
+                studyWorkbook.deleted.isFalse()
+            )
             .fetch();
     }
 

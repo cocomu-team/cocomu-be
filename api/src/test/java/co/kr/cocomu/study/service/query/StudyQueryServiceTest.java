@@ -1,4 +1,4 @@
-package co.kr.cocomu.study.service;
+package co.kr.cocomu.study.service.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,12 +21,13 @@ import co.kr.cocomu.study.dto.response.LanguageDto;
 import co.kr.cocomu.study.dto.response.LeaderDto;
 import co.kr.cocomu.study.dto.response.StudyCardDto;
 import co.kr.cocomu.study.dto.response.StudyMemberDto;
-import co.kr.cocomu.study.dto.response.WorkbookDto;
+import co.kr.cocomu.study.repository.query.StudyWorkbookQueryRepository;
+import co.kr.cocomu.study.service.business.StudyDomainService;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.repository.jpa.LanguageRepository;
 import co.kr.cocomu.study.repository.jpa.StudyRepository;
 import co.kr.cocomu.study.repository.jpa.StudyUserRepository;
-import co.kr.cocomu.study.repository.jpa.WorkbookRepository;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ class StudyQueryServiceTest {
 
     @Mock private StudyRepository studyQuery;
     @Mock private StudyUserRepository studyUserQuery;
-    @Mock private WorkbookRepository workbookQuery;
+    @Mock private StudyWorkbookQueryRepository studyWorkbookQuery;
     @Mock private LanguageRepository languageQuery;
     @Mock private StudyDomainService studyDomainService;
     @Mock private CodingSpaceQueryService codingSpaceQueryService;
@@ -68,7 +69,7 @@ class StudyQueryServiceTest {
         when(studyQuery.countStudyCardsWithFilter(dto, 1L)).thenReturn(totalCount);
         when(studyQuery.findTop12StudyCardsWithFilter(dto, 1L)).thenReturn(List.of(mockStudyCard));
         when(languageQuery.findLanguageByStudies(anyList())).thenReturn(languageByStudies);
-        when(workbookQuery.findWorkbookByStudies(anyList())).thenReturn(new HashMap<>());
+        when(studyWorkbookQuery.findWorkbookByStudies(anyList())).thenReturn(new HashMap<>());
         when(studyUserQuery.findLeaderByStudies(anyList())).thenReturn(leaderByStudies);
 
         // when
@@ -94,7 +95,7 @@ class StudyQueryServiceTest {
         LeaderDto mockLeader = new LeaderDto();
         when(studyQuery.findStudyPagesByStudyId(studyId, 1L)).thenReturn(Optional.of(mockStudyCard));
         when(languageQuery.findLanguageByStudyId(studyId)).thenReturn(List.of());
-        when(workbookQuery.findWorkbookByStudyId(studyId)).thenReturn(List.of());
+        when(studyWorkbookQuery.findWorkbookByStudyId(studyId)).thenReturn(List.of());
         when(studyUserQuery.findLeaderByStudyId(studyId)).thenReturn(mockLeader);
 
         // when
@@ -128,18 +129,6 @@ class StudyQueryServiceTest {
 
         // when
         List<LanguageDto> result = studyQueryService.getAllLanguages();
-
-        // then
-        assertThat(result).hasSize(0);
-    }
-
-    @Test
-    void 스터디_전체_문제집_정보를_조회한다() {
-        // given
-        when(workbookQuery.findAll()).thenReturn(List.of());
-
-        // when
-        List<WorkbookDto> result = studyQueryService.getAllWorkbooks();
 
         // then
         assertThat(result).hasSize(0);
@@ -185,7 +174,7 @@ class StudyQueryServiceTest {
         // given
         when(studyQuery.findTop20UserStudyCards(1L, 1L, null)).thenReturn(List.of());
         when(languageQuery.findLanguageByStudies(anyList())).thenReturn(new HashMap<>());
-        when(workbookQuery.findWorkbookByStudies(anyList())).thenReturn(new HashMap<>());
+        when(studyWorkbookQuery.findWorkbookByStudies(anyList())).thenReturn(new HashMap<>());
         when(studyUserQuery.findLeaderByStudies(anyList())).thenReturn(new HashMap<>());
 
         // when
@@ -195,7 +184,7 @@ class StudyQueryServiceTest {
         assertThat(result).isEqualTo(List.of());
         verify(studyQuery).findTop20UserStudyCards(1L, 1L, null);
         verify(languageQuery).findLanguageByStudies(anyList());
-        verify(workbookQuery).findWorkbookByStudies(anyList());
+        verify(studyWorkbookQuery).findWorkbookByStudies(anyList());
         verify(studyUserQuery).findLeaderByStudies(anyList());
     }
 

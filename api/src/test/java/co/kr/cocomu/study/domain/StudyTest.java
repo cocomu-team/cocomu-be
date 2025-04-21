@@ -12,6 +12,8 @@ import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.user.domain.User;
 import java.util.List;
+
+import co.kr.cocomu.workbook.domain.Workbook;
 import org.junit.jupiter.api.Test;
 
 class StudyTest {
@@ -223,34 +225,6 @@ class StudyTest {
         assertThatThrownBy(() -> publicStudy.joinPublicMember(mockUser))
             .isInstanceOf(BadRequestException.class)
             .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.STUDY_REQUIRES_LEADER);
-    }
-
-    @Test
-    void 스터디에서_활용할_문제집_리스트를_추가한다() {
-        // given
-        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 10);
-        Study publicStudy = Study.createPublicStudy(dto);
-
-        // when
-        publicStudy.addWorkBooks(List.of(mock(Workbook.class), mock(Workbook.class)));
-
-        // then
-        assertThat(publicStudy.getWorkbooks()).hasSize(2);
-    }
-
-    @Test
-    void 스터디_문제집_정보가_수정이_된다() {
-        // given
-        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 10);
-        Study publicStudy = Study.createPublicStudy(dto);
-        List<Workbook> workbooks = List.of(mock(Workbook.class), mock(Workbook.class));
-        publicStudy.addWorkBooks(workbooks);
-
-        // when
-        publicStudy.addWorkBooks(List.of(mock(Workbook.class)));
-
-        // then
-        assertThat(publicStudy.getWorkbooks()).hasSize(1);
     }
 
     @Test
