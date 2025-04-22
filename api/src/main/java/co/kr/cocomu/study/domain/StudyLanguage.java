@@ -1,5 +1,6 @@
 package co.kr.cocomu.study.domain;
 
+import co.kr.cocomu.language.domain.Language;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -12,15 +13,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "cocomu_study_language")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class StudyLanguage {
 
@@ -37,13 +37,30 @@ public class StudyLanguage {
     @JoinColumn(name = "language_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Language language;
 
-    private StudyLanguage(final Study study, final Language language) {
+    @Column
+    private boolean deleted;
+
+    protected StudyLanguage(final Study study, final Language language) {
         this.study = study;
         this.language = language;
     }
 
-    public static StudyLanguage of(final Study study, final Language language) {
-        return new StudyLanguage(study, language);
+    public static List<StudyLanguage> createStudyLanguages(final Study study, final List<Language> languages) {
+        return languages.stream()
+            .map(language -> new StudyLanguage(study, language))
+            .toList();
+    }
+
+    public boolean hasSameLanguage(final Language other) {
+        return other.equals(getLanguage());
+    }
+
+    public void useLanguage() {
+        deleted = false;
+    }
+
+    public void unUseLanguage() {
+        deleted = true;
     }
 
 }

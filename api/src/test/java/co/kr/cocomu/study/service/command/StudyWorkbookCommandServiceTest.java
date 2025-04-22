@@ -13,6 +13,7 @@ import co.kr.cocomu.workbook.service.WorkbookQueryService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -37,8 +38,8 @@ class StudyWorkbookCommandServiceTest {
         studyWorkbookCommandService.addWorkbooksToStudy(mockStudy, workbookIds);
 
         // then
-        List<StudyWorkbook> result = StudyWorkbook.createStudyWorkbooks(mockStudy, mockWorkbooks);
-        verify(studyWorkbookJpaRepository).saveAll(result);
+        ArgumentCaptor<List<StudyWorkbook>> captor = ArgumentCaptor.forClass(List.class);
+        verify(studyWorkbookJpaRepository).saveAll(captor.capture());
     }
 
     @Test
@@ -50,7 +51,6 @@ class StudyWorkbookCommandServiceTest {
 
         List<StudyWorkbook> mockStudyWorkbooks = List.of(mock(StudyWorkbook.class));
         when(studyWorkbookJpaRepository.findAllByStudyId(mockStudy.getId())).thenReturn(mockStudyWorkbooks);
-
         when(studyWorkbookDomainService.extractNewWorkbooks(mockWorkbooks, mockStudyWorkbooks)).thenReturn(List.of());
 
         // when

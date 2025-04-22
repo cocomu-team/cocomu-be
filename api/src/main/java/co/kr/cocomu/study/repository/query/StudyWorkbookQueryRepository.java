@@ -1,6 +1,6 @@
 package co.kr.cocomu.study.repository.query;
 
-import co.kr.cocomu.workbook.service.dto.WorkbookDto;
+import co.kr.cocomu.workbook.dto.WorkbookDto;
 import java.util.List;
 import java.util.Map;
 

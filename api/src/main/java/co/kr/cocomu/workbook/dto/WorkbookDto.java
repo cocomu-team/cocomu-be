@@ -1,4 +1,4 @@
-package co.kr.cocomu.workbook.service.dto;
+package co.kr.cocomu.workbook.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

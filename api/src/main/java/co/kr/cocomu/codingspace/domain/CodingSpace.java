@@ -5,7 +5,7 @@ import co.kr.cocomu.codingspace.domain.vo.TestCaseType;
 import co.kr.cocomu.codingspace.dto.request.CreateCodingSpaceDto;
 import co.kr.cocomu.codingspace.exception.CodingSpaceExceptionCode;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
-import co.kr.cocomu.study.domain.Language;
+import co.kr.cocomu.language.domain.Language;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.user.domain.User;
 import jakarta.persistence.CascadeType;

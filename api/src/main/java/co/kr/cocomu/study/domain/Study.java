@@ -6,6 +6,7 @@ import static co.kr.cocomu.study.domain.vo.StudyStatus.REMOVE;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.common.repository.TimeBaseEntity;
+import co.kr.cocomu.language.domain.Language;
 import co.kr.cocomu.study.domain.vo.StudyStatus;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
@@ -128,14 +129,6 @@ public class Study extends TimeBaseEntity {
         increaseCurrentUserCount();
 
         return memberUser;
-    }
-
-    public void addLanguages(final List<Language> languages) {
-        this.languages.clear();
-        for (final Language language : languages) {
-            final StudyLanguage studyLanguage = StudyLanguage.of(this, language);
-            this.languages.add(studyLanguage);
-        }
     }
 
     public Language getLanguage(final Long languageId) {

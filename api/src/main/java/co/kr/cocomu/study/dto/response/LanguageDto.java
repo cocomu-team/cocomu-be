@@ -1,6 +1,6 @@
 package co.kr.cocomu.study.dto.response;
 
-import co.kr.cocomu.study.domain.Language;
+import co.kr.cocomu.language.domain.Language;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;

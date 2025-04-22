@@ -5,7 +5,7 @@ import co.kr.cocomu.workbook.domain.Workbook;
 import co.kr.cocomu.workbook.exception.WorkbookExceptionCode;
 import co.kr.cocomu.workbook.repository.WorkbookRepository;
 import co.kr.cocomu.workbook.service.WorkbookQueryService;
-import co.kr.cocomu.workbook.service.dto.WorkbookDto;
+import co.kr.cocomu.workbook.dto.WorkbookDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

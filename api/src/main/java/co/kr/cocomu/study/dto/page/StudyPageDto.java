@@ -2,7 +2,7 @@ package co.kr.cocomu.study.dto.page;
 
 import co.kr.cocomu.study.dto.response.AllStudyCardDto;
 import co.kr.cocomu.study.dto.response.LanguageDto;
-import co.kr.cocomu.workbook.service.dto.WorkbookDto;
+import co.kr.cocomu.workbook.dto.WorkbookDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.AllArgsConstructor;

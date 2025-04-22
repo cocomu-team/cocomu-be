@@ -3,6 +3,7 @@ package co.kr.cocomu.study.domain;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.common.repository.TimeBaseEntity;
+import co.kr.cocomu.language.domain.Language;
 import co.kr.cocomu.study.domain.vo.StudyRole;
 import co.kr.cocomu.study.domain.vo.StudyUserStatus;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
@@ -105,22 +106,16 @@ public class StudyUser extends TimeBaseEntity {
         }
     }
 
-    public void editPublicStudy(final EditStudyDto dto, final List<Language> languages) {
+    public void editPublicStudy(final EditStudyDto dto) {
         validateLeaderRole();
         study.updateStudyInfo(dto.name(), dto.description(), dto.totalUserCount());
         study.changeToPublic();
-        study.addLanguages(languages);
     }
 
-    public void editPrivateStudy(
-        final EditStudyDto dto,
-        final List<Language> languages,
-        final String newPassword
-    ) {
+    public void editPrivateStudy(final EditStudyDto dto, final String newPassword) {
         validateLeaderRole();
         study.updateStudyInfo(dto.name(), dto.description(), dto.totalUserCount());
         study.changeToPrivate(newPassword);
-        study.addLanguages(languages);
     }
 
     public StudyUser reJoin() {

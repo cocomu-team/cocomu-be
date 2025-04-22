@@ -1,7 +1,7 @@
 package co.kr.cocomu.study.repository.query.impl;
 
 import co.kr.cocomu.study.repository.query.StudyWorkbookQueryRepository;
-import co.kr.cocomu.workbook.service.dto.WorkbookDto;
+import co.kr.cocomu.workbook.dto.WorkbookDto;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;

@@ -2,7 +2,6 @@ package co.kr.cocomu.study.service.query;
 
 import co.kr.cocomu.codingspace.service.CodingSpaceQueryService;
 import co.kr.cocomu.common.exception.domain.NotFoundException;
-import co.kr.cocomu.study.domain.Language;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.dto.page.StudyDetailPageDto;
 import co.kr.cocomu.study.dto.request.GetAllStudyFilterDto;
@@ -13,12 +12,12 @@ import co.kr.cocomu.study.dto.response.LeaderDto;
 import co.kr.cocomu.study.dto.response.StudyCardDto;
 import co.kr.cocomu.study.dto.response.StudyMemberDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
-import co.kr.cocomu.study.repository.jpa.LanguageRepository;
 import co.kr.cocomu.study.repository.jpa.StudyRepository;
 import co.kr.cocomu.study.repository.jpa.StudyUserRepository;
+import co.kr.cocomu.study.repository.query.StudyLanguageQueryRepository;
 import co.kr.cocomu.study.repository.query.StudyWorkbookQueryRepository;
 import co.kr.cocomu.study.service.business.StudyDomainService;
-import co.kr.cocomu.workbook.service.dto.WorkbookDto;
+import co.kr.cocomu.workbook.dto.WorkbookDto;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -33,9 +32,9 @@ public class StudyQueryService {
     private final StudyDomainService studyDomainService;
     private final CodingSpaceQueryService codingSpaceQueryService;
     private final StudyWorkbookQueryRepository studyWorkbookQuery;
+    private final StudyLanguageQueryRepository studyLanguageQuery;
     private final StudyRepository studyQuery;
     private final StudyUserRepository studyUserQuery;
-    private final LanguageRepository languageQuery;
 
     public AllStudyCardDto getAllStudyCard(final GetAllStudyFilterDto dto, final Long userId) {
         final Long totalStudyCount = studyQuery.countStudyCardsWithFilter(dto, userId);
@@ -49,19 +48,12 @@ public class StudyQueryService {
     public StudyCardDto getStudyCard(final Long studyId, final Long userId) {
         return studyQuery.findStudyPagesByStudyId(studyId, userId)
             .map(studyPage -> {
-                studyPage.setLanguages(languageQuery.findLanguageByStudyId(studyId));
+                studyPage.setLanguages(studyLanguageQuery.findLanguageByStudyId(studyId));
                 studyPage.setWorkbooks(studyWorkbookQuery.findWorkbookByStudyId(studyId));
                 studyPage.setLeader(studyUserQuery.findLeaderByStudyId(studyId));
                 return studyPage;
             })
             .orElseThrow(() -> new NotFoundException(StudyExceptionCode.NOT_FOUND_STUDY));
-    }
-
-    public List<LanguageDto> getAllLanguages() {
-        final List<Language> languages = languageQuery.findAll();
-        return languages.stream()
-            .map(Language::toDto)
-            .toList();
     }
 
     public StudyDetailPageDto getStudyDetailPage(final Long studyId, final Long userId) {
@@ -93,7 +85,7 @@ public class StudyQueryService {
     }
 
     private void setStudyInformation(final List<Long> studyIds, final List<StudyCardDto> studyPages) {
-        final Map<Long, List<LanguageDto>> languageByStudies = languageQuery.findLanguageByStudies(studyIds);
+        final Map<Long, List<LanguageDto>> languageByStudies = studyLanguageQuery.findLanguageByStudies(studyIds);
         final Map<Long, List<WorkbookDto>> workbookByStudies = studyWorkbookQuery.findWorkbookByStudies(studyIds);
         final Map<Long, LeaderDto> LeaderByStudies = studyUserQuery.findLeaderByStudies(studyIds);
 

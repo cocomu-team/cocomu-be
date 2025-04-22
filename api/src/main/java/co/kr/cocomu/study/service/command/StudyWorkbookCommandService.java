@@ -32,8 +32,8 @@ public class StudyWorkbookCommandService {
         studyWorkbookDomainService.activateSelectedWorkbooks(existing, allWb);
         studyWorkbookDomainService.deactivateUnselectedWorkbooks(existing, allWb);
 
-        final List<Workbook> relation = studyWorkbookDomainService.extractNewWorkbooks(allWb, existing);
-        final List<StudyWorkbook> newStudyWorkbooks = StudyWorkbook.createStudyWorkbooks(study, relation);
+        final List<Workbook> newWorkbooks = studyWorkbookDomainService.extractNewWorkbooks(allWb, existing);
+        final List<StudyWorkbook> newStudyWorkbooks = StudyWorkbook.createStudyWorkbooks(study, newWorkbooks);
         studyWorkbookJpaRepository.saveAll(newStudyWorkbooks);
     }
 

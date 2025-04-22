@@ -25,7 +25,6 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 @Table(name = "cocomu_study_workbook")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "id")
 @DynamicUpdate
 @Getter
 public class StudyWorkbook {

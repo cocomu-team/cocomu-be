@@ -35,7 +35,7 @@ class StudyWorkbookTest {
     }
 
     @Test
-    void 스터디를_사용하지_않는다() {
+    void 스터디_문제집_태그를_사용하지_않는다() {
         // given
         StudyWorkbook studyWorkbook = new StudyWorkbook(mock(Study.class), mock(Workbook.class));
 
@@ -47,7 +47,7 @@ class StudyWorkbookTest {
     }
 
     @Test
-    void 스터디를_재사용한다() {
+    void 스터디_문제집_태그를_재사용한다() {
         // given
         StudyWorkbook studyWorkbook = new StudyWorkbook(mock(Study.class), mock(Workbook.class));
         studyWorkbook.unUseWorkbook();

@@ -112,25 +112,37 @@ class StudyDomainServiceTest {
     @Test
     void 스터디_생성시_문제집_정보가_비어있으면_예외가_발생한다() {
         // given
-        List<Long> workbookIds = List.of();
         CreatePublicStudyDto mockDto = mock(CreatePublicStudyDto.class);
-        when(mockDto.workbooks()).thenReturn(workbookIds);
+        when(mockDto.workbooks()).thenReturn(List.of());
 
         // when & then
-        assertThatThrownBy(() -> studyDomainService.validateCreateStudy(mockDto))
+        assertThatThrownBy(() -> studyDomainService.validateStudyCreation(mockDto))
             .isInstanceOf(BadRequestException.class)
             .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.WORKBOOK_IS_REQUIRED_VALUE);
     }
 
     @Test
-    void 스터디_생성시_문제집_정보는_필수이다() {
+    void 스터디_생성시_언어_정보가_비어있으면_예외가_발생한다() {
         // given
-        List<Long> workbookIds = List.of(1L);
         CreatePublicStudyDto mockDto = mock(CreatePublicStudyDto.class);
-        when(mockDto.workbooks()).thenReturn(workbookIds);
+        when(mockDto.workbooks()).thenReturn(List.of(1L));
+        when(mockDto.languages()).thenReturn(List.of());
 
         // when & then
-        assertThatCode(() -> studyDomainService.validateCreateStudy(mockDto))
+        assertThatThrownBy(() -> studyDomainService.validateStudyCreation(mockDto))
+            .isInstanceOf(BadRequestException.class)
+            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.LANGUAGE_IS_REQUIRED_VALUE);
+    }
+
+    @Test
+    void 스터디_생성시_문제집_정보는_필수이다() {
+        // given
+        CreatePublicStudyDto mockDto = mock(CreatePublicStudyDto.class);
+        when(mockDto.workbooks()).thenReturn(List.of(1L));
+        when(mockDto.languages()).thenReturn( List.of(1L));
+
+        // when & then
+        assertThatCode(() -> studyDomainService.validateStudyCreation(mockDto))
             .doesNotThrowAnyException();
     }
 

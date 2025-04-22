@@ -1,19 +1,21 @@
 package co.kr.cocomu.workbook.domain;
 
 
-import co.kr.cocomu.workbook.service.dto.WorkbookDto;
+import co.kr.cocomu.workbook.dto.WorkbookDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "cocomu_workbook")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id")
 @Getter
 public class Workbook {
@@ -25,7 +27,7 @@ public class Workbook {
     private String name;
     private String imageUrl;
 
-    private Workbook(final String name, final String imageUrl) {
+    protected Workbook(final String name, final String imageUrl) {
         this.name = name;
         this.imageUrl = imageUrl;
     }

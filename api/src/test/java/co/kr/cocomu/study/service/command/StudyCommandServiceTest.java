@@ -13,7 +13,6 @@ import co.kr.cocomu.study.domain.StudyUser;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
-import co.kr.cocomu.study.repository.jpa.LanguageRepository;
 import co.kr.cocomu.study.repository.jpa.StudyRepository;
 import co.kr.cocomu.study.service.StudyPasswordService;
 import co.kr.cocomu.study.service.business.StudyDomainService;
@@ -30,11 +29,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class StudyCommandServiceTest {
 
     @Mock private StudyRepository studyRepository;
-    @Mock private LanguageRepository languageRepository;
     @Mock private StudyDomainService studyDomainService;
     @Mock private UserService userService;
     @Mock private StudyPasswordService studyPasswordService;
     @Mock private StudyWorkbookCommandService studyWorkbookCommandService;
+    @Mock private StudyLanguageCommandService studyLanguageCommandService;
 
     @InjectMocks private StudyCommandService studyCommandService;
 
@@ -45,16 +44,17 @@ class StudyCommandServiceTest {
         Study mockStudy = mock(Study.class);
         User mockUser = mock(User.class);
 
-        when(languageRepository.findAllById(dto.languages())).thenReturn(List.of());
         when(userService.getUserWithThrow(1L)).thenReturn(mockUser);
-        when(mockStudy.getId()).thenReturn(1L);
         when(studyRepository.save(any(Study.class))).thenReturn(mockStudy);
+        when(mockStudy.getId()).thenReturn(1L);
 
         // when
         Long result = studyCommandService.createPublicStudy(1L, dto);
 
         // then
+        verify(studyDomainService).validateStudyCreation(dto);
         verify(studyWorkbookCommandService).addWorkbooksToStudy(mockStudy, dto.workbooks());
+        verify(studyWorkbookCommandService).addWorkbooksToStudy(mockStudy, dto.languages());
         assertThat(result).isEqualTo(1L);
     }
 
@@ -81,17 +81,17 @@ class StudyCommandServiceTest {
         Study mockStudy = mock(Study.class);
         User mockUser = mock(User.class);
 
-        when(languageRepository.findAllById(dto.languages())).thenReturn(List.of());
         when(userService.getUserWithThrow(1L)).thenReturn(mockUser);
-        when(mockStudy.getId()).thenReturn(1L);
         when(studyRepository.save(any(Study.class))).thenReturn(mockStudy);
         when(studyPasswordService.encodeStudyPassword(anyString())).thenReturn("password");
+        when(mockStudy.getId()).thenReturn(1L);
 
         // when
         Long result = studyCommandService.createPrivateStudy(dto, 1L);
 
         // then
         verify(studyWorkbookCommandService).addWorkbooksToStudy(mockStudy, dto.workbooks());
+        verify(studyWorkbookCommandService).addWorkbooksToStudy(mockStudy, dto.languages());
         assertThat(result).isEqualTo(1L);
     }
 
@@ -145,17 +145,17 @@ class StudyCommandServiceTest {
     void 공개_스터디_수정을_한다() {
         // given
         StudyUser mockStudyUser = mock(StudyUser.class);
-        EditStudyDto dto = mock(EditStudyDto.class);
+        EditStudyDto mockDto = mock(EditStudyDto.class);
         when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockStudyUser);
-        when(languageRepository.findAllById(List.of())).thenReturn(List.of());
-        doNothing().when(mockStudyUser).editPublicStudy(dto, List.of());
         when(mockStudyUser.getStudyId()).thenReturn(1L);
 
         // when
-        Long result = studyCommandService.editPublicStudy(1L, 1L, dto);
+        Long result = studyCommandService.editPublicStudy(1L, 1L, mockDto);
 
         // then
-        verify(studyWorkbookCommandService).changeWorkbooksToStudy(mockStudyUser.getStudy(), dto.workbooks());
+        verify(studyWorkbookCommandService).changeWorkbooksToStudy(mockStudyUser.getStudy(), mockDto.workbooks());
+        verify(studyLanguageCommandService).changeLanguagesToStudy(mockStudyUser.getStudy(), mockDto.languages());
+        verify(mockStudyUser).editPublicStudy(mockDto);
         assertThat(result).isEqualTo(1L);
     }
 
@@ -163,19 +163,19 @@ class StudyCommandServiceTest {
     void 비공개_스터디_수정을_한다() {
         // given
         StudyUser mockStudyUser = mock(StudyUser.class);
-        EditStudyDto dto = mock(EditStudyDto.class);
-        when(dto.password()).thenReturn("pass");
+        EditStudyDto mockDto = mock(EditStudyDto.class);
+        when(mockDto.password()).thenReturn("pass");
         when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockStudyUser);
-        when(languageRepository.findAllById(List.of())).thenReturn(List.of());
         when(studyPasswordService.encodeStudyPassword(anyString())).thenReturn("password");
-        doNothing().when(mockStudyUser).editPrivateStudy(dto, List.of(), "password");
         when(mockStudyUser.getStudyId()).thenReturn(1L);
 
         // when
-        Long result = studyCommandService.editPrivateStudy(1L, 1L, dto);
+        Long result = studyCommandService.editPrivateStudy(1L, 1L, mockDto);
 
         // then
-        verify(studyWorkbookCommandService).changeWorkbooksToStudy(mockStudyUser.getStudy(), dto.workbooks());
+        verify(studyWorkbookCommandService).changeWorkbooksToStudy(mockStudyUser.getStudy(), mockDto.workbooks());
+        verify(studyLanguageCommandService).changeLanguagesToStudy(mockStudyUser.getStudy(), mockDto.languages());
+        verify(mockStudyUser).editPrivateStudy(mockDto, "password");
         assertThat(result).isEqualTo(1L);
     }
 

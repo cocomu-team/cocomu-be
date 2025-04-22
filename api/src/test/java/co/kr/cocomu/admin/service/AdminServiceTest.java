@@ -11,11 +11,11 @@ import co.kr.cocomu.admin.dto.request.CreateLanguageRequest;
 import co.kr.cocomu.admin.dto.request.CreateWorkbookRequest;
 import co.kr.cocomu.admin.exception.AdminExceptionCode;
 import co.kr.cocomu.common.exception.domain.NotFoundException;
-import co.kr.cocomu.study.domain.Language;
+import co.kr.cocomu.language.domain.Language;
 import co.kr.cocomu.workbook.domain.Workbook;
 import co.kr.cocomu.study.dto.response.LanguageDto;
-import co.kr.cocomu.workbook.service.dto.WorkbookDto;
-import co.kr.cocomu.study.repository.jpa.LanguageRepository;
+import co.kr.cocomu.workbook.dto.WorkbookDto;
+import co.kr.cocomu.language.repository.LanguageJpaRepository;
 import co.kr.cocomu.workbook.repository.WorkbookRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class AdminServiceTest {
 
-    @Mock private LanguageRepository languageRepository;
+    @Mock private LanguageJpaRepository languageJpaRepository;
     @Mock private WorkbookRepository workbookRepository;
 
     @InjectMocks private AdminService adminService;
@@ -56,7 +56,7 @@ class AdminServiceTest {
         Language savedLanguage = Language.of("자바", "이미지URL");
         ReflectionTestUtils.setField(savedLanguage, "id", 1L);
 
-        given(languageRepository.save(any(Language.class))).willReturn(savedLanguage);
+        given(languageJpaRepository.save(any(Language.class))).willReturn(savedLanguage);
 
         // when
         LanguageDto result = adminService.addLanguage(dto);
@@ -93,19 +93,19 @@ class AdminServiceTest {
     void 언어가_삭제된다() {
         // given
         Language language = Language.of("자바", "이미지URL");
-        given(languageRepository.findById(anyLong())).willReturn(Optional.of(language));
+        given(languageJpaRepository.findById(anyLong())).willReturn(Optional.of(language));
 
         // when
         adminService.deleteLanguage(1L);
 
         // then
-        verify(languageRepository).delete(language);
+        verify(languageJpaRepository).delete(language);
     }
 
     @Test
     void 존재하지_않는_언어_삭제시_예외가_발생한다() {
         // given
-        given(languageRepository.findById(anyLong())).willReturn(Optional.empty());
+        given(languageJpaRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> adminService.deleteLanguage(1L))

@@ -6,7 +6,7 @@ import static co.kr.cocomu.codingspace.repository.query.condition.CodingSpaceCon
 import static co.kr.cocomu.codingspace.repository.query.condition.CodingSpaceCondition.getSelectCondition;
 import static co.kr.cocomu.codingspace.repository.query.condition.CodingSpaceCondition.isHost;
 import static co.kr.cocomu.codingspace.repository.query.condition.CodingSpaceCondition.isUserJoined;
-import static co.kr.cocomu.study.domain.QLanguage.language;
+import static co.kr.cocomu.language.domain.QLanguage.language;
 import static co.kr.cocomu.study.domain.QStudyUser.studyUser;
 
 import co.kr.cocomu.codingspace.domain.vo.CodingSpaceStatus;

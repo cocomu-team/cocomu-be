@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
+import co.kr.cocomu.language.domain.Language;
 import co.kr.cocomu.study.domain.vo.StudyStatus;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
@@ -13,7 +14,6 @@ import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.user.domain.User;
 import java.util.List;
 
-import co.kr.cocomu.workbook.domain.Workbook;
 import org.junit.jupiter.api.Test;
 
 class StudyTest {
@@ -225,48 +225,6 @@ class StudyTest {
         assertThatThrownBy(() -> publicStudy.joinPublicMember(mockUser))
             .isInstanceOf(BadRequestException.class)
             .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.STUDY_REQUIRES_LEADER);
-    }
-
-    @Test
-    void 스터디에서_활용할_언어_리스트를_추가한다() {
-        // given
-        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 10);
-        Study publicStudy = Study.createPublicStudy(dto);
-
-        // when
-        publicStudy.addLanguages(List.of(mock(Language.class), mock(Language.class)));
-
-        // then
-        assertThat(publicStudy.getLanguages()).hasSize(2);
-    }
-
-    @Test
-    void 스터디_언어_정보가_수정이_된다() {
-        // given
-        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 10);
-        Study publicStudy = Study.createPublicStudy(dto);
-        publicStudy.addLanguages(List.of(mock(Language.class), mock(Language.class)));
-
-        // when
-        publicStudy.addLanguages(List.of(mock(Language.class)));
-
-        // then
-        assertThat(publicStudy.getLanguages()).hasSize(1);
-    }
-
-    @Test
-    void 스터디에서_사용하는_언어_정보를_가져올_수_있다() {
-        // given
-        Study study = new Study();
-        Language mockLanguage = mock(Language.class);
-        when(mockLanguage.getId()).thenReturn(1L);
-        study.addLanguages(List.of(mockLanguage));
-
-        // when
-        Language result = study.getLanguage(1L);
-
-        // then
-        assertThat(result).isEqualTo(mockLanguage);
     }
 
     @Test

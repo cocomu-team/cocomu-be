@@ -1,18 +1,15 @@
 package co.kr.cocomu.study.service.command;
 
-import co.kr.cocomu.study.domain.Language;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.domain.StudyUser;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
-import co.kr.cocomu.study.repository.jpa.LanguageRepository;
 import co.kr.cocomu.study.repository.jpa.StudyRepository;
 import co.kr.cocomu.study.service.StudyPasswordService;
 import co.kr.cocomu.study.service.business.StudyDomainService;
 import co.kr.cocomu.user.domain.User;
 import co.kr.cocomu.user.service.UserService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,20 +25,18 @@ public class StudyCommandService {
     private final UserService userService;
     private final StudyPasswordService studyPasswordService;
     private final StudyWorkbookCommandService studyWorkbookCommandService;
+    private final StudyLanguageCommandService studyLanguageCommandService;
     private final StudyRepository studyRepository;
-    private final LanguageRepository languageRepository;
 
     public Long createPublicStudy(final Long userId, final CreatePublicStudyDto dto) {
-        studyDomainService.validateCreateStudy(dto);
+        studyDomainService.validateStudyCreation(dto);
         final User user = userService.getUserWithThrow(userId);
-        final List<Language> languages = languageRepository.findAllById(dto.languages());
-
         final Study study = Study.createPublicStudy(dto);
         study.joinLeader(user);
-        study.addLanguages(languages);
 
         final Study savedStudy = studyRepository.save(study);
         studyWorkbookCommandService.addWorkbooksToStudy(savedStudy, dto.workbooks());
+        studyLanguageCommandService.addLanguagesToStudy(savedStudy, dto.languages());
 
         return savedStudy.getId();
     }
@@ -56,15 +51,13 @@ public class StudyCommandService {
 
     public Long createPrivateStudy(final CreatePrivateStudyDto dto, final Long userId) {
         final User user = userService.getUserWithThrow(userId);
-        final List<Language> languages = languageRepository.findAllById(dto.languages());
-
         final String encodedPassword = studyPasswordService.encodeStudyPassword(dto.password());
         final Study study = Study.createPrivateStudy(dto, encodedPassword);
-        study.addLanguages(languages);
         study.joinLeader(user);
 
         final Study savedStudy = studyRepository.save(study);
         studyWorkbookCommandService.addWorkbooksToStudy(savedStudy, dto.workbooks());
+        studyLanguageCommandService.addLanguagesToStudy(savedStudy, dto.languages());
 
         return savedStudy.getId();
     }
@@ -90,19 +83,21 @@ public class StudyCommandService {
 
     public Long editPublicStudy(final Long studyId, final Long userId, final EditStudyDto dto) {
         final StudyUser studyUser = studyDomainService.getStudyUserWithThrow(studyId, userId);
-        final List<Language> languages = languageRepository.findAllById(dto.languages());
-        studyUser.editPublicStudy(dto, languages);
+        studyUser.editPublicStudy(dto);
+
         studyWorkbookCommandService.changeWorkbooksToStudy(studyUser.getStudy(), dto.workbooks());
+        studyLanguageCommandService.changeLanguagesToStudy(studyUser.getStudy(), dto.languages());
 
         return studyUser.getStudyId();
     }
 
     public Long editPrivateStudy(final Long studyId, final Long userId, final EditStudyDto dto) {
         final StudyUser studyUser = studyDomainService.getStudyUserWithThrow(studyId, userId);
-        final List<Language> languages = languageRepository.findAllById(dto.languages());
         final String encodedPassword = studyPasswordService.encodeStudyPassword(dto.password());
-        studyUser.editPrivateStudy(dto, languages, encodedPassword);
+        studyUser.editPrivateStudy(dto, encodedPassword);
+
         studyWorkbookCommandService.changeWorkbooksToStudy(studyUser.getStudy(), dto.workbooks());
+        studyLanguageCommandService.changeLanguagesToStudy(studyUser.getStudy(), dto.languages());
 
         return studyUser.getStudyId();
     }

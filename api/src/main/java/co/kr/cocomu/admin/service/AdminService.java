@@ -4,11 +4,11 @@ import co.kr.cocomu.admin.dto.request.CreateLanguageRequest;
 import co.kr.cocomu.admin.dto.request.CreateWorkbookRequest;
 import co.kr.cocomu.admin.exception.AdminExceptionCode;
 import co.kr.cocomu.common.exception.domain.NotFoundException;
-import co.kr.cocomu.study.domain.Language;
+import co.kr.cocomu.language.domain.Language;
 import co.kr.cocomu.workbook.domain.Workbook;
 import co.kr.cocomu.study.dto.response.LanguageDto;
-import co.kr.cocomu.workbook.service.dto.WorkbookDto;
-import co.kr.cocomu.study.repository.jpa.LanguageRepository;
+import co.kr.cocomu.workbook.dto.WorkbookDto;
+import co.kr.cocomu.language.repository.LanguageJpaRepository;
 import co.kr.cocomu.workbook.repository.WorkbookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminService {
 
     private final WorkbookRepository workbookRepository;
-    private final LanguageRepository languageRepository;
+    private final LanguageJpaRepository languageJpaRepository;
 
     public WorkbookDto addWorkbook(final CreateWorkbookRequest dto) {
         final Workbook workBook = Workbook.of(dto.workbookName(), dto.workbookImageUrl());
@@ -29,13 +29,13 @@ public class AdminService {
 
     public LanguageDto addLanguage(final CreateLanguageRequest dto) {
         final Language language = Language.of(dto.languageName(), dto.languageImageUrl());
-        return languageRepository.save(language).toDto();
+        return languageJpaRepository.save(language).toDto();
     }
 
     public void deleteLanguage(final Long languageId) {
-        final Language language = languageRepository.findById(languageId)
+        final Language language = languageJpaRepository.findById(languageId)
             .orElseThrow(() -> new NotFoundException(AdminExceptionCode.NOT_FOUND_LANGUAGE));
-        languageRepository.delete(language);
+        languageJpaRepository.delete(language);
     }
 
     public void deleteWorkbook(final Long workbookId) {

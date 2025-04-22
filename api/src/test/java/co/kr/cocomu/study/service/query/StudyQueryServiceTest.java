@@ -21,10 +21,10 @@ import co.kr.cocomu.study.dto.response.LanguageDto;
 import co.kr.cocomu.study.dto.response.LeaderDto;
 import co.kr.cocomu.study.dto.response.StudyCardDto;
 import co.kr.cocomu.study.dto.response.StudyMemberDto;
+import co.kr.cocomu.study.repository.query.StudyLanguageQueryRepository;
 import co.kr.cocomu.study.repository.query.StudyWorkbookQueryRepository;
 import co.kr.cocomu.study.service.business.StudyDomainService;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
-import co.kr.cocomu.study.repository.jpa.LanguageRepository;
 import co.kr.cocomu.study.repository.jpa.StudyRepository;
 import co.kr.cocomu.study.repository.jpa.StudyUserRepository;
 
@@ -44,7 +44,7 @@ class StudyQueryServiceTest {
     @Mock private StudyRepository studyQuery;
     @Mock private StudyUserRepository studyUserQuery;
     @Mock private StudyWorkbookQueryRepository studyWorkbookQuery;
-    @Mock private LanguageRepository languageQuery;
+    @Mock private StudyLanguageQueryRepository studyLanguageQuery;
     @Mock private StudyDomainService studyDomainService;
     @Mock private CodingSpaceQueryService codingSpaceQueryService;
 
@@ -68,7 +68,7 @@ class StudyQueryServiceTest {
 
         when(studyQuery.countStudyCardsWithFilter(dto, 1L)).thenReturn(totalCount);
         when(studyQuery.findTop12StudyCardsWithFilter(dto, 1L)).thenReturn(List.of(mockStudyCard));
-        when(languageQuery.findLanguageByStudies(anyList())).thenReturn(languageByStudies);
+        when(studyLanguageQuery.findLanguageByStudies(anyList())).thenReturn(languageByStudies);
         when(studyWorkbookQuery.findWorkbookByStudies(anyList())).thenReturn(new HashMap<>());
         when(studyUserQuery.findLeaderByStudies(anyList())).thenReturn(leaderByStudies);
 
@@ -94,7 +94,7 @@ class StudyQueryServiceTest {
         StudyCardDto mockStudyCard = new StudyCardDto();
         LeaderDto mockLeader = new LeaderDto();
         when(studyQuery.findStudyPagesByStudyId(studyId, 1L)).thenReturn(Optional.of(mockStudyCard));
-        when(languageQuery.findLanguageByStudyId(studyId)).thenReturn(List.of());
+        when(studyLanguageQuery.findLanguageByStudyId(studyId)).thenReturn(List.of());
         when(studyWorkbookQuery.findWorkbookByStudyId(studyId)).thenReturn(List.of());
         when(studyUserQuery.findLeaderByStudyId(studyId)).thenReturn(mockLeader);
 
@@ -120,18 +120,6 @@ class StudyQueryServiceTest {
         assertThatThrownBy(() -> studyQueryService.getStudyCard(studyId, userId))
             .isInstanceOf(NotFoundException.class)
             .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.NOT_FOUND_STUDY);
-    }
-
-    @Test
-    void 스터디_전체_언어_정보를_조회한다() {
-        // given
-        when(languageQuery.findAll()).thenReturn(List.of());
-
-        // when
-        List<LanguageDto> result = studyQueryService.getAllLanguages();
-
-        // then
-        assertThat(result).hasSize(0);
     }
 
     @Test
@@ -173,7 +161,7 @@ class StudyQueryServiceTest {
     void 참여한_스터디를_조회한다() {
         // given
         when(studyQuery.findTop20UserStudyCards(1L, 1L, null)).thenReturn(List.of());
-        when(languageQuery.findLanguageByStudies(anyList())).thenReturn(new HashMap<>());
+        when(studyLanguageQuery.findLanguageByStudies(anyList())).thenReturn(new HashMap<>());
         when(studyWorkbookQuery.findWorkbookByStudies(anyList())).thenReturn(new HashMap<>());
         when(studyUserQuery.findLeaderByStudies(anyList())).thenReturn(new HashMap<>());
 
@@ -183,7 +171,7 @@ class StudyQueryServiceTest {
         // then
         assertThat(result).isEqualTo(List.of());
         verify(studyQuery).findTop20UserStudyCards(1L, 1L, null);
-        verify(languageQuery).findLanguageByStudies(anyList());
+        verify(studyLanguageQuery).findLanguageByStudies(anyList());
         verify(studyWorkbookQuery).findWorkbookByStudies(anyList());
         verify(studyUserQuery).findLeaderByStudies(anyList());
     }

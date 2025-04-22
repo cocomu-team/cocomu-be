@@ -1,4 +1,4 @@
-package co.kr.cocomu.study.domain;
+package co.kr.cocomu.language.domain;
 
 import co.kr.cocomu.study.dto.response.LanguageDto;
 import jakarta.persistence.Column;
@@ -8,14 +8,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "cocomu_language")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id")
 @Getter
 public class Language {
 
@@ -26,7 +26,7 @@ public class Language {
     private String name;
     private String imageUrl;
 
-    private Language(final String name, final String imageUrl) {
+    protected Language(final String name, final String imageUrl) {
         this.name = name;
         this.imageUrl = imageUrl;
     }
