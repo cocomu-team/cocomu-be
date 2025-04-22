@@ -9,6 +9,7 @@ import co.kr.cocomu.language.service.LanguageQueryService;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.domain.StudyLanguage;
 import co.kr.cocomu.study.repository.jpa.StudyLanguageJpaRepository;
+import co.kr.cocomu.study.service.StudyLanguageService;
 import co.kr.cocomu.study.service.business.StudyLanguageDomainService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -19,13 +20,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class StudyLanguageCommandServiceTest {
+class StudyLanguageServiceTest {
 
     @Mock private StudyLanguageJpaRepository studyLanguageJpaRepository;
     @Mock private LanguageQueryService languageQueryService;
     @Mock private StudyLanguageDomainService studyLanguageDomainService;
 
-    @InjectMocks private StudyLanguageCommandService studyLanguageCommandService;
+    @InjectMocks private StudyLanguageService studyLanguageService;
 
     @Test
     void 스터디_언어_태그_목록을_추가한다() {
@@ -36,7 +37,7 @@ class StudyLanguageCommandServiceTest {
         when(languageQueryService.getLanguagesByIdIn(languageIds)).thenReturn(mockLanguages);
 
         // when
-        studyLanguageCommandService.addLanguagesToStudy(mockStudy, languageIds);
+        studyLanguageService.addLanguagesToStudy(mockStudy, languageIds);
 
         // then
         ArgumentCaptor<List<StudyLanguage>> captor = ArgumentCaptor.forClass(List.class);
@@ -55,7 +56,7 @@ class StudyLanguageCommandServiceTest {
         when(studyLanguageDomainService.extractNewLanguages(mockLanguages, mockStudyLanguages)).thenReturn(List.of());
 
         // when
-        studyLanguageCommandService.changeLanguagesToStudy(mockStudy, languageIds);
+        studyLanguageService.changeLanguagesToStudy(mockStudy, languageIds);
 
         // then
         verify(studyLanguageDomainService).activateSelectedLanguages(mockStudyLanguages, mockLanguages);

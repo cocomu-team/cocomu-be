@@ -21,12 +21,4 @@ public class StudyDetailPageDto {
     @Schema(description = "스터디 사용 언어 정보")
     private List<LanguageDto> languages;
 
-    public static StudyDetailPageDto from(final Study study) {
-        final List<LanguageDto> languages = study.getLanguages()
-            .stream()
-            .map(LanguageDto::from)
-            .toList();
-        return new StudyDetailPageDto(study.getId(), study.getName(), languages);
-    }
-
 }

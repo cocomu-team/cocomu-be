@@ -94,7 +94,7 @@ class StudyQueryServiceTest {
         StudyCardDto mockStudyCard = new StudyCardDto();
         LeaderDto mockLeader = new LeaderDto();
         when(studyQuery.findStudyPagesByStudyId(studyId, 1L)).thenReturn(Optional.of(mockStudyCard));
-        when(studyLanguageQuery.findLanguageByStudyId(studyId)).thenReturn(List.of());
+        when(studyLanguageQuery.findAllLanguagesByStudyId(studyId)).thenReturn(List.of());
         when(studyWorkbookQuery.findWorkbookByStudyId(studyId)).thenReturn(List.of());
         when(studyUserQuery.findLeaderByStudyId(studyId)).thenReturn(mockLeader);
 
@@ -126,20 +126,19 @@ class StudyQueryServiceTest {
     void 스터디_상세_페이지_정보를_조회한다() {
         // given
         Study mockStudy = mock(Study.class);
-        when(mockStudy.getId()).thenReturn(1L);
-        when(mockStudy.getName()).thenReturn("study");
-        when(mockStudy.getLanguages()).thenReturn(List.of());
+        List<LanguageDto> mockDto = List.of(mock(LanguageDto.class));
+        StudyDetailPageDto expected = new StudyDetailPageDto(mockStudy.getId(), mockStudy.getName(), mockDto);
 
         when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
-        doNothing().when(studyDomainService).validateStudyMembership(1L, 1L);
+        when(studyLanguageQuery.findAllLanguagesByStudyId(1L)).thenReturn(mockDto);
 
         // when
         StudyDetailPageDto result = studyQueryService.getStudyDetailPage(1L, 1L);
 
         // then
-        assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getName()).isEqualTo(mockStudy.getName());
-        assertThat(result.getLanguages()).isEqualTo(List.of());
+
+        verify(studyDomainService).validateStudyMembership(1L, mockStudy.getId());
+        assertThat(result).isEqualTo(expected);
     }
 
     @Test

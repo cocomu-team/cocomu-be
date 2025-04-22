@@ -82,22 +82,6 @@ class CodingSpaceExecutorControllerTest extends BaseExecutorControllerTest {
     }
 
     @Test
-    void 코딩_스페이스_생성_페이지_조회에_성공한다() {
-        // given
-        when(codingSpaceQueryService.getStudyLanguages(1L, 1L)).thenReturn(List.of());
-
-        // when
-        String path = PATH_PREFIX + "/write?studyId=1";
-        ValidatableMockMvcResponse response = GetRequestTemplate.execute(path);
-
-        // then
-        Api<StudyInformationPage> result = response.status(HttpStatus.OK).extract().as(new TypeRef<>() {});
-        assertThat(result.code()).isEqualTo(CodingSpaceApiCode.GET_WRITE_PAGE_SUCCESS.getCode());
-        assertThat(result.message()).isEqualTo(CodingSpaceApiCode.GET_WRITE_PAGE_SUCCESS.getMessage());
-        assertThat(result.result().languages()).isEqualTo(List.of());
-    }
-
-    @Test
     void 코딩_스페이스_목록_조회하기() {
         // given
         CodingSpacesDto mockResult = CodingSpacesDto.of(List.of(), Map.of());

@@ -24,7 +24,8 @@ public class StudyLanguageRepositoryImpl implements StudyLanguageQueryRepository
             .from(studyLanguage)
             .join(language).on(studyLanguage.language.id.eq(language.id))
             .where(
-                studyLanguage.study.id.in(studyIds)
+                studyLanguage.study.id.in(studyIds),
+                studyLanguage.deleted.isFalse()
             )
             .transform(GroupBy.groupBy(studyLanguage.study.id)
                 .as(GroupBy.list(
@@ -38,7 +39,7 @@ public class StudyLanguageRepositoryImpl implements StudyLanguageQueryRepository
             );
     }
 
-    public List<LanguageDto> findLanguageByStudyId(final Long studyId) {
+    public List<LanguageDto> findAllLanguagesByStudyId(final Long studyId) {
         return queryFactory.select(
                 Projections.fields(
                     LanguageDto.class,
@@ -49,7 +50,8 @@ public class StudyLanguageRepositoryImpl implements StudyLanguageQueryRepository
             .from(studyLanguage)
             .join(language).on(studyLanguage.language.id.eq(language.id))
             .where(
-                studyLanguage.study.id.eq(studyId)
+                studyLanguage.study.id.eq(studyId),
+                studyLanguage.deleted.isFalse()
             )
             .fetch();
     }

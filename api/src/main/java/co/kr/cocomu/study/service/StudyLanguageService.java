@@ -1,4 +1,4 @@
-package co.kr.cocomu.study.service.command;
+package co.kr.cocomu.study.service;
 
 import co.kr.cocomu.language.domain.Language;
 import co.kr.cocomu.language.service.LanguageQueryService;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class StudyLanguageCommandService {
+public class StudyLanguageService {
 
     private final StudyLanguageJpaRepository studyLanguageJpaRepository;
     private final LanguageQueryService languageQueryService;

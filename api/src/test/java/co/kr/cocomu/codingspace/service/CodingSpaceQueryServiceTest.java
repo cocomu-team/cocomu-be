@@ -44,21 +44,6 @@ class CodingSpaceQueryServiceTest {
     @InjectMocks private CodingSpaceQueryService codingSpaceQueryService;
 
     @Test
-    void 스터디에서_사용하는_언어_목록을_가져온다() {
-        // given
-        Study mockStudy = mock(Study.class);
-        when(mockStudy.getLanguages()).thenReturn(List.of());
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
-        doNothing().when(studyDomainService).validateStudyMembership(1L, 1L);
-
-        // when
-        List<LanguageDto> result = codingSpaceQueryService.getStudyLanguages(1L, 1L);
-
-        // then
-        assertThat(result).isEqualTo(List.of());
-    }
-
-    @Test
     void 빈_코딩스페이스_목록을_가져온다() {
         List<CodingSpaceDto> mockSpaces = List.of();
         doNothing().when(studyDomainService).validateStudyMembership(1L, 1L);

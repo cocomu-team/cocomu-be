@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.domain.StudyWorkbook;
 import co.kr.cocomu.study.repository.jpa.StudyWorkbookJpaRepository;
+import co.kr.cocomu.study.service.StudyWorkbookService;
 import co.kr.cocomu.study.service.business.StudyWorkbookDomainService;
 import co.kr.cocomu.workbook.domain.Workbook;
 import co.kr.cocomu.workbook.service.WorkbookQueryService;
@@ -19,12 +20,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class StudyWorkbookCommandServiceTest {
+class StudyWorkbookServiceTest {
 
     @Mock private StudyWorkbookJpaRepository studyWorkbookJpaRepository;
     @Mock private WorkbookQueryService workbookQueryService;
     @Mock private StudyWorkbookDomainService studyWorkbookDomainService;
-    @InjectMocks private StudyWorkbookCommandService studyWorkbookCommandService;
+    @InjectMocks private StudyWorkbookService studyWorkbookService;
 
     @Test
     void 스터디_문제집_목록을_추가한다() {
@@ -35,7 +36,7 @@ class StudyWorkbookCommandServiceTest {
         when(workbookQueryService.getWorkbooksByIdIn(workbookIds)).thenReturn(mockWorkbooks);
 
         // when
-        studyWorkbookCommandService.addWorkbooksToStudy(mockStudy, workbookIds);
+        studyWorkbookService.addWorkbooksToStudy(mockStudy, workbookIds);
 
         // then
         ArgumentCaptor<List<StudyWorkbook>> captor = ArgumentCaptor.forClass(List.class);
@@ -54,7 +55,7 @@ class StudyWorkbookCommandServiceTest {
         when(studyWorkbookDomainService.extractNewWorkbooks(mockWorkbooks, mockStudyWorkbooks)).thenReturn(List.of());
 
         // when
-        studyWorkbookCommandService.changeWorkbooksToStudy(mockStudy, workbookIds);
+        studyWorkbookService.changeWorkbooksToStudy(mockStudy, workbookIds);
 
         // then
         verify(studyWorkbookDomainService).activateSelectedWorkbooks(mockStudyWorkbooks, mockWorkbooks);

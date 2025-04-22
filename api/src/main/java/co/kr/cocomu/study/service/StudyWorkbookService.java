@@ -1,4 +1,4 @@
-package co.kr.cocomu.study.service.command;
+package co.kr.cocomu.study.service;
 
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.domain.StudyWorkbook;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class StudyWorkbookCommandService {
+public class StudyWorkbookService {
 
     private final StudyWorkbookJpaRepository studyWorkbookJpaRepository;
     private final WorkbookQueryService workbookQueryService;

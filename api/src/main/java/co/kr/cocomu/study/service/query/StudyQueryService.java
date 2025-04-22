@@ -48,7 +48,7 @@ public class StudyQueryService {
     public StudyCardDto getStudyCard(final Long studyId, final Long userId) {
         return studyQuery.findStudyPagesByStudyId(studyId, userId)
             .map(studyPage -> {
-                studyPage.setLanguages(studyLanguageQuery.findLanguageByStudyId(studyId));
+                studyPage.setLanguages(studyLanguageQuery.findAllLanguagesByStudyId(studyId));
                 studyPage.setWorkbooks(studyWorkbookQuery.findWorkbookByStudyId(studyId));
                 studyPage.setLeader(studyUserQuery.findLeaderByStudyId(studyId));
                 return studyPage;
@@ -59,7 +59,8 @@ public class StudyQueryService {
     public StudyDetailPageDto getStudyDetailPage(final Long studyId, final Long userId) {
         final Study study = studyDomainService.getStudyWithThrow(studyId);
         studyDomainService.validateStudyMembership(userId, study.getId());
-        return StudyDetailPageDto.from(study);
+        final List<LanguageDto> languages = studyLanguageQuery.findAllLanguagesByStudyId(studyId);
+        return new StudyDetailPageDto(study.getId(), study.getName(), languages);
     }
 
     public List<StudyMemberDto> findAllMembers(final Long userId, final Long studyId, final StudyUserFilterDto dto) {

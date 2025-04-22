@@ -14,7 +14,9 @@ import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
 import co.kr.cocomu.study.repository.jpa.StudyRepository;
+import co.kr.cocomu.study.service.StudyLanguageService;
 import co.kr.cocomu.study.service.StudyPasswordService;
+import co.kr.cocomu.study.service.StudyWorkbookService;
 import co.kr.cocomu.study.service.business.StudyDomainService;
 import co.kr.cocomu.user.domain.User;
 import co.kr.cocomu.user.service.UserService;
@@ -32,8 +34,8 @@ class StudyCommandServiceTest {
     @Mock private StudyDomainService studyDomainService;
     @Mock private UserService userService;
     @Mock private StudyPasswordService studyPasswordService;
-    @Mock private StudyWorkbookCommandService studyWorkbookCommandService;
-    @Mock private StudyLanguageCommandService studyLanguageCommandService;
+    @Mock private StudyWorkbookService studyWorkbookService;
+    @Mock private StudyLanguageService studyLanguageService;
 
     @InjectMocks private StudyCommandService studyCommandService;
 
@@ -53,8 +55,8 @@ class StudyCommandServiceTest {
 
         // then
         verify(studyDomainService).validateStudyCreation(dto);
-        verify(studyWorkbookCommandService).addWorkbooksToStudy(mockStudy, dto.workbooks());
-        verify(studyWorkbookCommandService).addWorkbooksToStudy(mockStudy, dto.languages());
+        verify(studyWorkbookService).addWorkbooksToStudy(mockStudy, dto.workbooks());
+        verify(studyWorkbookService).addWorkbooksToStudy(mockStudy, dto.languages());
         assertThat(result).isEqualTo(1L);
     }
 
@@ -90,8 +92,8 @@ class StudyCommandServiceTest {
         Long result = studyCommandService.createPrivateStudy(dto, 1L);
 
         // then
-        verify(studyWorkbookCommandService).addWorkbooksToStudy(mockStudy, dto.workbooks());
-        verify(studyWorkbookCommandService).addWorkbooksToStudy(mockStudy, dto.languages());
+        verify(studyWorkbookService).addWorkbooksToStudy(mockStudy, dto.workbooks());
+        verify(studyWorkbookService).addWorkbooksToStudy(mockStudy, dto.languages());
         assertThat(result).isEqualTo(1L);
     }
 
@@ -153,8 +155,8 @@ class StudyCommandServiceTest {
         Long result = studyCommandService.editPublicStudy(1L, 1L, mockDto);
 
         // then
-        verify(studyWorkbookCommandService).changeWorkbooksToStudy(mockStudyUser.getStudy(), mockDto.workbooks());
-        verify(studyLanguageCommandService).changeLanguagesToStudy(mockStudyUser.getStudy(), mockDto.languages());
+        verify(studyWorkbookService).changeWorkbooksToStudy(mockStudyUser.getStudy(), mockDto.workbooks());
+        verify(studyLanguageService).changeLanguagesToStudy(mockStudyUser.getStudy(), mockDto.languages());
         verify(mockStudyUser).editPublicStudy(mockDto);
         assertThat(result).isEqualTo(1L);
     }
@@ -173,8 +175,8 @@ class StudyCommandServiceTest {
         Long result = studyCommandService.editPrivateStudy(1L, 1L, mockDto);
 
         // then
-        verify(studyWorkbookCommandService).changeWorkbooksToStudy(mockStudyUser.getStudy(), mockDto.workbooks());
-        verify(studyLanguageCommandService).changeLanguagesToStudy(mockStudyUser.getStudy(), mockDto.languages());
+        verify(studyWorkbookService).changeWorkbooksToStudy(mockStudyUser.getStudy(), mockDto.workbooks());
+        verify(studyLanguageService).changeLanguagesToStudy(mockStudyUser.getStudy(), mockDto.languages());
         verify(mockStudyUser).editPrivateStudy(mockDto, "password");
         assertThat(result).isEqualTo(1L);
     }

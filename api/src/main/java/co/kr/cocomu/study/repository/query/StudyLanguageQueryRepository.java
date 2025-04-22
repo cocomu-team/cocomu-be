@@ -8,6 +8,6 @@ public interface StudyLanguageQueryRepository {
 
     Map<Long, List<LanguageDto>> findLanguageByStudies(List<Long> studyIds);
 
-    List<LanguageDto> findLanguageByStudyId(Long studyId);
+    List<LanguageDto> findAllLanguagesByStudyId(Long studyId);
 
 }
