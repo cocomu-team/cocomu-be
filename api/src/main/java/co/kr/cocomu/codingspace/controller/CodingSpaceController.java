@@ -43,17 +43,6 @@ public class CodingSpaceController implements CodingSpaceControllerDocs {
     private final CodingSpaceCommandService codingSpaceCommandService;
     private final CodingSpaceQueryService codingSpaceQueryService;
 
-    @GetMapping("/write")
-    @Deprecated
-    public Api<StudyInformationPage> getStudyInformation(
-        @AuthenticationPrincipal final Long userId,
-        @RequestParam final Long studyId
-    ) {
-        final List<LanguageDto> languages = codingSpaceQueryService.getStudyLanguages(userId, studyId);
-        final StudyInformationPage result = new StudyInformationPage(languages);
-        return Api.of(CodingSpaceApiCode.GET_WRITE_PAGE_SUCCESS, result);
-    }
-
     @PostMapping
     public Api<CodingSpaceIdDto> createCodingSpace(
         @RequestBody @Valid final CreateCodingSpaceDto dto,

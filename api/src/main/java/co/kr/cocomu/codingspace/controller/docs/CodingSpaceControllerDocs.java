@@ -78,13 +78,6 @@ public interface CodingSpaceControllerDocs {
     )
     Api<CodingSpaceIdDto> joinCodingSpace(Long codingSpaceId, Long userId);
 
-    @Operation(summary = "코딩 스페이스 생성 페이지 조회", description = "코딩 스페이스 생성 페이지를 조회하는 기능")
-    @ApiResponse(
-        responseCode = "200",
-        description = "코딩 스페이스 생성 페이지 조회에 성공했습니다."
-    )
-    Api<StudyInformationPage> getStudyInformation(Long userId, Long studyId);
-
     @Operation(summary = "코딩 스페이스 목록 조회", description = "코딩 스페이스 목록을 조회하는 기능")
     @ApiResponse(
         responseCode = "200",

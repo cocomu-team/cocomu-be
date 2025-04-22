@@ -32,16 +32,6 @@ public class CodingSpaceQueryService {
     private final CodingSpaceTabRepository codingSpaceTabQuery;
     private final TestCaseQuery testCaseQuery;
 
-    public List<LanguageDto> getStudyLanguages(final Long userId, final Long studyId) {
-        final Study study = studyDomainService.getStudyWithThrow(studyId);
-        studyDomainService.validateStudyMembership(userId, studyId);
-
-        return study.getLanguages()
-            .stream()
-            .map(LanguageDto::from)
-            .toList();
-    }
-
     public CodingSpacesDto getCodingSpaces(final Long studyId, final Long userId, final FilterDto dto) {
         studyDomainService.validateStudyMembership(userId, studyId);
         final List<CodingSpaceDto> codingSpaces = codingSpaceQuery.findSpacesWithFilter(userId, studyId, dto);
