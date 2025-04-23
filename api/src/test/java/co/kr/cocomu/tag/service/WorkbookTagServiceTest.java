@@ -2,8 +2,8 @@ package co.kr.cocomu.tag.service;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.tag.domain.WorkbookTag;
-import co.kr.cocomu.tag.exception.WorkbookExceptionCode;
-import co.kr.cocomu.tag.repository.WorkbookRepository;
+import co.kr.cocomu.tag.exception.WorkbookTagExceptionCode;
+import co.kr.cocomu.tag.repository.WorkbookTagRepository;
 import co.kr.cocomu.tag.dto.WorkbookDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,8 +21,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class WorkbookTagServiceTest {
 
-    @Mock private WorkbookRepository workbookQuery;
-    @InjectMocks private WorkbookService workbookService;
+    @Mock private WorkbookTagRepository workbookQuery;
+    @InjectMocks private WorkbookTagService workbookTagService;
 
     @Test
     void 전체_문제집_정보를_조회한다() {
@@ -30,7 +30,7 @@ public class WorkbookTagServiceTest {
         when(workbookQuery.findAll()).thenReturn(List.of(mock(WorkbookTag.class)));
 
         // when
-        List<WorkbookDto> result = workbookService.getAllWorkbooks();
+        List<WorkbookDto> result = workbookTagService.getAllWorkbooks();
 
         // then
         assertThat(result).hasSize(1);
@@ -44,7 +44,7 @@ public class WorkbookTagServiceTest {
         when(workbookQuery.findAllById(ids)).thenReturn(mockWorkbookTags);
 
         // when
-        List<WorkbookTag> result = workbookService.getWorkbooksByIdIn(ids);
+        List<WorkbookTag> result = workbookTagService.getTagsByIdIn(ids);
 
         // then
         assertThat(result).hasSize(2);
@@ -58,9 +58,9 @@ public class WorkbookTagServiceTest {
         when(workbookQuery.findAllById(ids)).thenReturn(mockWorkbookTags);
 
         // when & then
-        assertThatThrownBy(() -> workbookService.getWorkbooksByIdIn(ids))
+        assertThatThrownBy(() -> workbookTagService.getTagsByIdIn(ids))
                 .isInstanceOf(BadRequestException.class)
-                .hasFieldOrPropertyWithValue("exceptionType", WorkbookExceptionCode.INVALID_REQUEST);
+                .hasFieldOrPropertyWithValue("exceptionType", WorkbookTagExceptionCode.INVALID_REQUEST);
     }
 
 

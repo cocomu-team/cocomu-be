@@ -8,15 +8,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import co.kr.cocomu.study.domain.Membership;
 import co.kr.cocomu.study.domain.Study;
-import co.kr.cocomu.study.domain.StudyUser;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
 import co.kr.cocomu.study.repository.StudyRepository;
-import co.kr.cocomu.study.service.StudyLanguageService;
+import co.kr.cocomu.study.service.LanguageRelationService;
 import co.kr.cocomu.study.service.StudyPasswordService;
-import co.kr.cocomu.study.service.StudyWorkbookService;
+import co.kr.cocomu.study.service.WorkbookRelationService;
 import co.kr.cocomu.study.service.business.StudyDomainService;
 import co.kr.cocomu.user.domain.User;
 import co.kr.cocomu.user.service.UserService;
@@ -34,8 +34,8 @@ class StudyCommandServiceTest {
     @Mock private StudyDomainService studyDomainService;
     @Mock private UserService userService;
     @Mock private StudyPasswordService studyPasswordService;
-    @Mock private StudyWorkbookService studyWorkbookService;
-    @Mock private StudyLanguageService studyLanguageService;
+    @Mock private WorkbookRelationService workbookRelationService;
+    @Mock private LanguageRelationService languageRelationService;
 
     @InjectMocks private StudyCommandService studyCommandService;
 
@@ -55,8 +55,8 @@ class StudyCommandServiceTest {
 
         // then
         verify(studyDomainService).validateStudyCreation(dto);
-        verify(studyWorkbookService).addWorkbooksToStudy(mockStudy, dto.workbooks());
-        verify(studyWorkbookService).addWorkbooksToStudy(mockStudy, dto.languages());
+        verify(workbookRelationService).addWorkbooksToStudy(mockStudy, dto.workbooks());
+        verify(workbookRelationService).addWorkbooksToStudy(mockStudy, dto.languages());
         assertThat(result).isEqualTo(1L);
     }
 
@@ -92,8 +92,8 @@ class StudyCommandServiceTest {
         Long result = studyCommandService.createPrivateStudy(dto, 1L);
 
         // then
-        verify(studyWorkbookService).addWorkbooksToStudy(mockStudy, dto.workbooks());
-        verify(studyWorkbookService).addWorkbooksToStudy(mockStudy, dto.languages());
+        verify(workbookRelationService).addWorkbooksToStudy(mockStudy, dto.workbooks());
+        verify(workbookRelationService).addWorkbooksToStudy(mockStudy, dto.languages());
         assertThat(result).isEqualTo(1L);
     }
 
@@ -118,66 +118,66 @@ class StudyCommandServiceTest {
     @Test
     void 스터디에서_나간다() {
         // given
-        StudyUser mockStudyUser = mock(StudyUser.class);
-        doNothing().when(mockStudyUser).leaveStudy();
-        when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockStudyUser);
+        Membership mockMembership = mock(Membership.class);
+        doNothing().when(mockMembership).leaveStudy();
+        when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockMembership);
 
         // when
         studyCommandService.leaveStudy(1L, 1L);
 
         // then
-        verify(mockStudyUser).leaveStudy();
+        verify(mockMembership).leaveStudy();
     }
 
     @Test
     void 스터디를_삭제한다() {
         // given
-        StudyUser mockStudyUser = mock(StudyUser.class);
-        doNothing().when(mockStudyUser).removeStudy();
-        when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockStudyUser);
+        Membership mockMembership = mock(Membership.class);
+        doNothing().when(mockMembership).removeStudy();
+        when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockMembership);
 
         // when
         studyCommandService.removeStudy(1L, 1L);
 
         // then
-        verify(mockStudyUser).removeStudy();
+        verify(mockMembership).removeStudy();
     }
 
     @Test
     void 공개_스터디_수정을_한다() {
         // given
-        StudyUser mockStudyUser = mock(StudyUser.class);
+        Membership mockMembership = mock(Membership.class);
         EditStudyDto mockDto = mock(EditStudyDto.class);
-        when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockStudyUser);
-        when(mockStudyUser.getStudyId()).thenReturn(1L);
+        when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockMembership);
+        when(mockMembership.getStudyId()).thenReturn(1L);
 
         // when
         Long result = studyCommandService.editPublicStudy(1L, 1L, mockDto);
 
         // then
-        verify(studyWorkbookService).changeWorkbooksToStudy(mockStudyUser.getStudy(), mockDto.workbooks());
-        verify(studyLanguageService).changeLanguagesToStudy(mockStudyUser.getStudy(), mockDto.languages());
-        verify(mockStudyUser).editPublicStudy(mockDto);
+        verify(workbookRelationService).changeWorkbooksToStudy(mockMembership.getStudy(), mockDto.workbooks());
+        verify(languageRelationService).changeRelationToStudy(mockMembership.getStudy(), mockDto.languages());
+        verify(mockMembership).editPublicStudy(mockDto);
         assertThat(result).isEqualTo(1L);
     }
 
     @Test
     void 비공개_스터디_수정을_한다() {
         // given
-        StudyUser mockStudyUser = mock(StudyUser.class);
+        Membership mockMembership = mock(Membership.class);
         EditStudyDto mockDto = mock(EditStudyDto.class);
         when(mockDto.password()).thenReturn("pass");
-        when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockStudyUser);
+        when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockMembership);
         when(studyPasswordService.encodeStudyPassword(anyString())).thenReturn("password");
-        when(mockStudyUser.getStudyId()).thenReturn(1L);
+        when(mockMembership.getStudyId()).thenReturn(1L);
 
         // when
         Long result = studyCommandService.editPrivateStudy(1L, 1L, mockDto);
 
         // then
-        verify(studyWorkbookService).changeWorkbooksToStudy(mockStudyUser.getStudy(), mockDto.workbooks());
-        verify(studyLanguageService).changeLanguagesToStudy(mockStudyUser.getStudy(), mockDto.languages());
-        verify(mockStudyUser).editPrivateStudy(mockDto, "password");
+        verify(workbookRelationService).changeWorkbooksToStudy(mockMembership.getStudy(), mockDto.workbooks());
+        verify(languageRelationService).changeRelationToStudy(mockMembership.getStudy(), mockDto.languages());
+        verify(mockMembership).editPrivateStudy(mockDto, "password");
         assertThat(result).isEqualTo(1L);
     }
 

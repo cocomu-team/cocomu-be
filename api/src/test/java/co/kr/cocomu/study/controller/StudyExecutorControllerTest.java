@@ -5,7 +5,7 @@ import co.kr.cocomu.common.api.Api;
 import co.kr.cocomu.common.api.NoContent;
 import co.kr.cocomu.common.template.GetRequestTemplate;
 import co.kr.cocomu.common.template.PostRequestTemplate;
-import co.kr.cocomu.tag.service.LanguageService;
+import co.kr.cocomu.tag.service.LanguageTagService;
 import co.kr.cocomu.study.controller.code.StudyApiCode;
 import co.kr.cocomu.study.dto.page.StudyDetailPageDto;
 import co.kr.cocomu.study.dto.page.StudyPageDto;
@@ -13,7 +13,7 @@ import co.kr.cocomu.study.dto.request.*;
 import co.kr.cocomu.study.dto.response.*;
 import co.kr.cocomu.study.service.command.StudyCommandService;
 import co.kr.cocomu.study.service.query.StudyQueryService;
-import co.kr.cocomu.tag.service.WorkbookService;
+import co.kr.cocomu.tag.service.WorkbookTagService;
 import co.kr.cocomu.tag.dto.WorkbookDto;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.module.mockmvc.response.ValidatableMockMvcResponse;
@@ -36,8 +36,8 @@ class StudyExecutorControllerTest extends BaseExecutorControllerTest {
 
     @MockBean private StudyCommandService studyCommandService;
     @MockBean private StudyQueryService studyQueryService;
-    @MockBean private WorkbookService workbookService;
-    @MockBean private LanguageService languageService;
+    @MockBean private WorkbookTagService workbookTagService;
+    @MockBean private LanguageTagService languageTagService;
 
     @Test
     void 공개방_생성_요청이_성공한다() {
@@ -122,8 +122,8 @@ class StudyExecutorControllerTest extends BaseExecutorControllerTest {
         AllStudyCardDto mockStudyCards = new AllStudyCardDto(10L, List.of());
         StudyPageDto mockResult = new StudyPageDto(mockWorkbooks, mockLanguages, mockStudyCards);
 
-        when(workbookService.getAllWorkbooks()).thenReturn(mockWorkbooks);
-        when(languageService.getAllLanguages()).thenReturn(mockLanguages);
+        when(workbookTagService.getAllWorkbooks()).thenReturn(mockWorkbooks);
+        when(languageTagService.getAllTags()).thenReturn(mockLanguages);
         when(studyQueryService.getAllStudyCard(noFilter, null)).thenReturn(mockStudyCards);
 
         // when
@@ -157,8 +157,8 @@ class StudyExecutorControllerTest extends BaseExecutorControllerTest {
     @Test
     void 스터디_작성_페이지_조회_요청이_성공한다() {
         // given
-        when(languageService.getAllLanguages()).thenReturn(List.of());
-        when(workbookService.getAllWorkbooks()).thenReturn(List.of());
+        when(languageTagService.getAllTags()).thenReturn(List.of());
+        when(workbookTagService.getAllWorkbooks()).thenReturn(List.of());
 
         // when
         String path = PATH_PREFIX + "/filter-options";

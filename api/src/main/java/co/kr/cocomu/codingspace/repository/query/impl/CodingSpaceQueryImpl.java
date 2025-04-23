@@ -6,8 +6,8 @@ import static co.kr.cocomu.codingspace.repository.query.condition.CodingSpaceCon
 import static co.kr.cocomu.codingspace.repository.query.condition.CodingSpaceCondition.getSelectCondition;
 import static co.kr.cocomu.codingspace.repository.query.condition.CodingSpaceCondition.isHost;
 import static co.kr.cocomu.codingspace.repository.query.condition.CodingSpaceCondition.isUserJoined;
+import static co.kr.cocomu.study.domain.QMembership.membership;
 import static co.kr.cocomu.tag.domain.QLanguageTag.languageTag;
-import static co.kr.cocomu.study.domain.QStudyUser.studyUser;
 
 import co.kr.cocomu.codingspace.domain.vo.CodingSpaceStatus;
 import co.kr.cocomu.codingspace.domain.vo.TabStatus;
@@ -206,10 +206,10 @@ public class CodingSpaceQueryImpl implements CodingSpaceQuery {
                 codingSpace.id.eq(codingSpaceId),
                 JPAExpressions
                     .selectOne()
-                    .from(studyUser)
+                    .from(membership)
                     .where(
-                        studyUser.study.id.eq(codingSpace.study.id),
-                        studyUser.user.id.eq(userId)
+                        membership.study.id.eq(codingSpace.study.id),
+                        membership.user.id.eq(userId)
                     )
                     .exists()
             )

@@ -20,8 +20,8 @@ import co.kr.cocomu.study.dto.response.StudyMemberDto;
 import co.kr.cocomu.study.service.command.StudyCommandService;
 import co.kr.cocomu.study.service.query.StudyQueryService;
 import co.kr.cocomu.tag.dto.WorkbookDto;
-import co.kr.cocomu.tag.service.LanguageService;
-import co.kr.cocomu.tag.service.WorkbookService;
+import co.kr.cocomu.tag.service.LanguageTagService;
+import co.kr.cocomu.tag.service.WorkbookTagService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -43,13 +43,13 @@ public class StudyController implements StudyControllerDocs {
 
     private final StudyCommandService studyCommandService;
     private final StudyQueryService studyQueryService;
-    private final WorkbookService workbookService;
-    private final LanguageService languageService;
+    private final WorkbookTagService workbookTagService;
+    private final LanguageTagService languageTagService;
 
     @GetMapping("/filter-options")
     public Api<FilterOptionsDto> getFilterOptions(@AuthenticationPrincipal final Long userId) {
-        final List<LanguageDto> allLanguages = languageService.getAllLanguages();
-        final List<WorkbookDto> allWorkbooks = workbookService.getAllWorkbooks();
+        final List<LanguageDto> allLanguages = languageTagService.getAllTags();
+        final List<WorkbookDto> allWorkbooks = workbookTagService.getAllWorkbooks();
         final FilterOptionsDto result = new FilterOptionsDto(allWorkbooks, allLanguages);
 
         return Api.of(StudyApiCode.GET_FILTER_OPTIONS_SUCCESS, result);
@@ -95,8 +95,8 @@ public class StudyController implements StudyControllerDocs {
     @Deprecated
     public Api<StudyPageDto> getStudiesPage(@AuthenticationPrincipal final Long userId) {
         final GetAllStudyFilterDto noFilter = GetAllStudyFilterDto.filterNothing();
-        final List<LanguageDto> allLanguages = languageService.getAllLanguages();
-        final List<WorkbookDto> allWorkbooks = workbookService.getAllWorkbooks();
+        final List<LanguageDto> allLanguages = languageTagService.getAllTags();
+        final List<WorkbookDto> allWorkbooks = workbookTagService.getAllWorkbooks();
         final AllStudyCardDto allStudyCard = studyQueryService.getAllStudyCard(noFilter, userId);
         final StudyPageDto result = new StudyPageDto(allWorkbooks, allLanguages, allStudyCard);
 

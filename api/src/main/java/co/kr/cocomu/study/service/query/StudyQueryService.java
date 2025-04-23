@@ -12,10 +12,10 @@ import co.kr.cocomu.study.dto.response.LeaderDto;
 import co.kr.cocomu.study.dto.response.StudyCardDto;
 import co.kr.cocomu.study.dto.response.StudyMemberDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
+import co.kr.cocomu.study.repository.LanguageRelationRepository;
 import co.kr.cocomu.study.repository.StudyRepository;
-import co.kr.cocomu.study.repository.StudyUserRepository;
-import co.kr.cocomu.study.repository.query.StudyLanguageQueryRepository;
-import co.kr.cocomu.study.repository.query.StudyWorkbookQueryRepository;
+import co.kr.cocomu.study.repository.MembershipRepository;
+import co.kr.cocomu.study.repository.WorkbookRelationRepository;
 import co.kr.cocomu.study.service.business.StudyDomainService;
 import co.kr.cocomu.tag.dto.WorkbookDto;
 import java.util.List;
@@ -31,10 +31,10 @@ public class StudyQueryService {
 
     private final StudyDomainService studyDomainService;
     private final CodingSpaceQueryService codingSpaceQueryService;
-    private final StudyWorkbookQueryRepository studyWorkbookQuery;
-    private final StudyLanguageQueryRepository studyLanguageQuery;
+    private final WorkbookRelationRepository workbookRelationQuery;
+    private final LanguageRelationRepository languageRelationQuery;
     private final StudyRepository studyQuery;
-    private final StudyUserRepository studyUserQuery;
+    private final MembershipRepository studyUserQuery;
 
     public AllStudyCardDto getAllStudyCard(final GetAllStudyFilterDto dto, final Long userId) {
         final Long totalStudyCount = studyQuery.countStudyCardsWithFilter(dto, userId);
@@ -48,8 +48,8 @@ public class StudyQueryService {
     public StudyCardDto getStudyCard(final Long studyId, final Long userId) {
         return studyQuery.findStudyPagesByStudyId(studyId, userId)
             .map(studyPage -> {
-                studyPage.setLanguages(studyLanguageQuery.findAllLanguagesByStudyId(studyId));
-                studyPage.setWorkbooks(studyWorkbookQuery.findWorkbookByStudyId(studyId));
+                studyPage.setLanguages(languageRelationQuery.findTagsByStudyId(studyId));
+                studyPage.setWorkbooks(workbookRelationQuery.findTagsByStudyId(studyId));
                 studyPage.setLeader(studyUserQuery.findLeaderByStudyId(studyId));
                 return studyPage;
             })
@@ -59,7 +59,7 @@ public class StudyQueryService {
     public StudyDetailPageDto getStudyDetailPage(final Long studyId, final Long userId) {
         final Study study = studyDomainService.getStudyWithThrow(studyId);
         studyDomainService.validateStudyMembership(userId, study.getId());
-        final List<LanguageDto> languages = studyLanguageQuery.findAllLanguagesByStudyId(studyId);
+        final List<LanguageDto> languages = languageRelationQuery.findTagsByStudyId(studyId);
         return new StudyDetailPageDto(study.getId(), study.getName(), languages);
     }
 
@@ -86,14 +86,14 @@ public class StudyQueryService {
     }
 
     private void setStudyInformation(final List<Long> studyIds, final List<StudyCardDto> studyPages) {
-        final Map<Long, List<LanguageDto>> languageByStudies = studyLanguageQuery.findLanguageByStudies(studyIds);
-        final Map<Long, List<WorkbookDto>> workbookByStudies = studyWorkbookQuery.findWorkbookByStudies(studyIds);
-        final Map<Long, LeaderDto> LeaderByStudies = studyUserQuery.findLeaderByStudies(studyIds);
+        final Map<Long, List<LanguageDto>> languageTags = languageRelationQuery.findTagsByStudies(studyIds);
+        final Map<Long, List<WorkbookDto>> workbookTags = workbookRelationQuery.findTagsByStudies(studyIds);
+        final Map<Long, LeaderDto> leaders = studyUserQuery.findLeaderByStudies(studyIds);
 
         for (StudyCardDto studyPage: studyPages) {
-            studyPage.setLanguages(languageByStudies.getOrDefault(studyPage.getId(), List.of()));
-            studyPage.setWorkbooks(workbookByStudies.getOrDefault(studyPage.getId(), List.of()));
-            studyPage.setLeader(LeaderByStudies.get(studyPage.getId()));
+            studyPage.setLanguages(languageTags.getOrDefault(studyPage.getId(), List.of()));
+            studyPage.setWorkbooks(workbookTags.getOrDefault(studyPage.getId(), List.of()));
+            studyPage.setLeader(leaders.get(studyPage.getId()));
         }
     }
 

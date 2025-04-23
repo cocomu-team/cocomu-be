@@ -57,7 +57,7 @@ public class Study extends TimeBaseEntity {
     private int totalUserCount;
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StudyUser> studyUsers = new ArrayList<>();
+    private List<Membership> memberships = new ArrayList<>();
 
     private Study(
         final String name,
@@ -85,8 +85,8 @@ public class Study extends TimeBaseEntity {
     public void joinLeader(final User user) {
         validateNoLeaderExists();
 
-        final StudyUser leaderUser = StudyUser.createLeader(this, user);
-        this.studyUsers.add(leaderUser);
+        final Membership leaderUser = Membership.createLeader(this, user);
+        this.memberships.add(leaderUser);
         increaseCurrentUserCount();
     }
 
@@ -112,16 +112,16 @@ public class Study extends TimeBaseEntity {
         validateStudyUserCount(this.totalUserCount);
         validateLeaderExists();
 
-        studyUsers.stream()
+        memberships.stream()
             .filter(studyUser -> studyUser.getUser().equals(user))
             .findFirst()
-            .map(StudyUser::reJoin)
+            .map(Membership::reJoin)
             .orElseGet(() -> joinNewMember(user));
     }
 
-    private StudyUser joinNewMember(final User user) {
-        final StudyUser memberUser = StudyUser.createMember(this, user);
-        this.studyUsers.add(memberUser);
+    private Membership joinNewMember(final User user) {
+        final Membership memberUser = Membership.createMember(this, user);
+        this.memberships.add(memberUser);
         increaseCurrentUserCount();
 
         return memberUser;
@@ -140,7 +140,7 @@ public class Study extends TimeBaseEntity {
     }
 
     private void validateNoLeaderExists() {
-        if (this.studyUsers.stream().anyMatch(StudyUser::isLeader)) {
+        if (this.memberships.stream().anyMatch(Membership::isLeader)) {
             throw new BadRequestException(StudyExceptionCode.ALREADY_LEADER_EXISTS);
         }
     }
@@ -152,7 +152,7 @@ public class Study extends TimeBaseEntity {
     }
 
     private void validateLeaderExists() {
-        if (this.studyUsers.stream().noneMatch(StudyUser::isLeader)) {
+        if (this.memberships.stream().noneMatch(Membership::isLeader)) {
             throw new BadRequestException(StudyExceptionCode.STUDY_REQUIRES_LEADER);
         }
     }

@@ -20,12 +20,12 @@ import co.kr.cocomu.study.dto.response.LanguageDto;
 import co.kr.cocomu.study.dto.response.LeaderDto;
 import co.kr.cocomu.study.dto.response.StudyCardDto;
 import co.kr.cocomu.study.dto.response.StudyMemberDto;
-import co.kr.cocomu.study.repository.query.StudyLanguageQueryRepository;
-import co.kr.cocomu.study.repository.query.StudyWorkbookQueryRepository;
+import co.kr.cocomu.study.repository.query.LanguageRelationQuery;
+import co.kr.cocomu.study.repository.query.WorkbookRelationQuery;
 import co.kr.cocomu.study.service.business.StudyDomainService;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.repository.StudyRepository;
-import co.kr.cocomu.study.repository.StudyUserRepository;
+import co.kr.cocomu.study.repository.MembershipRepository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,9 +41,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class StudyQueryServiceTest {
 
     @Mock private StudyRepository studyQuery;
-    @Mock private StudyUserRepository studyUserQuery;
-    @Mock private StudyWorkbookQueryRepository studyWorkbookQuery;
-    @Mock private StudyLanguageQueryRepository studyLanguageQuery;
+    @Mock private MembershipRepository studyUserQuery;
+    @Mock private WorkbookRelationQuery studyWorkbookQuery;
+    @Mock private LanguageRelationQuery studyLanguageQuery;
     @Mock private StudyDomainService studyDomainService;
     @Mock private CodingSpaceQueryService codingSpaceQueryService;
 
@@ -67,8 +67,8 @@ class StudyQueryServiceTest {
 
         when(studyQuery.countStudyCardsWithFilter(dto, 1L)).thenReturn(totalCount);
         when(studyQuery.findTop12StudyCardsWithFilter(dto, 1L)).thenReturn(List.of(mockStudyCard));
-        when(studyLanguageQuery.findLanguageByStudies(anyList())).thenReturn(languageByStudies);
-        when(studyWorkbookQuery.findWorkbookByStudies(anyList())).thenReturn(new HashMap<>());
+        when(studyLanguageQuery.findTagsByStudies(anyList())).thenReturn(languageByStudies);
+        when(studyWorkbookQuery.findTagsByStudies(anyList())).thenReturn(new HashMap<>());
         when(studyUserQuery.findLeaderByStudies(anyList())).thenReturn(leaderByStudies);
 
         // when
@@ -93,8 +93,8 @@ class StudyQueryServiceTest {
         StudyCardDto mockStudyCard = new StudyCardDto();
         LeaderDto mockLeader = new LeaderDto();
         when(studyQuery.findStudyPagesByStudyId(studyId, 1L)).thenReturn(Optional.of(mockStudyCard));
-        when(studyLanguageQuery.findAllLanguagesByStudyId(studyId)).thenReturn(List.of());
-        when(studyWorkbookQuery.findWorkbookByStudyId(studyId)).thenReturn(List.of());
+        when(studyLanguageQuery.findTagsByStudyId(studyId)).thenReturn(List.of());
+        when(studyWorkbookQuery.findTagsByStudyId(studyId)).thenReturn(List.of());
         when(studyUserQuery.findLeaderByStudyId(studyId)).thenReturn(mockLeader);
 
         // when
@@ -129,7 +129,7 @@ class StudyQueryServiceTest {
         StudyDetailPageDto expected = new StudyDetailPageDto(mockStudy.getId(), mockStudy.getName(), mockDto);
 
         when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
-        when(studyLanguageQuery.findAllLanguagesByStudyId(1L)).thenReturn(mockDto);
+        when(studyLanguageQuery.findTagsByStudyId(1L)).thenReturn(mockDto);
 
         // when
         StudyDetailPageDto result = studyQueryService.getStudyDetailPage(1L, 1L);
@@ -159,8 +159,8 @@ class StudyQueryServiceTest {
     void 참여한_스터디를_조회한다() {
         // given
         when(studyQuery.findTop20UserStudyCards(1L, 1L, null)).thenReturn(List.of());
-        when(studyLanguageQuery.findLanguageByStudies(anyList())).thenReturn(new HashMap<>());
-        when(studyWorkbookQuery.findWorkbookByStudies(anyList())).thenReturn(new HashMap<>());
+        when(studyLanguageQuery.findTagsByStudies(anyList())).thenReturn(new HashMap<>());
+        when(studyWorkbookQuery.findTagsByStudies(anyList())).thenReturn(new HashMap<>());
         when(studyUserQuery.findLeaderByStudies(anyList())).thenReturn(new HashMap<>());
 
         // when
@@ -169,8 +169,8 @@ class StudyQueryServiceTest {
         // then
         assertThat(result).isEqualTo(List.of());
         verify(studyQuery).findTop20UserStudyCards(1L, 1L, null);
-        verify(studyLanguageQuery).findLanguageByStudies(anyList());
-        verify(studyWorkbookQuery).findWorkbookByStudies(anyList());
+        verify(studyLanguageQuery).findTagsByStudies(anyList());
+        verify(studyWorkbookQuery).findTagsByStudies(anyList());
         verify(studyUserQuery).findLeaderByStudies(anyList());
     }
 

@@ -15,8 +15,8 @@ import co.kr.cocomu.tag.domain.LanguageTag;
 import co.kr.cocomu.tag.domain.WorkbookTag;
 import co.kr.cocomu.study.dto.response.LanguageDto;
 import co.kr.cocomu.tag.dto.WorkbookDto;
-import co.kr.cocomu.tag.repository.LanguageJpaRepository;
-import co.kr.cocomu.tag.repository.WorkbookRepository;
+import co.kr.cocomu.tag.repository.LanguageTagRepository;
+import co.kr.cocomu.tag.repository.WorkbookTagRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,8 +28,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class AdminServiceTest {
 
-    @Mock private LanguageJpaRepository languageJpaRepository;
-    @Mock private WorkbookRepository workbookRepository;
+    @Mock private LanguageTagRepository languageTagRepository;
+    @Mock private WorkbookTagRepository workbookTagRepository;
 
     @InjectMocks private AdminService adminService;
 
@@ -40,7 +40,7 @@ class AdminServiceTest {
         WorkbookTag savedWorkbookTag = WorkbookTag.of("백준", "이미지URL");
         ReflectionTestUtils.setField(savedWorkbookTag, "id", 1L);
 
-        given(workbookRepository.save(any(WorkbookTag.class))).willReturn(savedWorkbookTag);
+        given(workbookTagRepository.save(any(WorkbookTag.class))).willReturn(savedWorkbookTag);
 
         // when
         WorkbookDto result = adminService.addWorkbook(dto);
@@ -56,7 +56,7 @@ class AdminServiceTest {
         LanguageTag savedLanguageTag = LanguageTag.of("자바", "이미지URL");
         ReflectionTestUtils.setField(savedLanguageTag, "id", 1L);
 
-        given(languageJpaRepository.save(any(LanguageTag.class))).willReturn(savedLanguageTag);
+        given(languageTagRepository.save(any(LanguageTag.class))).willReturn(savedLanguageTag);
 
         // when
         LanguageDto result = adminService.addLanguage(dto);
@@ -69,19 +69,19 @@ class AdminServiceTest {
     void 문제집이_삭제된다() {
         // given
         WorkbookTag workBook = WorkbookTag.of("백준", "이미지 URL");
-        given(workbookRepository.findById(anyLong())).willReturn(Optional.of(workBook));
+        given(workbookTagRepository.findById(anyLong())).willReturn(Optional.of(workBook));
 
         // when
         adminService.deleteWorkbook(1L);
 
         // then
-        verify(workbookRepository).delete(workBook);
+        verify(workbookTagRepository).delete(workBook);
     }
 
     @Test
     void 존재하지_않는_문제집_삭제시_예외가_발생한다() {
         // given
-        given(workbookRepository.findById(anyLong())).willReturn(Optional.empty());
+        given(workbookTagRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> adminService.deleteWorkbook(1L))
@@ -93,19 +93,19 @@ class AdminServiceTest {
     void 언어가_삭제된다() {
         // given
         LanguageTag languageTag = LanguageTag.of("자바", "이미지URL");
-        given(languageJpaRepository.findById(anyLong())).willReturn(Optional.of(languageTag));
+        given(languageTagRepository.findById(anyLong())).willReturn(Optional.of(languageTag));
 
         // when
         adminService.deleteLanguage(1L);
 
         // then
-        verify(languageJpaRepository).delete(languageTag);
+        verify(languageTagRepository).delete(languageTag);
     }
 
     @Test
     void 존재하지_않는_언어_삭제시_예외가_발생한다() {
         // given
-        given(languageJpaRepository.findById(anyLong())).willReturn(Optional.empty());
+        given(languageTagRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> adminService.deleteLanguage(1L))

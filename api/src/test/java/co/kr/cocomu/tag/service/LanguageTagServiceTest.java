@@ -7,8 +7,8 @@ import static org.mockito.Mockito.when;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.tag.domain.LanguageTag;
-import co.kr.cocomu.tag.exception.LanguageExceptionCode;
-import co.kr.cocomu.tag.repository.LanguageJpaRepository;
+import co.kr.cocomu.tag.exception.LanguageTagExceptionCode;
+import co.kr.cocomu.tag.repository.LanguageTagRepository;
 import co.kr.cocomu.study.dto.response.LanguageDto;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -20,17 +20,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class LanguageTagServiceTest {
 
-    @Mock private LanguageJpaRepository languageJpaRepository;
+    @Mock private LanguageTagRepository languageTagRepository;
 
-    @InjectMocks private LanguageService languageService;
+    @InjectMocks private LanguageTagService languageTagService;
 
     @Test
     void 스터디_전체_언어_정보를_조회한다() {
         // given
-        when(languageJpaRepository.findAll()).thenReturn(List.of());
+        when(languageTagRepository.findAll()).thenReturn(List.of());
 
         // when
-        List<LanguageDto> result = languageService.getAllLanguages();
+        List<LanguageDto> result = languageTagService.getAllTags();
 
         // then
         assertThat(result).hasSize(0);
@@ -41,10 +41,10 @@ public class LanguageTagServiceTest {
         // given
         List<Long> ids = List.of(1L, 2L);
         List<LanguageTag> mockLanguageTag = List.of(mock(LanguageTag.class), mock(LanguageTag.class));
-        when(languageJpaRepository.findAllById(ids)).thenReturn(mockLanguageTag);
+        when(languageTagRepository.findAllById(ids)).thenReturn(mockLanguageTag);
 
         // when
-        List<LanguageTag> result = languageService.getLanguagesByIdIn(ids);
+        List<LanguageTag> result = languageTagService.getTagsByIdIn(ids);
 
         // then
         assertThat(result).hasSize(2);
@@ -55,12 +55,12 @@ public class LanguageTagServiceTest {
         // given
         List<Long> ids = List.of(1L, 2L);
         List<LanguageTag> mockLanguageTags = List.of(mock(LanguageTag.class));
-        when(languageJpaRepository.findAllById(ids)).thenReturn(mockLanguageTags);
+        when(languageTagRepository.findAllById(ids)).thenReturn(mockLanguageTags);
 
         // when & then
-        assertThatThrownBy(() -> languageService.getLanguagesByIdIn(ids))
+        assertThatThrownBy(() -> languageTagService.getTagsByIdIn(ids))
             .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", LanguageExceptionCode.INVALID_REQUEST);
+            .hasFieldOrPropertyWithValue("exceptionType", LanguageTagExceptionCode.INVALID_REQUEST);
     }
 
 

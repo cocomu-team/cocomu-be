@@ -35,9 +35,9 @@ public class CodingSpaceCommandService {
         studyDomainService.validateStudyMembership(userId, dto.studyId());
         final Study study = studyDomainService.getStudyWithThrow(dto.studyId());
         final User user = userService.getUserWithThrow(userId);
-        final LanguageTag languageTag = studyDomainService.getLanguageTagInStudy(dto.studyId(), dto.languageId());
+        final LanguageTag tag = studyDomainService.getLanguageTagInStudy(dto.studyId(), dto.languageId());
 
-        final CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, study, user, languageTag);
+        final CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, study, user, tag);
         final CodingSpace savedCodingSpace = codingSpaceRepository.save(codingSpace);
 
         return savedCodingSpace.getId();

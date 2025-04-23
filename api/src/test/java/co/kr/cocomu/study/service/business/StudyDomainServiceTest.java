@@ -9,15 +9,15 @@ import static org.mockito.Mockito.when;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.common.exception.domain.NotFoundException;
+import co.kr.cocomu.study.domain.Membership;
 import co.kr.cocomu.study.domain.Study;
-import co.kr.cocomu.study.domain.StudyLanguage;
-import co.kr.cocomu.study.domain.StudyUser;
+import co.kr.cocomu.study.domain.LanguageRelation;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
-import co.kr.cocomu.study.exception.StudyLanguageExceptionCode;
-import co.kr.cocomu.study.repository.StudyLanguageJpaRepository;
+import co.kr.cocomu.study.exception.LanguageRelationExceptionCode;
+import co.kr.cocomu.study.repository.LanguageRelationRepository;
 import co.kr.cocomu.study.repository.StudyRepository;
-import co.kr.cocomu.study.repository.StudyUserRepository;
+import co.kr.cocomu.study.repository.MembershipRepository;
 import co.kr.cocomu.tag.domain.LanguageTag;
 import java.util.List;
 import java.util.Optional;
@@ -31,8 +31,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class StudyDomainServiceTest {
 
     @Mock private StudyRepository studyRepository;
-    @Mock private StudyUserRepository studyUserRepository;
-    @Mock private StudyLanguageJpaRepository studyLanguageJpaRepository;
+    @Mock private MembershipRepository membershipRepository;
+    @Mock private LanguageRelationRepository languageRelationRepository;
 
     @InjectMocks private StudyDomainService studyDomainService;
 
@@ -68,7 +68,7 @@ class StudyDomainServiceTest {
         Long userId = 1L;
         Long studyId = 1L;
 
-        when(studyUserRepository.isUserJoinedStudy(userId, studyId)).thenReturn(false);
+        when(membershipRepository.isUserJoinedStudy(userId, studyId)).thenReturn(false);
 
         // when & then
         assertThatThrownBy(() -> studyDomainService.validateStudyMembership(userId, studyId))
@@ -82,7 +82,7 @@ class StudyDomainServiceTest {
         Long userId = 1L;
         Long studyId = 1L;
 
-        when(studyUserRepository.isUserJoinedStudy(userId, studyId)).thenReturn(true);
+        when(membershipRepository.isUserJoinedStudy(userId, studyId)).thenReturn(true);
 
         // when & then
         assertThatCode(() -> studyDomainService.validateStudyMembership(userId, studyId))
@@ -92,21 +92,21 @@ class StudyDomainServiceTest {
     @Test
     void 스터디_사용자를_찾을_수_있다() {
         // given
-        StudyUser mockStudyUser = mock(StudyUser.class);
+        Membership mockMembership = mock(Membership.class);
 
-        when(studyUserRepository.findByUser_IdAndStudy_Id(anyLong(), anyLong())).thenReturn(Optional.of(mockStudyUser));
+        when(membershipRepository.findByUser_IdAndStudy_Id(anyLong(), anyLong())).thenReturn(Optional.of(mockMembership));
 
         // when
-        StudyUser result = studyDomainService.getStudyUserWithThrow(1L, 1L);
+        Membership result = studyDomainService.getStudyUserWithThrow(1L, 1L);
 
         // then
-        assertThat(result).isEqualTo(mockStudyUser);
+        assertThat(result).isEqualTo(mockMembership);
     }
 
     @Test
     void 스터디_사용자가_없으면_예외가_발생한다() {
         // given
-        when(studyUserRepository.findByUser_IdAndStudy_Id(anyLong(), anyLong())).thenReturn(Optional.empty());
+        when(membershipRepository.findByUser_IdAndStudy_Id(anyLong(), anyLong())).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> studyDomainService.getStudyUserWithThrow(1L, 1L))
@@ -123,7 +123,7 @@ class StudyDomainServiceTest {
         // when & then
         assertThatThrownBy(() -> studyDomainService.validateStudyCreation(mockDto))
             .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.WORKBOOK_IS_REQUIRED_VALUE);
+            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.REQUIRED_WORKBOOK_TAG);
     }
 
     @Test
@@ -136,7 +136,7 @@ class StudyDomainServiceTest {
         // when & then
         assertThatThrownBy(() -> studyDomainService.validateStudyCreation(mockDto))
             .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.LANGUAGE_IS_REQUIRED_VALUE);
+            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.REQUIRED_LANGUAGE_TAG);
     }
 
     @Test
@@ -154,11 +154,11 @@ class StudyDomainServiceTest {
     @Test
     void 스터디에서_사용중인_언어_태그를_가져올_수_있다() {
         // given
-        StudyLanguage mockStudyLanguage = mock(StudyLanguage.class);
+        LanguageRelation mockLanguageRelation = mock(LanguageRelation.class);
         LanguageTag mockLanguageTag = mock(LanguageTag.class);
-        when(mockStudyLanguage.getLanguageTag()).thenReturn(mockLanguageTag);
-        when(studyLanguageJpaRepository.findByStudy_idAndLanguage_IdAndDeletedIsFalse(1L, 1L))
-            .thenReturn(Optional.of(mockStudyLanguage));
+        when(mockLanguageRelation.getLanguageTag()).thenReturn(mockLanguageTag);
+        when(languageRelationRepository.findByStudy_idAndLanguage_IdAndDeletedIsFalse(1L, 1L))
+            .thenReturn(Optional.of(mockLanguageRelation));
 
         // when
         LanguageTag result = studyDomainService.getLanguageTagInStudy(1L, 1L);
@@ -170,13 +170,13 @@ class StudyDomainServiceTest {
     @Test
     void 스터디에서_사용중인_언어_태그가_아니면_예외가_발생한다() {
         // given
-        when(studyLanguageJpaRepository.findByStudy_idAndLanguage_IdAndDeletedIsFalse(1L, 1L))
+        when(languageRelationRepository.findByStudy_idAndLanguage_IdAndDeletedIsFalse(1L, 1L))
             .thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> studyDomainService.getLanguageTagInStudy(1L, 1L))
             .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyLanguageExceptionCode.INVALID_STUDY_LANGUAGE_TAG);
+            .hasFieldOrPropertyWithValue("exceptionType", LanguageRelationExceptionCode.INVALID_RELATION);
     }
 
 }

@@ -60,7 +60,7 @@ public class CodingSpace {
     private Study study;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "language_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "language_tag_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private LanguageTag languageTag;
 
     private int codingMinutes;

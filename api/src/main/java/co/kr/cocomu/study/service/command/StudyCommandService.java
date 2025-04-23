@@ -1,14 +1,14 @@
 package co.kr.cocomu.study.service.command;
 
 import co.kr.cocomu.study.domain.Study;
-import co.kr.cocomu.study.domain.StudyUser;
+import co.kr.cocomu.study.domain.Membership;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
 import co.kr.cocomu.study.repository.StudyRepository;
-import co.kr.cocomu.study.service.StudyLanguageService;
+import co.kr.cocomu.study.service.LanguageRelationService;
 import co.kr.cocomu.study.service.StudyPasswordService;
-import co.kr.cocomu.study.service.StudyWorkbookService;
+import co.kr.cocomu.study.service.WorkbookRelationService;
 import co.kr.cocomu.study.service.business.StudyDomainService;
 import co.kr.cocomu.user.domain.User;
 import co.kr.cocomu.user.service.UserService;
@@ -26,8 +26,8 @@ public class StudyCommandService {
     private final StudyDomainService studyDomainService;
     private final UserService userService;
     private final StudyPasswordService studyPasswordService;
-    private final StudyWorkbookService studyWorkbookService;
-    private final StudyLanguageService studyLanguageService;
+    private final WorkbookRelationService workbookRelationService;
+    private final LanguageRelationService languageRelationService;
     private final StudyRepository studyRepository;
 
     public Long createPublicStudy(final Long userId, final CreatePublicStudyDto dto) {
@@ -37,8 +37,8 @@ public class StudyCommandService {
         study.joinLeader(user);
 
         final Study savedStudy = studyRepository.save(study);
-        studyWorkbookService.addWorkbooksToStudy(savedStudy, dto.workbooks());
-        studyLanguageService.addLanguagesToStudy(savedStudy, dto.languages());
+        workbookRelationService.addWorkbooksToStudy(savedStudy, dto.workbooks());
+        languageRelationService.addRelationToStudy(savedStudy, dto.languages());
 
         return savedStudy.getId();
     }
@@ -58,8 +58,8 @@ public class StudyCommandService {
         study.joinLeader(user);
 
         final Study savedStudy = studyRepository.save(study);
-        studyWorkbookService.addWorkbooksToStudy(savedStudy, dto.workbooks());
-        studyLanguageService.addLanguagesToStudy(savedStudy, dto.languages());
+        workbookRelationService.addWorkbooksToStudy(savedStudy, dto.workbooks());
+        languageRelationService.addRelationToStudy(savedStudy, dto.languages());
 
         return savedStudy.getId();
     }
@@ -74,34 +74,34 @@ public class StudyCommandService {
     }
 
     public void leaveStudy(final Long userId, final Long studyId) {
-        final StudyUser studyUser = studyDomainService.getStudyUserWithThrow(studyId, userId);
-        studyUser.leaveStudy();
+        final Membership membership = studyDomainService.getStudyUserWithThrow(studyId, userId);
+        membership.leaveStudy();
     }
 
     public void removeStudy(final Long userId, final Long studyId) {
-        final StudyUser studyUser = studyDomainService.getStudyUserWithThrow(studyId, userId);
-        studyUser.removeStudy();
+        final Membership membership = studyDomainService.getStudyUserWithThrow(studyId, userId);
+        membership.removeStudy();
     }
 
     public Long editPublicStudy(final Long studyId, final Long userId, final EditStudyDto dto) {
-        final StudyUser studyUser = studyDomainService.getStudyUserWithThrow(studyId, userId);
-        studyUser.editPublicStudy(dto);
+        final Membership membership = studyDomainService.getStudyUserWithThrow(studyId, userId);
+        membership.editPublicStudy(dto);
 
-        studyWorkbookService.changeWorkbooksToStudy(studyUser.getStudy(), dto.workbooks());
-        studyLanguageService.changeLanguagesToStudy(studyUser.getStudy(), dto.languages());
+        workbookRelationService.changeWorkbooksToStudy(membership.getStudy(), dto.workbooks());
+        languageRelationService.changeRelationToStudy(membership.getStudy(), dto.languages());
 
-        return studyUser.getStudyId();
+        return membership.getStudyId();
     }
 
     public Long editPrivateStudy(final Long studyId, final Long userId, final EditStudyDto dto) {
-        final StudyUser studyUser = studyDomainService.getStudyUserWithThrow(studyId, userId);
+        final Membership membership = studyDomainService.getStudyUserWithThrow(studyId, userId);
         final String encodedPassword = studyPasswordService.encodeStudyPassword(dto.password());
-        studyUser.editPrivateStudy(dto, encodedPassword);
+        membership.editPrivateStudy(dto, encodedPassword);
 
-        studyWorkbookService.changeWorkbooksToStudy(studyUser.getStudy(), dto.workbooks());
-        studyLanguageService.changeLanguagesToStudy(studyUser.getStudy(), dto.languages());
+        workbookRelationService.changeWorkbooksToStudy(membership.getStudy(), dto.workbooks());
+        languageRelationService.changeRelationToStudy(membership.getStudy(), dto.languages());
 
-        return studyUser.getStudyId();
+        return membership.getStudyId();
     }
 
 }
