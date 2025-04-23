@@ -1,7 +1,7 @@
 package co.kr.cocomu.study.dto.response;
 
 import co.kr.cocomu.study.domain.vo.StudyStatus;
-import co.kr.cocomu.workbook.dto.WorkbookDto;
+import co.kr.cocomu.tag.dto.WorkbookDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;

@@ -1,7 +1,7 @@
 package co.kr.cocomu.study.repository.query.impl;
 
 import co.kr.cocomu.study.repository.query.StudyWorkbookQueryRepository;
-import co.kr.cocomu.workbook.dto.WorkbookDto;
+import co.kr.cocomu.tag.dto.WorkbookDto;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import static co.kr.cocomu.study.domain.QStudyWorkbook.studyWorkbook;
-import static co.kr.cocomu.workbook.domain.QWorkbook.workbook;
+import static co.kr.cocomu.tag.domain.QWorkbookTag.workbookTag;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,9 +21,9 @@ public class StudyWorkbookRepositoryImpl implements StudyWorkbookQueryRepository
     private final JPAQueryFactory queryFactory;
 
     public Map<Long, List<WorkbookDto>> findWorkbookByStudies(final List<Long> studyIds) {
-        return queryFactory.select(studyWorkbook.study.id, workbook)
+        return queryFactory.select(studyWorkbook.study.id, workbookTag)
             .from(studyWorkbook)
-            .join(workbook).on(studyWorkbook.workbook.id.eq(workbook.id))
+            .join(workbookTag).on(studyWorkbook.workbookTag.id.eq(workbookTag.id))
             .where(
                 studyWorkbook.study.id.in(studyIds),
                 studyWorkbook.deleted.isFalse()
@@ -32,9 +32,9 @@ public class StudyWorkbookRepositoryImpl implements StudyWorkbookQueryRepository
                 .as(GroupBy.list(
                     Projections.fields(
                         WorkbookDto.class,
-                        workbook.id.as("id"),
-                        workbook.name.as("name"),
-                        workbook.imageUrl.as("imageUrl")
+                        workbookTag.id.as("id"),
+                        workbookTag.name.as("name"),
+                        workbookTag.imageUrl.as("imageUrl")
                     )
                 ))
             );
@@ -44,12 +44,12 @@ public class StudyWorkbookRepositoryImpl implements StudyWorkbookQueryRepository
         return queryFactory.select(
                 Projections.fields(
                     WorkbookDto.class,
-                    workbook.id.as("id"),
-                    workbook.name.as("name"),
-                    workbook.imageUrl.as("imageUrl")
+                    workbookTag.id.as("id"),
+                    workbookTag.name.as("name"),
+                    workbookTag.imageUrl.as("imageUrl")
                 ))
             .from(studyWorkbook)
-            .join(workbook).on(studyWorkbook.workbook.id.eq(workbook.id))
+            .join(workbookTag).on(studyWorkbook.workbookTag.id.eq(workbookTag.id))
             .where(
                 studyWorkbook.study.id.eq(studyId),
                 studyWorkbook.deleted.isFalse()

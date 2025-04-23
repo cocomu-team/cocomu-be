@@ -2,7 +2,6 @@ package co.kr.cocomu.study.controller;
 
 import co.kr.cocomu.common.api.Api;
 import co.kr.cocomu.common.api.NoContent;
-import co.kr.cocomu.language.service.LanguageQueryService;
 import co.kr.cocomu.study.controller.code.StudyApiCode;
 import co.kr.cocomu.study.controller.docs.StudyControllerDocs;
 import co.kr.cocomu.study.dto.page.StudyDetailPageDto;
@@ -20,8 +19,9 @@ import co.kr.cocomu.study.dto.response.StudyCardDto;
 import co.kr.cocomu.study.dto.response.StudyMemberDto;
 import co.kr.cocomu.study.service.command.StudyCommandService;
 import co.kr.cocomu.study.service.query.StudyQueryService;
-import co.kr.cocomu.workbook.service.WorkbookQueryService;
-import co.kr.cocomu.workbook.dto.WorkbookDto;
+import co.kr.cocomu.tag.dto.WorkbookDto;
+import co.kr.cocomu.tag.service.LanguageService;
+import co.kr.cocomu.tag.service.WorkbookService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -43,13 +43,13 @@ public class StudyController implements StudyControllerDocs {
 
     private final StudyCommandService studyCommandService;
     private final StudyQueryService studyQueryService;
-    private final WorkbookQueryService workbookQueryService;
-    private final LanguageQueryService languageQueryService;
+    private final WorkbookService workbookService;
+    private final LanguageService languageService;
 
     @GetMapping("/filter-options")
     public Api<FilterOptionsDto> getFilterOptions(@AuthenticationPrincipal final Long userId) {
-        final List<LanguageDto> allLanguages = languageQueryService.getAllLanguages();
-        final List<WorkbookDto> allWorkbooks = workbookQueryService.getAllWorkbooks();
+        final List<LanguageDto> allLanguages = languageService.getAllLanguages();
+        final List<WorkbookDto> allWorkbooks = workbookService.getAllWorkbooks();
         final FilterOptionsDto result = new FilterOptionsDto(allWorkbooks, allLanguages);
 
         return Api.of(StudyApiCode.GET_FILTER_OPTIONS_SUCCESS, result);
@@ -95,8 +95,8 @@ public class StudyController implements StudyControllerDocs {
     @Deprecated
     public Api<StudyPageDto> getStudiesPage(@AuthenticationPrincipal final Long userId) {
         final GetAllStudyFilterDto noFilter = GetAllStudyFilterDto.filterNothing();
-        final List<LanguageDto> allLanguages = languageQueryService.getAllLanguages();
-        final List<WorkbookDto> allWorkbooks = workbookQueryService.getAllWorkbooks();
+        final List<LanguageDto> allLanguages = languageService.getAllLanguages();
+        final List<WorkbookDto> allWorkbooks = workbookService.getAllWorkbooks();
         final AllStudyCardDto allStudyCard = studyQueryService.getAllStudyCard(noFilter, userId);
         final StudyPageDto result = new StudyPageDto(allWorkbooks, allLanguages, allStudyCard);
 

@@ -3,17 +3,14 @@ package co.kr.cocomu.study.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
-import co.kr.cocomu.language.domain.Language;
 import co.kr.cocomu.study.domain.vo.StudyStatus;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.user.domain.User;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 class StudyTest {
@@ -225,17 +222,6 @@ class StudyTest {
         assertThatThrownBy(() -> publicStudy.joinPublicMember(mockUser))
             .isInstanceOf(BadRequestException.class)
             .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.STUDY_REQUIRES_LEADER);
-    }
-
-    @Test
-    void 스터디에서_사용하는_언어_정보가_없다면_예외가_발생한다() {
-        // given
-        Study study = new Study();
-
-        // when & then
-        assertThatThrownBy(() -> study.getLanguage(1L))
-            .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.INVALID_STUDY_LANGUAGE);
     }
 
     @Test

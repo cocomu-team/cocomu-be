@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,9 +15,10 @@ import co.kr.cocomu.codingspace.domain.vo.CodingSpaceStatus;
 import co.kr.cocomu.codingspace.dto.request.CreateCodingSpaceDto;
 import co.kr.cocomu.codingspace.dto.request.CreateTestCaseDto;
 import co.kr.cocomu.codingspace.dto.response.TestCaseDto;
+import co.kr.cocomu.codingspace.repository.CodingSpaceRepository;
 import co.kr.cocomu.codingspace.repository.TestCaseRepository;
 import co.kr.cocomu.codingspace.stomp.StompSSEProducer;
-import co.kr.cocomu.codingspace.repository.CodingSpaceRepository;
+import co.kr.cocomu.tag.domain.LanguageTag;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.service.business.StudyDomainService;
 import co.kr.cocomu.user.domain.User;
@@ -57,18 +57,15 @@ class CodingSpaceCommandServiceTest {
     @Test
     void 코딩_스페이스를_생성한다() {
         // given
-        CreateCodingSpaceDto dto = mock(CreateCodingSpaceDto.class);
-        CreateTestCaseDto testCase = mock(CreateTestCaseDto.class);
-        when(dto.studyId()).thenReturn(1L);
-        when(dto.totalUserCount()).thenReturn(2);
-        when(dto.testcases()).thenReturn(List.of(testCase));
-        코딩_스페이스_생성_스텁();
+        CreateCodingSpaceDto mockDto = mock(CreateCodingSpaceDto.class);
+        List<CreateTestCaseDto> mockTestCases = List.of(mock(CreateTestCaseDto.class));
+        코딩_스페이스_생성_스텁(mockDto, mockTestCases);
 
         // when
-        Long result = codingSpaceCommandService.createCodingSpace(dto, 1L);
+        Long result = codingSpaceCommandService.createCodingSpace(mockDto, 1L);
 
         // then
-        assertThat(result).isEqualTo(1L);
+        assertThat(result).isEqualTo(mockCodingSpace.getId());
     }
 
     @Test
@@ -225,14 +222,13 @@ class CodingSpaceCommandServiceTest {
     * ========================== SET STUB ==========================
     * */
 
-    private void 코딩_스페이스_생성_스텁() {
-        when(mockStudy.getId()).thenReturn(1L);
-        when(mockUser.getId()).thenReturn(1L);
-        when(mockCodingSpace.getId()).thenReturn(1L);
-
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+    private void 코딩_스페이스_생성_스텁(CreateCodingSpaceDto mockDto, List<CreateTestCaseDto> mockTestCases) {
+        when(mockDto.totalUserCount()).thenReturn(2);
+        when(mockDto.testcases()).thenReturn(mockTestCases);
+        when(studyDomainService.getStudyWithThrow(mockDto.studyId())).thenReturn(mockStudy);
         when(userService.getUserWithThrow(1L)).thenReturn(mockUser);
-        doNothing().when(studyDomainService).validateStudyMembership(1L, 1L);
+        when(studyDomainService.getLanguageTagInStudy(mockDto.studyId(), mockDto.languageId()))
+            .thenReturn(mock(LanguageTag.class));
         when(codingSpaceRepository.save(any(CodingSpace.class))).thenReturn(mockCodingSpace);
     }
 

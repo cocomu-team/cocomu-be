@@ -6,7 +6,6 @@ import static co.kr.cocomu.study.domain.vo.StudyStatus.REMOVE;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.common.repository.TimeBaseEntity;
-import co.kr.cocomu.language.domain.Language;
 import co.kr.cocomu.study.domain.vo.StudyStatus;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
@@ -59,9 +58,6 @@ public class Study extends TimeBaseEntity {
 
     @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudyUser> studyUsers = new ArrayList<>();
-
-    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StudyLanguage> languages = new ArrayList<>();
 
     private Study(
         final String name,
@@ -129,14 +125,6 @@ public class Study extends TimeBaseEntity {
         increaseCurrentUserCount();
 
         return memberUser;
-    }
-
-    public Language getLanguage(final Long languageId) {
-        return languages.stream()
-            .filter(studyLanguage -> studyLanguage.getLanguage().getId().equals(languageId))
-            .findFirst()
-            .orElseThrow(() -> new BadRequestException(StudyExceptionCode.INVALID_STUDY_LANGUAGE))
-            .getLanguage();
     }
 
     protected void leaveUser() {

@@ -10,6 +10,7 @@ import co.kr.cocomu.codingspace.dto.response.TestCaseDto;
 import co.kr.cocomu.codingspace.repository.CodingSpaceRepository;
 import co.kr.cocomu.codingspace.repository.TestCaseRepository;
 import co.kr.cocomu.codingspace.stomp.StompSSEProducer;
+import co.kr.cocomu.tag.domain.LanguageTag;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.service.business.StudyDomainService;
 import co.kr.cocomu.user.domain.User;
@@ -31,11 +32,12 @@ public class CodingSpaceCommandService {
     private final StompSSEProducer stompSSEProducer;
 
     public Long createCodingSpace(final CreateCodingSpaceDto dto, final Long userId) {
+        studyDomainService.validateStudyMembership(userId, dto.studyId());
         final Study study = studyDomainService.getStudyWithThrow(dto.studyId());
         final User user = userService.getUserWithThrow(userId);
-        studyDomainService.validateStudyMembership(user.getId(), study.getId());
+        final LanguageTag languageTag = studyDomainService.getLanguageTagInStudy(dto.studyId(), dto.languageId());
 
-        final CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, study, user);
+        final CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, study, user, languageTag);
         final CodingSpace savedCodingSpace = codingSpaceRepository.save(codingSpace);
 
         return savedCodingSpace.getId();

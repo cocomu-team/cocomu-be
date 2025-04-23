@@ -1,6 +1,6 @@
 package co.kr.cocomu.study.domain;
 
-import co.kr.cocomu.workbook.domain.Workbook;
+import co.kr.cocomu.tag.domain.WorkbookTag;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -15,11 +15,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.List;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
@@ -39,26 +36,26 @@ public class StudyWorkbook {
     private Study study;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workbook_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Workbook workbook;
+    @JoinColumn(name = "workbook_tag_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private WorkbookTag workbookTag;
 
     @Column(nullable = false)
     private boolean deleted;
 
-    protected StudyWorkbook(final Study study, final Workbook workbook) {
+    protected StudyWorkbook(final Study study, final WorkbookTag workbookTag) {
         this.study = study;
-        this.workbook = workbook;
+        this.workbookTag = workbookTag;
         this.deleted = false;
     }
 
-    public static List<StudyWorkbook> createStudyWorkbooks(final Study study, final List<Workbook> workbooks) {
-        return workbooks.stream()
+    public static List<StudyWorkbook> createStudyWorkbooks(final Study study, final List<WorkbookTag> workbookTags) {
+        return workbookTags.stream()
             .map(workbook -> new StudyWorkbook(study, workbook))
             .toList();
     }
 
-    public boolean hasSameWorkbook(final Workbook workbook) {
-        return workbook.equals(getWorkbook());
+    public boolean hasSameWorkbook(final WorkbookTag workbookTag) {
+        return workbookTag.equals(getWorkbookTag());
     }
 
     public void useWorkbook() {

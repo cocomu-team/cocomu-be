@@ -9,7 +9,7 @@ import co.kr.cocomu.admin.uploader.AdminImageUploader;
 import co.kr.cocomu.common.api.Api;
 import co.kr.cocomu.common.api.NoContent;
 import co.kr.cocomu.study.dto.response.LanguageDto;
-import co.kr.cocomu.workbook.dto.WorkbookDto;
+import co.kr.cocomu.tag.dto.WorkbookDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;

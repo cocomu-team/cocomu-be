@@ -5,7 +5,7 @@ import co.kr.cocomu.study.domain.StudyUser;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
-import co.kr.cocomu.study.repository.jpa.StudyRepository;
+import co.kr.cocomu.study.repository.StudyRepository;
 import co.kr.cocomu.study.service.StudyLanguageService;
 import co.kr.cocomu.study.service.StudyPasswordService;
 import co.kr.cocomu.study.service.StudyWorkbookService;

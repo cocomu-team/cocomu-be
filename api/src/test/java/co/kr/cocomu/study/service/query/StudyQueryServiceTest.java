@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,8 +24,8 @@ import co.kr.cocomu.study.repository.query.StudyLanguageQueryRepository;
 import co.kr.cocomu.study.repository.query.StudyWorkbookQueryRepository;
 import co.kr.cocomu.study.service.business.StudyDomainService;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
-import co.kr.cocomu.study.repository.jpa.StudyRepository;
-import co.kr.cocomu.study.repository.jpa.StudyUserRepository;
+import co.kr.cocomu.study.repository.StudyRepository;
+import co.kr.cocomu.study.repository.StudyUserRepository;
 
 import java.util.HashMap;
 import java.util.List;

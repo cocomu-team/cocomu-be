@@ -3,11 +3,15 @@ package co.kr.cocomu.study.service.business;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.common.exception.domain.NotFoundException;
 import co.kr.cocomu.study.domain.Study;
+import co.kr.cocomu.study.domain.StudyLanguage;
 import co.kr.cocomu.study.domain.StudyUser;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
-import co.kr.cocomu.study.repository.jpa.StudyRepository;
-import co.kr.cocomu.study.repository.jpa.StudyUserRepository;
+import co.kr.cocomu.study.exception.StudyLanguageExceptionCode;
+import co.kr.cocomu.study.repository.StudyLanguageJpaRepository;
+import co.kr.cocomu.study.repository.StudyRepository;
+import co.kr.cocomu.study.repository.StudyUserRepository;
+import co.kr.cocomu.tag.domain.LanguageTag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,7 @@ public class StudyDomainService {
 
     private final StudyRepository studyRepository;
     private final StudyUserRepository studyUserRepository;
+    private final StudyLanguageJpaRepository studyLanguageJpaRepository;
 
     public Study getStudyWithThrow(final Long studyId) {
         return studyRepository.findById(studyId)
@@ -50,6 +55,12 @@ public class StudyDomainService {
         if (languageIds.isEmpty()) {
             throw new BadRequestException(StudyExceptionCode.LANGUAGE_IS_REQUIRED_VALUE);
         }
+    }
+
+    public LanguageTag getLanguageTagInStudy(final Long studyId, final Long tagId) {
+        return studyLanguageJpaRepository.findByStudy_idAndLanguageTag_IdAndDeletedIsFalse(studyId, tagId)
+            .map(StudyLanguage::getLanguageTag)
+            .orElseThrow(() -> new BadRequestException(StudyLanguageExceptionCode.INVALID_STUDY_LANGUAGE_TAG));
     }
 
 }

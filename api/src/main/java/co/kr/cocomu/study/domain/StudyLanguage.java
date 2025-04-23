@@ -1,6 +1,6 @@
 package co.kr.cocomu.study.domain;
 
-import co.kr.cocomu.language.domain.Language;
+import co.kr.cocomu.tag.domain.LanguageTag;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -34,25 +34,25 @@ public class StudyLanguage {
     private Study study;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "language_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Language language;
+    @JoinColumn(name = "language_tag_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private LanguageTag languageTag;
 
     @Column
     private boolean deleted;
 
-    protected StudyLanguage(final Study study, final Language language) {
+    protected StudyLanguage(final Study study, final LanguageTag languageTag) {
         this.study = study;
-        this.language = language;
+        this.languageTag = languageTag;
     }
 
-    public static List<StudyLanguage> createStudyLanguages(final Study study, final List<Language> languages) {
-        return languages.stream()
+    public static List<StudyLanguage> createStudyLanguages(final Study study, final List<LanguageTag> languageTags) {
+        return languageTags.stream()
             .map(language -> new StudyLanguage(study, language))
             .toList();
     }
 
-    public boolean hasSameLanguage(final Language other) {
-        return other.equals(getLanguage());
+    public boolean hasSameLanguage(final LanguageTag other) {
+        return other.equals(getLanguageTag());
     }
 
     public void useLanguage() {

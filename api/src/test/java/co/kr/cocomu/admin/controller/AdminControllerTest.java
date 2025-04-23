@@ -17,7 +17,7 @@ import co.kr.cocomu.common.api.NoContent;
 import co.kr.cocomu.common.template.DeleteRequestTemplate;
 import co.kr.cocomu.common.template.PostRequestTemplate;
 import co.kr.cocomu.study.dto.response.LanguageDto;
-import co.kr.cocomu.workbook.dto.WorkbookDto;
+import co.kr.cocomu.tag.dto.WorkbookDto;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.module.mockmvc.response.ValidatableMockMvcResponse;
 import java.io.IOException;

@@ -6,7 +6,7 @@ import static co.kr.cocomu.codingspace.repository.query.condition.CodingSpaceCon
 import static co.kr.cocomu.codingspace.repository.query.condition.CodingSpaceCondition.getSelectCondition;
 import static co.kr.cocomu.codingspace.repository.query.condition.CodingSpaceCondition.isHost;
 import static co.kr.cocomu.codingspace.repository.query.condition.CodingSpaceCondition.isUserJoined;
-import static co.kr.cocomu.language.domain.QLanguage.language;
+import static co.kr.cocomu.tag.domain.QLanguageTag.languageTag;
 import static co.kr.cocomu.study.domain.QStudyUser.studyUser;
 
 import co.kr.cocomu.codingspace.domain.vo.CodingSpaceStatus;
@@ -69,9 +69,9 @@ public class CodingSpaceQueryImpl implements CodingSpaceQuery {
                     codingSpace.name.as("name"),
                     Projections.fields(
                         LanguageDto.class,
-                        codingSpace.language.id.as("languageId"),
-                        codingSpace.language.name.as("languageName"),
-                        codingSpace.language.imageUrl.as("languageImageUrl")
+                        codingSpace.languageTag.id.as("languageId"),
+                        codingSpace.languageTag.name.as("languageName"),
+                        codingSpace.languageTag.imageUrl.as("languageImageUrl")
                     ).as("language"),
                     codingSpace.currentUserCount.as("currentUserCount"),
                     codingSpace.totalUserCount.as("totalUserCount"),
@@ -95,14 +95,14 @@ public class CodingSpaceQueryImpl implements CodingSpaceQuery {
                 codingSpace.status.as("status"),
                 Projections.fields(
                     LanguageDto.class,
-                    codingSpace.language.id.as("languageId"),
-                    codingSpace.language.name.as("languageName"),
-                    codingSpace.language.imageUrl.as("languageImageUrl")
+                    codingSpace.languageTag.id.as("languageId"),
+                    codingSpace.languageTag.name.as("languageName"),
+                    codingSpace.languageTag.imageUrl.as("languageImageUrl")
                 ).as("language")
             ))
             .from(codingSpaceTab)
             .join(codingSpaceTab.codingSpace, codingSpace)
-            .join(codingSpace.language, language)
+            .join(codingSpace.languageTag, languageTag)
             .where(
                 codingSpace.status.eq(CodingSpaceStatus.WAITING),
                 codingSpace.id.eq(codingSpaceId),
@@ -129,14 +129,14 @@ public class CodingSpaceQueryImpl implements CodingSpaceQuery {
                 codingSpaceTab.documentKey.as("documentKey"),
                 Projections.fields(
                     LanguageDto.class,
-                    codingSpace.language.id.as("languageId"),
-                    codingSpace.language.name.as("languageName"),
-                    codingSpace.language.imageUrl.as("languageImageUrl")
+                    codingSpace.languageTag.id.as("languageId"),
+                    codingSpace.languageTag.name.as("languageName"),
+                    codingSpace.languageTag.imageUrl.as("languageImageUrl")
                 ).as("language")
             ))
             .from(codingSpaceTab)
             .join(codingSpaceTab.codingSpace, codingSpace)
-            .join(codingSpace.language, language)
+            .join(codingSpace.languageTag, languageTag)
             .where(
                 codingSpace.status.eq(CodingSpaceStatus.RUNNING),
                 codingSpace.id.eq(codingSpaceId),
@@ -162,14 +162,14 @@ public class CodingSpaceQueryImpl implements CodingSpaceQuery {
                 codingSpace.finishTime.as("finishTime"),
                 Projections.fields(
                     LanguageDto.class,
-                    codingSpace.language.id.as("languageId"),
-                    codingSpace.language.name.as("languageName"),
-                    codingSpace.language.imageUrl.as("languageImageUrl")
+                    codingSpace.languageTag.id.as("languageId"),
+                    codingSpace.languageTag.name.as("languageName"),
+                    codingSpace.languageTag.imageUrl.as("languageImageUrl")
                 ).as("language")
             ))
             .from(codingSpaceTab)
             .join(codingSpaceTab.codingSpace, codingSpace)
-            .join(codingSpace.language, language)
+            .join(codingSpace.languageTag, languageTag)
             .where(
                 codingSpace.status.eq(CodingSpaceStatus.FEEDBACK),
                 codingSpace.id.eq(codingSpaceId),
@@ -195,9 +195,9 @@ public class CodingSpaceQueryImpl implements CodingSpaceQuery {
                 codingSpace.finishTime.as("finishTime"),
                 Projections.fields(
                     LanguageDto.class,
-                    codingSpace.language.id.as("languageId"),
-                    codingSpace.language.name.as("languageName"),
-                    codingSpace.language.imageUrl.as("languageImageUrl")
+                    codingSpace.languageTag.id.as("languageId"),
+                    codingSpace.languageTag.name.as("languageName"),
+                    codingSpace.languageTag.imageUrl.as("languageImageUrl")
                 ).as("language")
             ))
             .from(codingSpace)

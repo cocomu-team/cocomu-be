@@ -5,8 +5,8 @@ import co.kr.cocomu.codingspace.domain.vo.TestCaseType;
 import co.kr.cocomu.codingspace.dto.request.CreateCodingSpaceDto;
 import co.kr.cocomu.codingspace.exception.CodingSpaceExceptionCode;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
-import co.kr.cocomu.language.domain.Language;
 import co.kr.cocomu.study.domain.Study;
+import co.kr.cocomu.tag.domain.LanguageTag;
 import co.kr.cocomu.user.domain.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -61,7 +61,7 @@ public class CodingSpace {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "language_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private Language language;
+    private LanguageTag languageTag;
 
     private int codingMinutes;
     private int currentUserCount;
@@ -87,9 +87,9 @@ public class CodingSpace {
     @OneToMany(mappedBy = "codingSpace", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CodingSpaceTab> tabs = new ArrayList<>();
 
-    private CodingSpace(final CreateCodingSpaceDto dto, final Study study) {
+    private CodingSpace(final CreateCodingSpaceDto dto, final Study study, LanguageTag languageTag) {
         this.study = study;
-        this.language = study.getLanguage(dto.languageId());
+        this.languageTag = languageTag;
         this.name = dto.name();
         this.description = dto.description();
         this.workbookUrl = dto.workbookUrl();
@@ -99,10 +99,11 @@ public class CodingSpace {
         this.status = CodingSpaceStatus.WAITING;
     }
 
-    public static CodingSpace createCodingSpace(final CreateCodingSpaceDto dto, final Study study, final User host) {
+    public static CodingSpace createCodingSpace(final CreateCodingSpaceDto dto, final Study study, final User host,
+                                                final LanguageTag languageTag) {
         validateCreateCodingSpace(dto);
 
-        final CodingSpace codingSpace = new CodingSpace(dto, study);
+        final CodingSpace codingSpace = new CodingSpace(dto, study, languageTag);
         codingSpace.increaseCurrentUserCount();
 
         final CodingSpaceTab tab = CodingSpaceTab.createHost(codingSpace, host);

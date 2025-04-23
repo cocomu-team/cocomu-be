@@ -10,11 +10,15 @@ import static org.mockito.Mockito.when;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.common.exception.domain.NotFoundException;
 import co.kr.cocomu.study.domain.Study;
+import co.kr.cocomu.study.domain.StudyLanguage;
 import co.kr.cocomu.study.domain.StudyUser;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
-import co.kr.cocomu.study.repository.jpa.StudyRepository;
-import co.kr.cocomu.study.repository.jpa.StudyUserRepository;
+import co.kr.cocomu.study.exception.StudyLanguageExceptionCode;
+import co.kr.cocomu.study.repository.StudyLanguageJpaRepository;
+import co.kr.cocomu.study.repository.StudyRepository;
+import co.kr.cocomu.study.repository.StudyUserRepository;
+import co.kr.cocomu.tag.domain.LanguageTag;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -28,6 +32,7 @@ class StudyDomainServiceTest {
 
     @Mock private StudyRepository studyRepository;
     @Mock private StudyUserRepository studyUserRepository;
+    @Mock private StudyLanguageJpaRepository studyLanguageJpaRepository;
 
     @InjectMocks private StudyDomainService studyDomainService;
 
@@ -144,6 +149,34 @@ class StudyDomainServiceTest {
         // when & then
         assertThatCode(() -> studyDomainService.validateStudyCreation(mockDto))
             .doesNotThrowAnyException();
+    }
+
+    @Test
+    void 스터디에서_사용중인_언어_태그를_가져올_수_있다() {
+        // given
+        StudyLanguage mockStudyLanguage = mock(StudyLanguage.class);
+        LanguageTag mockLanguageTag = mock(LanguageTag.class);
+        when(mockStudyLanguage.getLanguageTag()).thenReturn(mockLanguageTag);
+        when(studyLanguageJpaRepository.findByStudy_idAndLanguage_IdAndDeletedIsFalse(1L, 1L))
+            .thenReturn(Optional.of(mockStudyLanguage));
+
+        // when
+        LanguageTag result = studyDomainService.getLanguageTagInStudy(1L, 1L);
+
+        // then
+        assertThat(result).isEqualTo(mockLanguageTag);
+    }
+
+    @Test
+    void 스터디에서_사용중인_언어_태그가_아니면_예외가_발생한다() {
+        // given
+        when(studyLanguageJpaRepository.findByStudy_idAndLanguage_IdAndDeletedIsFalse(1L, 1L))
+            .thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> studyDomainService.getLanguageTagInStudy(1L, 1L))
+            .isInstanceOf(BadRequestException.class)
+            .hasFieldOrPropertyWithValue("exceptionType", StudyLanguageExceptionCode.INVALID_STUDY_LANGUAGE_TAG);
     }
 
 }
