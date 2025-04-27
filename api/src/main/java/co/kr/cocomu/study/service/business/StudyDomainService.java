@@ -40,23 +40,6 @@ public class StudyDomainService {
         }
     }
 
-    public void validateStudyCreation(final CreatePublicStudyDto dto) {
-        validateEmptyWorkbooks(dto.workbooks());
-        validateEmptyLanguages(dto.languages());
-    }
-
-    private static void validateEmptyWorkbooks(final List<Long> workbookIds) {
-        if (workbookIds.isEmpty()) {
-            throw new BadRequestException(StudyExceptionCode.REQUIRED_WORKBOOK_TAG);
-        }
-    }
-
-    private void validateEmptyLanguages(final List<Long> languageIds) {
-        if (languageIds.isEmpty()) {
-            throw new BadRequestException(StudyExceptionCode.REQUIRED_LANGUAGE_TAG);
-        }
-    }
-
     public LanguageTag getLanguageTagInStudy(final Long studyId, final Long tagId) {
         return languageRelationRepository.findByStudy_idAndLanguageTag_IdAndDeletedIsFalse(studyId, tagId)
             .map(LanguageRelation::getLanguageTag)

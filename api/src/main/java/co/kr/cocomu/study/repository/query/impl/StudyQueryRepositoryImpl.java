@@ -51,7 +51,7 @@ public class StudyQueryRepositoryImpl implements StudyQueryRepository {
             .join(membership.study, study)
             .where(
                 getLastIndexCondition(lastIndex),
-                membership.user.id.eq(userId),
+                membership.userId.eq(userId),
                 study.status.ne(StudyStatus.REMOVE)
             )
             .orderBy(study.id.desc())

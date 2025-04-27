@@ -115,49 +115,12 @@ class StudyDomainServiceTest {
     }
 
     @Test
-    void 스터디_생성시_문제집_정보가_비어있으면_예외가_발생한다() {
-        // given
-        CreatePublicStudyDto mockDto = mock(CreatePublicStudyDto.class);
-        when(mockDto.workbooks()).thenReturn(List.of());
-
-        // when & then
-        assertThatThrownBy(() -> studyDomainService.validateStudyCreation(mockDto))
-            .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.REQUIRED_WORKBOOK_TAG);
-    }
-
-    @Test
-    void 스터디_생성시_언어_정보가_비어있으면_예외가_발생한다() {
-        // given
-        CreatePublicStudyDto mockDto = mock(CreatePublicStudyDto.class);
-        when(mockDto.workbooks()).thenReturn(List.of(1L));
-        when(mockDto.languages()).thenReturn(List.of());
-
-        // when & then
-        assertThatThrownBy(() -> studyDomainService.validateStudyCreation(mockDto))
-            .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.REQUIRED_LANGUAGE_TAG);
-    }
-
-    @Test
-    void 스터디_생성시_문제집_정보는_필수이다() {
-        // given
-        CreatePublicStudyDto mockDto = mock(CreatePublicStudyDto.class);
-        when(mockDto.workbooks()).thenReturn(List.of(1L));
-        when(mockDto.languages()).thenReturn( List.of(1L));
-
-        // when & then
-        assertThatCode(() -> studyDomainService.validateStudyCreation(mockDto))
-            .doesNotThrowAnyException();
-    }
-
-    @Test
     void 스터디에서_사용중인_언어_태그를_가져올_수_있다() {
         // given
         LanguageRelation mockLanguageRelation = mock(LanguageRelation.class);
         LanguageTag mockLanguageTag = mock(LanguageTag.class);
         when(mockLanguageRelation.getLanguageTag()).thenReturn(mockLanguageTag);
-        when(languageRelationRepository.findByStudy_idAndLanguage_IdAndDeletedIsFalse(1L, 1L))
+        when(languageRelationRepository.findByStudy_idAndLanguageTag_IdAndDeletedIsFalse(1L, 1L))
             .thenReturn(Optional.of(mockLanguageRelation));
 
         // when
@@ -170,7 +133,7 @@ class StudyDomainServiceTest {
     @Test
     void 스터디에서_사용중인_언어_태그가_아니면_예외가_발생한다() {
         // given
-        when(languageRelationRepository.findByStudy_idAndLanguage_IdAndDeletedIsFalse(1L, 1L))
+        when(languageRelationRepository.findByStudy_idAndLanguageTag_IdAndDeletedIsFalse(1L, 1L))
             .thenReturn(Optional.empty());
 
         // when & then

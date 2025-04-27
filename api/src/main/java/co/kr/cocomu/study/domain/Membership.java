@@ -43,8 +43,10 @@ public class Membership extends TimeBaseEntity {
     @JoinColumn(name = "study_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private Study study;
 
+    @Column(nullable = false)
+    private Long userId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private User user;
 
     @Enumerated(value = EnumType.STRING)
@@ -60,6 +62,17 @@ public class Membership extends TimeBaseEntity {
         this.user = user;
         this.role = role;
         this.status = MembershipStatus.JOIN;
+    }
+
+    protected Membership(final Study study, final Long userId, final MembershipRole role) {
+        this.study = study;
+        this.userId = userId;
+        this.role = role;
+        this.status = MembershipStatus.JOIN;
+    }
+
+    public static Membership createLeader(final Study study, final Long userId) {
+        return new Membership(study, userId, MembershipRole.LEADER);
     }
 
     public static Membership createLeader(final Study study, final User user) {

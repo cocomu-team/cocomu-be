@@ -82,14 +82,6 @@ public class Study extends TimeBaseEntity {
         return new Study(dto.name(), password, dto.description(), PRIVATE, dto.totalUserCount());
     }
 
-    public void joinLeader(final User user) {
-        validateNoLeaderExists();
-
-        final Membership leaderUser = Membership.createLeader(this, user);
-        this.memberships.add(leaderUser);
-        increaseCurrentUserCount();
-    }
-
     public void increaseCurrentUserCount() {
         this.currentUserCount++;
     }
@@ -137,12 +129,6 @@ public class Study extends TimeBaseEntity {
         }
         this.currentUserCount = 0;
         this.status = REMOVE;
-    }
-
-    private void validateNoLeaderExists() {
-        if (this.memberships.stream().anyMatch(Membership::isLeader)) {
-            throw new BadRequestException(StudyExceptionCode.ALREADY_LEADER_EXISTS);
-        }
     }
 
     private void validateStudyUserCount(final int totalUserCount) {

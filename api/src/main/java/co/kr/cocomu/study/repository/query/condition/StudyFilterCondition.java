@@ -36,7 +36,7 @@ public class StudyFilterCondition {
             .from(membership)
             .where(
                 membership.study.eq(study),
-                membership.user.id.eq(userId),
+                membership.userId.eq(userId),
                 membership.status.eq(MembershipStatus.JOIN)
             )
             .notExists();
@@ -99,7 +99,7 @@ public class StudyFilterCondition {
             .from(membership)
             .where(
                 membership.study.eq(study),
-                membership.user.id.eq(userId),
+                membership.userId.eq(userId),
                 membership.status.eq(MembershipStatus.JOIN)
             )
             .notExists()

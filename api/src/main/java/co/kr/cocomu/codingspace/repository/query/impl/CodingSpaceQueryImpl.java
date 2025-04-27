@@ -209,7 +209,7 @@ public class CodingSpaceQueryImpl implements CodingSpaceQuery {
                     .from(membership)
                     .where(
                         membership.study.id.eq(codingSpace.study.id),
-                        membership.user.id.eq(userId)
+                        membership.userId.eq(userId)
                     )
                     .exists()
             )

@@ -28,7 +28,7 @@ public class MembershipQueryImpl implements MembershipQuery {
     public Map<Long, LeaderDto> findLeaderByStudies(final List<Long> studyIds) {
         return queryFactory.select(membership.study.id, user)
             .from(membership)
-            .join(user).on(membership.user.id.eq(user.id))
+            .join(user).on(membership.userId.eq(user.id))
             .where(
                 membership.study.id.in(studyIds),
                 membership.role.eq(MembershipRole.LEADER),
@@ -52,7 +52,7 @@ public class MembershipQueryImpl implements MembershipQuery {
                 user.profileImageUrl.as("profileImageUrl")
             ))
             .from(membership)
-            .join(user).on(membership.user.id.eq(user.id))
+            .join(user).on(membership.userId.eq(user.id))
             .where(
                 membership.study.id.eq(studyId),
                 membership.role.eq(MembershipRole.LEADER),
@@ -73,7 +73,7 @@ public class MembershipQueryImpl implements MembershipQuery {
                 membership.createdAt.as("joinedDate")
             ))
             .from(membership)
-            .join(user).on(membership.user.id.eq(user.id))
+            .join(user).on(membership.userId.eq(user.id))
             .where(
                 membership.study.id.eq(studyId),
                 membership.status.eq(MembershipStatus.JOIN),

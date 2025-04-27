@@ -60,8 +60,8 @@ public class StudyController implements StudyControllerDocs {
         @AuthenticationPrincipal final Long userId,
         @Valid @RequestBody final CreatePublicStudyDto dto
     ) {
-        final Long publicStudyId = studyCommandService.createPublicStudy(userId, dto);
-        return Api.of(StudyApiCode.CREATE_STUDY_SUCCESS, publicStudyId);
+        final Long result = studyCommandService.createPublicStudy(userId, dto);
+        return Api.of(StudyApiCode.CREATE_STUDY_SUCCESS, result);
     }
 
     @PostMapping("/public/{studyId}/join")

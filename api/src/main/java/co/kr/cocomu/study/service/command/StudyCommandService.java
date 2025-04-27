@@ -7,6 +7,7 @@ import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
 import co.kr.cocomu.study.repository.StudyRepository;
 import co.kr.cocomu.study.service.LanguageRelationService;
+import co.kr.cocomu.study.service.MembershipService;
 import co.kr.cocomu.study.service.StudyPasswordService;
 import co.kr.cocomu.study.service.WorkbookRelationService;
 import co.kr.cocomu.study.service.business.StudyDomainService;
@@ -29,17 +30,15 @@ public class StudyCommandService {
     private final WorkbookRelationService workbookRelationService;
     private final LanguageRelationService languageRelationService;
     private final StudyRepository studyRepository;
+    private final MembershipService membershipService;
 
     public Long createPublicStudy(final Long userId, final CreatePublicStudyDto dto) {
-        studyDomainService.validateStudyCreation(dto);
-        final User user = userService.getUserWithThrow(userId);
         final Study study = Study.createPublicStudy(dto);
-        study.joinLeader(user);
+        workbookRelationService.addWorkbooksToStudy(study, dto.workbooks());
+        languageRelationService.addRelationToStudy(study, dto.languages());
+        membershipService.joinLeader(study, userId);
 
         final Study savedStudy = studyRepository.save(study);
-        workbookRelationService.addWorkbooksToStudy(savedStudy, dto.workbooks());
-        languageRelationService.addRelationToStudy(savedStudy, dto.languages());
-
         return savedStudy.getId();
     }
 
@@ -52,15 +51,13 @@ public class StudyCommandService {
     }
 
     public Long createPrivateStudy(final CreatePrivateStudyDto dto, final Long userId) {
-        final User user = userService.getUserWithThrow(userId);
         final String encodedPassword = studyPasswordService.encodeStudyPassword(dto.password());
         final Study study = Study.createPrivateStudy(dto, encodedPassword);
-        study.joinLeader(user);
+        workbookRelationService.addWorkbooksToStudy(study, dto.workbooks());
+        languageRelationService.addRelationToStudy(study, dto.languages());
+        membershipService.joinLeader(study, userId);
 
         final Study savedStudy = studyRepository.save(study);
-        workbookRelationService.addWorkbooksToStudy(savedStudy, dto.workbooks());
-        languageRelationService.addRelationToStudy(savedStudy, dto.languages());
-
         return savedStudy.getId();
     }
 
