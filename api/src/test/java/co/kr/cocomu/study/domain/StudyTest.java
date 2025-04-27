@@ -150,4 +150,30 @@ class StudyTest {
         assertThat(study.getCurrentUserCount()).isEqualTo(0);
     }
 
+    @Test
+    void 스터디_제거가_된다() {
+        // given
+        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 10);
+        Study study = Study.createPublicStudy(dto, 1L);
+
+        // when
+        study.remove();
+
+        // then
+        assertThat(study.getStatus()).isEqualTo(StudyStatus.REMOVE);
+    }
+
+    @Test
+    void 스터디_인원이_존재한다면_제거가_되지_않는다() {
+        // given
+        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 10);
+        Study study = Study.createPublicStudy(dto, 1L);
+        study.increaseCurrentUserCount();
+
+        // when & thenr
+        assertThatThrownBy(() -> study.remove())
+            .isInstanceOf(BadRequestException.class)
+            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.CAN_NOT_REMOVE);
+    }
+
 }

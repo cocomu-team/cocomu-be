@@ -73,12 +73,6 @@ public class Membership extends TimeBaseEntity {
         status = MembershipStatus.LEFT;
     }
 
-    public void removeStudy() {
-        validateLeaderRole();
-        study.remove();
-        status = MembershipStatus.LEFT;
-    }
-
     public Long getStudyId() {
         return study.getId();
     }

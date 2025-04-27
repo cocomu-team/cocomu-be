@@ -102,11 +102,10 @@ public class Study extends TimeBaseEntity {
         }
     }
 
-    protected void remove() {
-        if (this.currentUserCount > 1) {
-            throw new BadRequestException(StudyExceptionCode.REMAINING_MEMBER);
+    public void remove() {
+        if (this.currentUserCount > 0) {
+            throw new BadRequestException(StudyExceptionCode.CAN_NOT_REMOVE);
         }
-        this.currentUserCount = 0;
         this.status = REMOVE;
     }
 

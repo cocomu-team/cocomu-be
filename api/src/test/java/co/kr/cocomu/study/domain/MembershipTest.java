@@ -56,33 +56,6 @@ class MembershipTest {
     }
 
     @Test
-    void 스터디장은_스터디를_제거할_수_있다() {
-        // given
-        Study mockStudy = mock(Study.class);
-        Membership membership = Membership.createLeader(mockStudy, 1L);
-        doNothing().when(mockStudy).decreaseCurrentUserCount();
-
-        // when
-        membership.removeStudy();
-
-        // then
-        assertThat(membership.getStatus()).isEqualTo(MembershipStatus.LEFT);
-    }
-
-    @Test
-    void 일반_스터디원은_스터디를_제거할_수_있다() {
-        // given
-        Study mockStudy = mock(Study.class);
-        doNothing().when(mockStudy).remove();
-        Membership membership = Membership.createMember(mockStudy, 1L);
-
-        // when & then
-        assertThatThrownBy(membership::removeStudy)
-            .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.USER_IS_NOT_LEADER);
-    }
-
-    @Test
     void 스터디_식별자를_가져올_수_있다() {
         // given
         Study mockStudy = mock(Study.class);

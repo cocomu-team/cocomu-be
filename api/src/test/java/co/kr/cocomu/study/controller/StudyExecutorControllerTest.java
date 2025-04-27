@@ -209,7 +209,7 @@ class StudyExecutorControllerTest extends BaseExecutorControllerTest {
     @Test
     void 스터디_나가기_요청이_성공한다() {
         // given
-        doNothing().when(studyCommandService).leaveStudy(1L, 1L);
+        doNothing().when(studyCommandService).leaveMember(1L, 1L);
 
         // when
         String path = PATH_PREFIX + "/1/leave";

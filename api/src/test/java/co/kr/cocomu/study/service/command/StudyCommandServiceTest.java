@@ -115,7 +115,7 @@ class StudyCommandServiceTest {
         when(mockStudy.isLeader(anyLong())).thenReturn(false);
 
         // when
-        studyCommandService.leaveStudy(1L, 1L);
+        studyCommandService.leaveMember(1L, 1L);
 
         // then
         verify(membershipService).leave(mockStudy, 1L);
@@ -129,23 +129,37 @@ class StudyCommandServiceTest {
         when(mockStudy.isLeader(anyLong())).thenReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> studyCommandService.leaveStudy(1L, 1L))
+        assertThatThrownBy(() -> studyCommandService.leaveMember(1L, 1L))
             .isInstanceOf(BadRequestException.class)
             .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.LEADER_CAN_NOT_LEAVE);
     }
 
     @Test
-    void 스터디를_삭제한다() {
+    void 스터디_리더가_스터디를_삭제한다() {
         // given
-        Membership mockMembership = mock(Membership.class);
-        doNothing().when(mockMembership).removeStudy();
-        when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockMembership);
+        Study mockStudy = mock(Study.class);
+        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(mockStudy.isLeader(1L)).thenReturn(true);
 
         // when
         studyCommandService.removeStudy(1L, 1L);
 
         // then
-        verify(mockMembership).removeStudy();
+        verify(membershipService).leave(mockStudy, 1L);
+        verify(mockStudy).remove();
+    }
+
+    @Test
+    void 스터디_멤버가_스터디를_삭제할_수_없다() {
+        // given
+        Study mockStudy = mock(Study.class);
+        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(mockStudy.isLeader(1L)).thenReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> studyCommandService.removeStudy(1L, 1L))
+            .isInstanceOf(BadRequestException.class)
+            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.MEMBER_CAN_NOT_REMOVE);
     }
 
     @Test

@@ -136,7 +136,7 @@ public class StudyController implements StudyControllerDocs {
         @PathVariable final Long studyId,
         @AuthenticationPrincipal final Long userId
     ) {
-        studyCommandService.leaveStudy(userId, studyId);
+        studyCommandService.leaveMember(userId, studyId);
         return NoContent.from(StudyApiCode.LEAVE_STUDY_SUCCESS);
     }
 

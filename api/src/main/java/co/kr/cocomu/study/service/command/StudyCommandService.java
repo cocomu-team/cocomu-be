@@ -67,7 +67,7 @@ public class StudyCommandService {
         return study.getId();
     }
 
-    public void leaveStudy(final Long userId, final Long studyId) {
+    public void leaveMember(final Long userId, final Long studyId) {
         final Study study = studyDomainService.getStudyWithThrow(studyId);
         if (study.isLeader(userId)) {
             throw new BadRequestException(StudyExceptionCode.LEADER_CAN_NOT_LEAVE);
@@ -76,8 +76,12 @@ public class StudyCommandService {
     }
 
     public void removeStudy(final Long userId, final Long studyId) {
-        final Membership membership = studyDomainService.getStudyUserWithThrow(studyId, userId);
-        membership.removeStudy();
+        final Study study = studyDomainService.getStudyWithThrow(studyId);
+        if (!study.isLeader(userId)) {
+            throw new BadRequestException(StudyExceptionCode.MEMBER_CAN_NOT_REMOVE);
+        }
+        membershipService.leave(study, userId);
+        study.remove();
     }
 
     public Long editPublicStudy(final Long studyId, final Long userId, final EditStudyDto dto) {
