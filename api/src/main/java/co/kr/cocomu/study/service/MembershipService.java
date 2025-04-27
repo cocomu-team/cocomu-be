@@ -1,10 +1,10 @@
 package co.kr.cocomu.study.service;
 
+import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.study.domain.Membership;
 import co.kr.cocomu.study.domain.Study;
-import co.kr.cocomu.study.domain.vo.MembershipRole;
+import co.kr.cocomu.study.exception.MembershipExceptionCode;
 import co.kr.cocomu.study.repository.MembershipRepository;
-import co.kr.cocomu.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,4 +29,14 @@ public class MembershipService {
 
         study.increaseCurrentUserCount();
     }
+
+    public void leave(final Study study, final Long userId) {
+        membershipRepository.findByUser_IdAndStudy_Id(userId, study.getId())
+            .ifPresentOrElse(Membership::leave, () -> {
+                throw new BadRequestException(MembershipExceptionCode.NO_PARTICIPATION);
+            });
+
+        study.decreaseCurrentUserCount();
+    }
+
 }

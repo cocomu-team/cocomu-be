@@ -58,13 +58,13 @@ public class StudyQueryService {
 
     public StudyDetailPageDto getStudyDetailPage(final Long studyId, final Long userId) {
         final Study study = studyDomainService.getStudyWithThrow(studyId);
-        studyDomainService.validateStudyMembership(userId, study.getId());
+        studyDomainService.validateMembership(userId, study.getId());
         final List<LanguageDto> languages = languageRelationQuery.findTagsByStudyId(studyId);
         return new StudyDetailPageDto(study.getId(), study.getName(), languages);
     }
 
     public List<StudyMemberDto> findAllMembers(final Long userId, final Long studyId, final StudyUserFilterDto dto) {
-        studyDomainService.validateStudyMembership(userId, studyId);
+        studyDomainService.validateMembership(userId, studyId);
         final List<StudyMemberDto> members = studyUserQuery.findMembers(studyId, dto);
 
         final List<Long> memberIds = members.stream().map(StudyMemberDto::getUserId).toList();

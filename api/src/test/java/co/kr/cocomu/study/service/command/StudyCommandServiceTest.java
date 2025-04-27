@@ -1,6 +1,7 @@
 package co.kr.cocomu.study.service.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -10,19 +11,19 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.study.domain.Membership;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
+import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.repository.StudyRepository;
 import co.kr.cocomu.study.service.LanguageRelationService;
 import co.kr.cocomu.study.service.MembershipService;
 import co.kr.cocomu.study.service.PasswordService;
 import co.kr.cocomu.study.service.WorkbookRelationService;
 import co.kr.cocomu.study.service.business.StudyDomainService;
-import co.kr.cocomu.user.domain.User;
-import co.kr.cocomu.user.service.UserService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,20 +61,6 @@ class StudyCommandServiceTest {
     }
 
     @Test
-    void 스터디에_일반_사용자로_참여에_성공한다() {
-        // given
-        Study mockStudy = mock(Study.class);
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
-
-        // when
-        Long result = studyCommandService.joinPublicStudy(1L, 1L);
-
-        // then
-        verify(membershipService).joinMember(mockStudy, 1L);
-        assertThat(result).isEqualTo(mockStudy.getId());
-    }
-
-    @Test
     void 비공개_스터디방_생성과_리더로_참여에_성공한다() {
         // given
         CreatePrivateStudyDto dto = new CreatePrivateStudyDto("스터디명", "", List.of(), List.of(), "설명", 10);
@@ -88,6 +75,20 @@ class StudyCommandServiceTest {
         verify(workbookRelationService).addWorkbooksToStudy(any(Study.class), anyList());
         verify(workbookRelationService).addWorkbooksToStudy(any(Study.class), anyList());
         verify(membershipService).joinLeader(any(Study.class), anyLong());
+        assertThat(result).isEqualTo(mockStudy.getId());
+    }
+
+    @Test
+    void 스터디에_일반_사용자로_참여에_성공한다() {
+        // given
+        Study mockStudy = mock(Study.class);
+        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+
+        // when
+        Long result = studyCommandService.joinPublicStudy(1L, 1L);
+
+        // then
+        verify(membershipService).joinMember(mockStudy, 1L);
         assertThat(result).isEqualTo(mockStudy.getId());
     }
 
@@ -107,17 +108,30 @@ class StudyCommandServiceTest {
     }
 
     @Test
-    void 스터디에서_나간다() {
+    void 스터디_리더가_아닐_경우_스터디에서_나간다() {
         // given
-        Membership mockMembership = mock(Membership.class);
-        doNothing().when(mockMembership).leaveStudy();
-        when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockMembership);
+        Study mockStudy = mock(Study.class);
+        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(mockStudy.isLeader(anyLong())).thenReturn(false);
 
         // when
         studyCommandService.leaveStudy(1L, 1L);
 
         // then
-        verify(mockMembership).leaveStudy();
+        verify(membershipService).leave(mockStudy, 1L);
+    }
+
+    @Test
+    void 스터디_리더일_경우_스터디에서_나갈_수_없다() {
+        // given
+        Study mockStudy = mock(Study.class);
+        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(mockStudy.isLeader(anyLong())).thenReturn(true);
+
+        // when & then
+        assertThatThrownBy(() -> studyCommandService.leaveStudy(1L, 1L))
+            .isInstanceOf(BadRequestException.class)
+            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.LEADER_CAN_NOT_LEAVE);
     }
 
     @Test

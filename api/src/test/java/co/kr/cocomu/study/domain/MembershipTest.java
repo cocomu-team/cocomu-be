@@ -10,6 +10,7 @@ import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.study.domain.vo.MembershipRole;
 import co.kr.cocomu.study.domain.vo.MembershipStatus;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
+import co.kr.cocomu.study.exception.MembershipExceptionCode;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.user.domain.User;
 import org.junit.jupiter.api.Test;
@@ -46,41 +47,26 @@ class MembershipTest {
         // given
         Study mockStudy = mock(Study.class);
         Membership membership = Membership.createMember(mockStudy, 1L);
-        doNothing().when(mockStudy).leaveUser();
 
         // when
-        membership.leaveStudy();
+        membership.leave();
 
         // then
-        assertThat(membership.getStatus()).isEqualTo(MembershipStatus.LEAVE);
-    }
-
-    @Test
-    void 스터디장은_스터디를_나갈_수_없다() {
-        // given
-        Study mockStudy = mock(Study.class);
-        User mockUser = mock(User.class);
-        Membership membership = Membership.createLeader(mockStudy, 1L);
-
-        // when & then
-        assertThatThrownBy(membership::leaveStudy)
-            .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.LEADER_MUST_USE_REMOVE);
+        assertThat(membership.getStatus()).isEqualTo(MembershipStatus.LEFT);
     }
 
     @Test
     void 스터디장은_스터디를_제거할_수_있다() {
         // given
         Study mockStudy = mock(Study.class);
-        User mockUser = mock(User.class);
         Membership membership = Membership.createLeader(mockStudy, 1L);
-        doNothing().when(mockStudy).leaveUser();
+        doNothing().when(mockStudy).decreaseCurrentUserCount();
 
         // when
         membership.removeStudy();
 
         // then
-        assertThat(membership.getStatus()).isEqualTo(MembershipStatus.LEAVE);
+        assertThat(membership.getStatus()).isEqualTo(MembershipStatus.LEFT);
     }
 
     @Test
@@ -168,7 +154,7 @@ class MembershipTest {
         // given
         Study mockStudy = mock(Study.class);
         Membership membership = Membership.createMember(mockStudy, 1L);
-        membership.leaveStudy();
+        membership.leave();
 
         // when
         membership.reJoin();

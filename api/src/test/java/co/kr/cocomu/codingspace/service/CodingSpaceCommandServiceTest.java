@@ -241,7 +241,7 @@ class CodingSpaceCommandServiceTest {
 
         when(codingSpaceDomainService.getCodingSpaceWithThrow(1L)).thenReturn(mockCodingSpace);
         when(userService.getUserWithThrow(1L)).thenReturn(mockUser);
-        doNothing().when(studyDomainService).validateStudyMembership(1L, 1L);
+        doNothing().when(studyDomainService).validateMembership(1L, 1L);
     }
 
 }

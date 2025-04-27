@@ -10,7 +10,6 @@ import co.kr.cocomu.study.domain.vo.StudyStatus;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
-import co.kr.cocomu.user.domain.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,6 +18,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
@@ -40,15 +40,18 @@ public class Study extends TimeBaseEntity {
     @Column(name = "study_id")
     private Long id;
 
-    @Column(length = 100, nullable = false)
+    @Column(nullable = false)
+    private Long leaderId;
+
+    @Column(nullable = false)
     private String name;
     private String password;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Lob
     private String description;
 
     @Enumerated(value = EnumType.STRING)
-    @Column(columnDefinition = "varchar(20)")
+    @Column(nullable = false)
     private StudyStatus status;
 
     @Column(nullable = false)
@@ -60,12 +63,14 @@ public class Study extends TimeBaseEntity {
     private List<Membership> memberships = new ArrayList<>();
 
     private Study(
+        final Long leaderId,
         final String name,
         final String password,
         final String description,
         final StudyStatus status,
         final int totalUserCount
     ) {
+        this.leaderId = leaderId;
         this.name = name;
         this.password = password;
         this.description = description;
@@ -74,20 +79,27 @@ public class Study extends TimeBaseEntity {
         this.totalUserCount = totalUserCount;
     }
 
-    public static Study createPublicStudy(final CreatePublicStudyDto dto) {
-        return new Study(dto.name(), null, dto.description(), PUBLIC, dto.totalUserCount());
+    public static Study createPublicStudy(final CreatePublicStudyDto dto, final Long leaderId) {
+        return new Study(leaderId, dto.name(), null, dto.description(), PUBLIC, dto.totalUserCount());
     }
 
-    public static Study createPrivateStudy(final CreatePrivateStudyDto dto, final String password) {
-        return new Study(dto.name(), password, dto.description(), PRIVATE, dto.totalUserCount());
+    public static Study createPrivateStudy(
+        final CreatePrivateStudyDto dto,
+        final String password,
+        final Long leaderId
+    ) {
+        return new Study(leaderId, dto.name(), password, dto.description(), PRIVATE, dto.totalUserCount());
     }
 
     public void increaseCurrentUserCount() {
+        validateStudyUserCount(totalUserCount);
         this.currentUserCount++;
     }
 
-    protected void leaveUser() {
-        this.currentUserCount--;
+    public void decreaseCurrentUserCount() {
+        if (this.currentUserCount > 0) {
+            this.currentUserCount--;
+        }
     }
 
     protected void remove() {
@@ -99,7 +111,7 @@ public class Study extends TimeBaseEntity {
     }
 
     private void validateStudyUserCount(final int totalUserCount) {
-        if (this.currentUserCount >= totalUserCount) {
+        if (currentUserCount >= totalUserCount) {
             throw new BadRequestException(StudyExceptionCode.STUDY_IS_FULL);
         }
     }
@@ -119,6 +131,10 @@ public class Study extends TimeBaseEntity {
     public void changeToPrivate(final String newPassword) {
         status = PRIVATE;
         password = newPassword;
+    }
+
+    public boolean isLeader(final Long userId) {
+        return leaderId.equals(userId);
     }
 
 }

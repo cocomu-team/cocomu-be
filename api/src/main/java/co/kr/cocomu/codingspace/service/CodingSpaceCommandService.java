@@ -32,7 +32,7 @@ public class CodingSpaceCommandService {
     private final StompSSEProducer stompSSEProducer;
 
     public Long createCodingSpace(final CreateCodingSpaceDto dto, final Long userId) {
-        studyDomainService.validateStudyMembership(userId, dto.studyId());
+        studyDomainService.validateMembership(userId, dto.studyId());
         final Study study = studyDomainService.getStudyWithThrow(dto.studyId());
         final User user = userService.getUserWithThrow(userId);
         final LanguageTag tag = studyDomainService.getLanguageTagInStudy(dto.studyId(), dto.languageId());
@@ -46,7 +46,7 @@ public class CodingSpaceCommandService {
     public Long joinCodingSpace(final Long codingSpaceId, final Long userId) {
         final CodingSpace codingSpace = codingSpaceDomainService.getCodingSpaceWithThrow(codingSpaceId);
         final User user = userService.getUserWithThrow(userId);
-        studyDomainService.validateStudyMembership(user.getId(), codingSpace.getStudy().getId());
+        studyDomainService.validateMembership(user.getId(), codingSpace.getStudy().getId());
         codingSpace.joinUser(user);
 
         return codingSpace.getId();

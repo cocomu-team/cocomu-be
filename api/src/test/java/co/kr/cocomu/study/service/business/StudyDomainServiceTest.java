@@ -12,14 +12,15 @@ import co.kr.cocomu.common.exception.domain.NotFoundException;
 import co.kr.cocomu.study.domain.Membership;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.domain.LanguageRelation;
+import co.kr.cocomu.study.domain.vo.StudyStatus;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
+import co.kr.cocomu.study.exception.MembershipExceptionCode;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.exception.LanguageRelationExceptionCode;
 import co.kr.cocomu.study.repository.LanguageRelationRepository;
 import co.kr.cocomu.study.repository.StudyRepository;
 import co.kr.cocomu.study.repository.MembershipRepository;
 import co.kr.cocomu.tag.domain.LanguageTag;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,9 +41,9 @@ class StudyDomainServiceTest {
     void 스터디_ID로_스터디를_찾을_수_있다() {
         // given
         final CreatePublicStudyDto dto = new CreatePublicStudyDto("스터디", null, null, null, 0);
-        final Study mockStudy = Study.createPublicStudy(dto);
+        final Study mockStudy = Study.createPublicStudy(dto, 1L);
 
-        when(studyRepository.findById(anyLong())).thenReturn(Optional.of(mockStudy));
+        when(studyRepository.findByIdAndStatusNot(1L, StudyStatus.REMOVE)).thenReturn(Optional.of(mockStudy));
 
         // when
         Study actualStudy = studyDomainService.getStudyWithThrow(1L);
@@ -54,7 +55,7 @@ class StudyDomainServiceTest {
     @Test
     void 존재하지_않는_스터디_조회_시_예외가_발생한다() {
         // given
-        when(studyRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(studyRepository.findByIdAndStatusNot(1L, StudyStatus.REMOVE)).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> studyDomainService.getStudyWithThrow(1L))
@@ -71,9 +72,9 @@ class StudyDomainServiceTest {
         when(membershipRepository.isUserJoinedStudy(userId, studyId)).thenReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> studyDomainService.validateStudyMembership(userId, studyId))
+        assertThatThrownBy(() -> studyDomainService.validateMembership(userId, studyId))
             .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.NO_PARTICIPATION_USER);
+            .hasFieldOrPropertyWithValue("exceptionType", MembershipExceptionCode.NO_PARTICIPATION);
     }
 
     @Test
@@ -85,7 +86,7 @@ class StudyDomainServiceTest {
         when(membershipRepository.isUserJoinedStudy(userId, studyId)).thenReturn(true);
 
         // when & then
-        assertThatCode(() -> studyDomainService.validateStudyMembership(userId, studyId))
+        assertThatCode(() -> studyDomainService.validateMembership(userId, studyId))
             .doesNotThrowAnyException();
     }
 

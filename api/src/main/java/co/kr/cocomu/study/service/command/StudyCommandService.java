@@ -1,10 +1,12 @@
 package co.kr.cocomu.study.service.command;
 
-import co.kr.cocomu.study.domain.Study;
+import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.study.domain.Membership;
+import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
 import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
+import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.repository.StudyRepository;
 import co.kr.cocomu.study.service.LanguageRelationService;
 import co.kr.cocomu.study.service.MembershipService;
@@ -26,14 +28,25 @@ public class StudyCommandService {
     private final PasswordService passwordService;
     private final WorkbookRelationService workbookRelationService;
     private final LanguageRelationService languageRelationService;
-    private final StudyRepository studyRepository;
     private final MembershipService membershipService;
+    private final StudyRepository studyRepository;
 
-    public Long createPublicStudy(final Long userId, final CreatePublicStudyDto dto) {
-        final Study study = Study.createPublicStudy(dto);
+    public Long createPublicStudy(final Long leaderId, final CreatePublicStudyDto dto) {
+        final Study study = Study.createPublicStudy(dto, leaderId);
         workbookRelationService.addWorkbooksToStudy(study, dto.workbooks());
         languageRelationService.addRelationToStudy(study, dto.languages());
-        membershipService.joinLeader(study, userId);
+        membershipService.joinLeader(study, leaderId);
+
+        final Study savedStudy = studyRepository.save(study);
+        return savedStudy.getId();
+    }
+
+    public Long createPrivateStudy(final CreatePrivateStudyDto dto, final Long leaderId) {
+        final String encodedPassword = passwordService.encodeStudyPassword(dto.password());
+        final Study study = Study.createPrivateStudy(dto, encodedPassword, leaderId);
+        workbookRelationService.addWorkbooksToStudy(study, dto.workbooks());
+        languageRelationService.addRelationToStudy(study, dto.languages());
+        membershipService.joinLeader(study, leaderId);
 
         final Study savedStudy = studyRepository.save(study);
         return savedStudy.getId();
@@ -46,17 +59,6 @@ public class StudyCommandService {
         return study.getId();
     }
 
-    public Long createPrivateStudy(final CreatePrivateStudyDto dto, final Long userId) {
-        final String encodedPassword = passwordService.encodeStudyPassword(dto.password());
-        final Study study = Study.createPrivateStudy(dto, encodedPassword);
-        workbookRelationService.addWorkbooksToStudy(study, dto.workbooks());
-        languageRelationService.addRelationToStudy(study, dto.languages());
-        membershipService.joinLeader(study, userId);
-
-        final Study savedStudy = studyRepository.save(study);
-        return savedStudy.getId();
-    }
-
     public Long joinPrivateStudy(final Long userId, final Long studyId, final String password) {
         final Study study = studyDomainService.getStudyWithThrow(studyId);
         passwordService.validatePassword(password, study.getPassword());
@@ -66,8 +68,11 @@ public class StudyCommandService {
     }
 
     public void leaveStudy(final Long userId, final Long studyId) {
-        final Membership membership = studyDomainService.getStudyUserWithThrow(studyId, userId);
-        membership.leaveStudy();
+        final Study study = studyDomainService.getStudyWithThrow(studyId);
+        if (study.isLeader(userId)) {
+            throw new BadRequestException(StudyExceptionCode.LEADER_CAN_NOT_LEAVE);
+        }
+        membershipService.leave(study, userId);
     }
 
     public void removeStudy(final Long userId, final Long studyId) {

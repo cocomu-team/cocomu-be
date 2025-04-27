@@ -136,7 +136,7 @@ class StudyQueryServiceTest {
 
         // then
 
-        verify(studyDomainService).validateStudyMembership(1L, mockStudy.getId());
+        verify(studyDomainService).validateMembership(1L, mockStudy.getId());
         assertThat(result).isEqualTo(expected);
     }
 

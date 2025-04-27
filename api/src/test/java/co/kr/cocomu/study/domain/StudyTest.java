@@ -21,7 +21,7 @@ class StudyTest {
         CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 10);
 
         // when
-        Study publicStudy = Study.createPublicStudy(dto);
+        Study publicStudy = Study.createPublicStudy(dto, 1L);
 
         // then
         assertThat(publicStudy.getCurrentUserCount()).isEqualTo(0);
@@ -33,10 +33,25 @@ class StudyTest {
         CreatePrivateStudyDto dto = new CreatePrivateStudyDto("코딩 스터디", "", List.of(), List.of(), "스터디", 10);
 
         // when
-        Study privateStudy = Study.createPrivateStudy(dto, "password");
+        Study privateStudy = Study.createPrivateStudy(dto, "password", 1L);
 
         // then
         assertThat(privateStudy.getPassword()).isEqualTo("password");
+    }
+
+    @Test
+    void 스터디_리더인지_알_수_있다() {
+        // given
+        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 10);
+        Study study = Study.createPublicStudy(dto, 1L);
+
+        // when
+        boolean sameLeader = study.isLeader(1L);
+        boolean notSameLeader = study.isLeader(2L);
+
+        // then
+        assertThat(sameLeader).isTrue();
+        assertThat(notSameLeader).isFalse();
     }
 
     @Test
@@ -57,7 +72,7 @@ class StudyTest {
     void 스터디가_공개_스터디로_변경된다() {
         // given
         CreatePrivateStudyDto dto = mock(CreatePrivateStudyDto.class);
-        Study study = Study.createPrivateStudy(dto, "pass");
+        Study study = Study.createPrivateStudy(dto, "pass", 1L);
 
         // when
         study.changeToPublic();
@@ -71,7 +86,7 @@ class StudyTest {
     void 스터디가_비공개_스터디로_변경된다() {
         // given
         CreatePublicStudyDto dto = mock(CreatePublicStudyDto.class);
-        Study study = Study.createPublicStudy(dto);
+        Study study = Study.createPublicStudy(dto, 1L);
 
         // when
         study.changeToPrivate("pass");
@@ -79,6 +94,60 @@ class StudyTest {
         // then
         assertThat(study.getPassword()).isEqualTo("pass");
         assertThat(study.getStatus()).isEqualTo(StudyStatus.PRIVATE);
+    }
+
+    @Test
+    void 스터디_인원수가_증가한다() {
+        // given
+        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 10);
+        Study study = Study.createPublicStudy(dto, 1L);
+        int currentUserCount = study.getCurrentUserCount();
+
+        // when
+        study.increaseCurrentUserCount();
+
+        // then
+        assertThat(study.getCurrentUserCount()).isEqualTo(currentUserCount + 1);
+    }
+
+    @Test
+    void 스터디_최대_인원수를_초과할_경우_예외가_발생한다() {
+        // given
+        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 1);
+        Study study = Study.createPublicStudy(dto, 1L);
+        study.increaseCurrentUserCount();
+
+        // when & then
+        assertThatThrownBy(() -> study.increaseCurrentUserCount())
+            .isInstanceOf(BadRequestException.class)
+            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.STUDY_IS_FULL);
+    }
+
+    @Test
+    void 스터디_인원수가_감소한다() {
+        // given
+        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 10);
+        Study study = Study.createPublicStudy(dto, 1L);
+        study.increaseCurrentUserCount();
+
+        // when
+        study.decreaseCurrentUserCount();
+
+        // then
+        assertThat(study.getCurrentUserCount()).isEqualTo(0);
+    }
+
+    @Test
+    void 스터디_인원수는_0보다_낮아질_수_없다() {
+        // given
+        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 10);
+        Study study = Study.createPublicStudy(dto, 1L);
+
+        // when
+        study.decreaseCurrentUserCount();
+
+        // then
+        assertThat(study.getCurrentUserCount()).isEqualTo(0);
     }
 
 }

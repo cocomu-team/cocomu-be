@@ -6,8 +6,8 @@ import co.kr.cocomu.common.repository.TimeBaseEntity;
 import co.kr.cocomu.study.domain.vo.MembershipRole;
 import co.kr.cocomu.study.domain.vo.MembershipStatus;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
+import co.kr.cocomu.study.exception.MembershipExceptionCode;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
-import co.kr.cocomu.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -69,16 +69,14 @@ public class Membership extends TimeBaseEntity {
         return new Membership(study, userId, MembershipRole.MEMBER);
     }
 
-    public void leaveStudy() {
-        validateMemberRole();
-        study.leaveUser();
-        status = MembershipStatus.LEAVE;
+    public void leave() {
+        status = MembershipStatus.LEFT;
     }
 
     public void removeStudy() {
         validateLeaderRole();
         study.remove();
-        status = MembershipStatus.LEAVE;
+        status = MembershipStatus.LEFT;
     }
 
     public Long getStudyId() {
@@ -87,12 +85,6 @@ public class Membership extends TimeBaseEntity {
 
     public boolean isLeader() {
         return this.role == MembershipRole.LEADER;
-    }
-
-    private void validateMemberRole() {
-        if (role != MembershipRole.MEMBER) {
-            throw new BadRequestException(StudyExceptionCode.LEADER_MUST_USE_REMOVE);
-        }
     }
 
     private void validateLeaderRole() {

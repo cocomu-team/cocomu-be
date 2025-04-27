@@ -10,7 +10,7 @@ public interface MembershipRepository extends JpaRepository<Membership, Long>, M
 
     @Query("""
         SELECT CASE WHEN COUNT(sm) > 0 THEN true ELSE false END FROM Membership sm
-        WHERE sm.user.id = :userId AND sm.study.id = :studyId AND sm.status = 'JOIN'
+        WHERE sm.userId = :userId AND sm.study.id = :studyId AND sm.status = 'JOIN'
     """)
     boolean isUserJoinedStudy(Long userId, Long studyId);
 

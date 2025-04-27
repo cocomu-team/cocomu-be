@@ -5,14 +5,14 @@ import co.kr.cocomu.common.exception.domain.NotFoundException;
 import co.kr.cocomu.study.domain.Membership;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.domain.LanguageRelation;
-import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
+import co.kr.cocomu.study.domain.vo.StudyStatus;
+import co.kr.cocomu.study.exception.MembershipExceptionCode;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.exception.LanguageRelationExceptionCode;
 import co.kr.cocomu.study.repository.LanguageRelationRepository;
 import co.kr.cocomu.study.repository.StudyRepository;
 import co.kr.cocomu.study.repository.MembershipRepository;
 import co.kr.cocomu.tag.domain.LanguageTag;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class StudyDomainService {
     private final LanguageRelationRepository languageRelationRepository;
 
     public Study getStudyWithThrow(final Long studyId) {
-        return studyRepository.findById(studyId)
+        return studyRepository.findByIdAndStatusNot(studyId, StudyStatus.REMOVE)
             .orElseThrow(() -> new NotFoundException(StudyExceptionCode.NOT_FOUND_STUDY));
     }
 
@@ -34,9 +34,9 @@ public class StudyDomainService {
             .orElseThrow(() -> new NotFoundException(StudyExceptionCode.NOT_FOUND_STUDY_USER));
     }
 
-    public void validateStudyMembership(final Long userId, final Long studyId) {
+    public void validateMembership(final Long userId, final Long studyId) {
         if (!membershipRepository.isUserJoinedStudy(userId, studyId)) {
-            throw new BadRequestException(StudyExceptionCode.NO_PARTICIPATION_USER);
+            throw new BadRequestException(MembershipExceptionCode.NO_PARTICIPATION);
         }
     }
 

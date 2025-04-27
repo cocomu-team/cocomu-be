@@ -16,13 +16,11 @@ import co.kr.cocomu.codingspace.dto.page.WaitingPage;
 import co.kr.cocomu.codingspace.dto.request.FilterDto;
 import co.kr.cocomu.codingspace.dto.response.CodingSpaceDto;
 import co.kr.cocomu.codingspace.dto.response.CodingSpacesDto;
-import co.kr.cocomu.codingspace.dto.response.LanguageDto;
 import co.kr.cocomu.codingspace.exception.CodingSpaceExceptionCode;
 import co.kr.cocomu.codingspace.repository.CodingSpaceRepository;
 import co.kr.cocomu.codingspace.repository.CodingSpaceTabRepository;
 import co.kr.cocomu.codingspace.repository.query.TestCaseQuery;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
-import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.service.business.StudyDomainService;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +44,7 @@ class CodingSpaceQueryServiceTest {
     @Test
     void 빈_코딩스페이스_목록을_가져온다() {
         List<CodingSpaceDto> mockSpaces = List.of();
-        doNothing().when(studyDomainService).validateStudyMembership(1L, 1L);
+        doNothing().when(studyDomainService).validateMembership(1L, 1L);
         when(codingSpaceQuery.findSpacesWithFilter(anyLong(), anyLong(), any(FilterDto.class))).thenReturn(mockSpaces);
         when(codingSpaceTabQuery.findUsersBySpace(List.of())).thenReturn(Map.of());
 
@@ -61,7 +59,7 @@ class CodingSpaceQueryServiceTest {
         final CodingSpaceDto codingSpaceDto = new CodingSpaceDto();
         codingSpaceDto.setId(1L);
         List<CodingSpaceDto> mockSpaces = List.of(codingSpaceDto);
-        doNothing().when(studyDomainService).validateStudyMembership(1L, 1L);
+        doNothing().when(studyDomainService).validateMembership(1L, 1L);
         when(codingSpaceQuery.findSpacesWithFilter(anyLong(), anyLong(), any(FilterDto.class))).thenReturn(mockSpaces);
         when(codingSpaceTabQuery.findUsersBySpace(List.of(1L))).thenReturn(Map.of(1L, List.of()));
 
