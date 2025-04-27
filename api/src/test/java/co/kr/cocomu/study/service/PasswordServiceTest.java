@@ -3,7 +3,6 @@ package co.kr.cocomu.study.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -17,17 +16,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
-class StudyPasswordServiceTest {
+class PasswordServiceTest {
 
     @Mock private PasswordEncoder passwordEncoder;
-    @InjectMocks private StudyPasswordService studyPasswordService;
+    @InjectMocks private PasswordService passwordService;
 
     @Test
     void 비밀번호_검증_성공() {
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
         // when & then
-        assertThatCode(() -> studyPasswordService.validatePrivateStudyPassword("password", "encodedPassword"))
+        assertThatCode(() -> passwordService.validatePassword("password", "encodedPassword"))
             .doesNotThrowAnyException();
     }
 
@@ -36,7 +35,7 @@ class StudyPasswordServiceTest {
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> studyPasswordService.validatePrivateStudyPassword("password", "encodedPassword"))
+        assertThatThrownBy(() -> passwordService.validatePassword("password", "encodedPassword"))
             .isInstanceOf(BadRequestException.class)
             .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.STUDY_PASSWORD_WRONG);
     }
@@ -47,7 +46,7 @@ class StudyPasswordServiceTest {
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
 
         // when
-        String result = studyPasswordService.encodeStudyPassword("password");
+        String result = passwordService.encodeStudyPassword("password");
 
         // then
         assertThat(result).isEqualTo("encodedPassword");

@@ -40,58 +40,6 @@ class StudyTest {
     }
 
     @Test
-    void 스터디장이_없으면_회원으로_참여하지_못한다() {
-        // given
-        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 2);
-        Study publicStudy = Study.createPublicStudy(dto);
-        User mockUser = mock(User.class);
-
-        // when & then
-        assertThatThrownBy(() -> publicStudy.joinPublicMember(mockUser))
-            .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.STUDY_REQUIRES_LEADER);
-    }
-
-    @Test
-    void 공개_스터디에_비공개_스터디_참여를_하면_예외가_발생한다() {
-        // given
-        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 2);
-        Study publicStudy = Study.createPublicStudy(dto);
-        User mockUser = mock(User.class);
-
-        // when & then
-        assertThatThrownBy(() -> publicStudy.joinPrivateMember(mockUser))
-            .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.USE_PUBLIC_JOIN);
-    }
-
-    @Test
-    void 비공개_스터디에_공개_스터디_참여를_하면_예외가_발생한다() {
-        // given
-        CreatePrivateStudyDto dto = new CreatePrivateStudyDto("코딩 스터디", "", List.of(), List.of(), "스터디", 2);
-        Study privateStudy = Study.createPrivateStudy(dto, "password");
-        User mockUser = mock(User.class);
-
-        // when & then
-        assertThatThrownBy(() -> privateStudy.joinPublicMember(mockUser))
-            .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.USE_PRIVATE_JOIN);
-    }
-
-    @Test
-    void 스터디_리더가_없으면_참여_할_수_없다() {
-        // given
-        CreatePublicStudyDto dto = new CreatePublicStudyDto("코딩 스터디", List.of(), List.of(), "스터디", 2);
-        Study publicStudy = Study.createPublicStudy(dto);
-        User mockUser = mock(User.class);
-
-        // when & then
-        assertThatThrownBy(() -> publicStudy.joinPublicMember(mockUser))
-            .isInstanceOf(BadRequestException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.STUDY_REQUIRES_LEADER);
-    }
-
-    @Test
     void 스터디_정보_수정이_된다() {
         // given
         Study study = new Study();

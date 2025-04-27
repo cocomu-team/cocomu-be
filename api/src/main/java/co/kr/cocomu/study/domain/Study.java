@@ -86,39 +86,6 @@ public class Study extends TimeBaseEntity {
         this.currentUserCount++;
     }
 
-    public void joinPublicMember(final User user) {
-        if (status != PUBLIC) {
-            throw new BadRequestException(StudyExceptionCode.USE_PRIVATE_JOIN);
-        }
-        joinMember(user);
-    }
-
-    public void joinPrivateMember(final User user) {
-        if (status != PRIVATE) {
-            throw new BadRequestException(StudyExceptionCode.USE_PUBLIC_JOIN);
-        }
-        joinMember(user);
-    }
-
-    private void joinMember(final User user) {
-        validateStudyUserCount(this.totalUserCount);
-        validateLeaderExists();
-
-        memberships.stream()
-            .filter(studyUser -> studyUser.getUser().equals(user))
-            .findFirst()
-            .map(Membership::reJoin)
-            .orElseGet(() -> joinNewMember(user));
-    }
-
-    private Membership joinNewMember(final User user) {
-        final Membership memberUser = Membership.createMember(this, user);
-        this.memberships.add(memberUser);
-        increaseCurrentUserCount();
-
-        return memberUser;
-    }
-
     protected void leaveUser() {
         this.currentUserCount--;
     }
@@ -134,12 +101,6 @@ public class Study extends TimeBaseEntity {
     private void validateStudyUserCount(final int totalUserCount) {
         if (this.currentUserCount >= totalUserCount) {
             throw new BadRequestException(StudyExceptionCode.STUDY_IS_FULL);
-        }
-    }
-
-    private void validateLeaderExists() {
-        if (this.memberships.stream().noneMatch(Membership::isLeader)) {
-            throw new BadRequestException(StudyExceptionCode.STUDY_REQUIRES_LEADER);
         }
     }
 

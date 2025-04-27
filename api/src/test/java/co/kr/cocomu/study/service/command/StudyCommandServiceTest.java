@@ -18,7 +18,7 @@ import co.kr.cocomu.study.dto.request.EditStudyDto;
 import co.kr.cocomu.study.repository.StudyRepository;
 import co.kr.cocomu.study.service.LanguageRelationService;
 import co.kr.cocomu.study.service.MembershipService;
-import co.kr.cocomu.study.service.StudyPasswordService;
+import co.kr.cocomu.study.service.PasswordService;
 import co.kr.cocomu.study.service.WorkbookRelationService;
 import co.kr.cocomu.study.service.business.StudyDomainService;
 import co.kr.cocomu.user.domain.User;
@@ -35,8 +35,7 @@ class StudyCommandServiceTest {
 
     @Mock private StudyRepository studyRepository;
     @Mock private StudyDomainService studyDomainService;
-    @Mock private UserService userService;
-    @Mock private StudyPasswordService studyPasswordService;
+    @Mock private PasswordService passwordService;
     @Mock private WorkbookRelationService workbookRelationService;
     @Mock private MembershipService membershipService;
     @Mock private LanguageRelationService languageRelationService;
@@ -48,9 +47,7 @@ class StudyCommandServiceTest {
         // given
         CreatePublicStudyDto dto = new CreatePublicStudyDto("스터디명", List.of(), List.of(), "설명", 10);
         Study mockStudy = mock(Study.class);
-
         when(studyRepository.save(any(Study.class))).thenReturn(mockStudy);
-        when(mockStudy.getId()).thenReturn(1L);
 
         // when
         Long result = studyCommandService.createPublicStudy(1L, dto);
@@ -59,23 +56,21 @@ class StudyCommandServiceTest {
         verify(workbookRelationService).addWorkbooksToStudy(any(Study.class), anyList());
         verify(workbookRelationService).addWorkbooksToStudy(any(Study.class), anyList());
         verify(membershipService).joinLeader(any(Study.class), any(Long.class));
-        assertThat(result).isEqualTo(1L);
+        assertThat(result).isEqualTo(mockStudy.getId());
     }
 
     @Test
     void 스터디에_일반_사용자로_참여에_성공한다() {
         // given
         Study mockStudy = mock(Study.class);
-        User mockUser = mock(User.class);
-        when(userService.getUserWithThrow(1L)).thenReturn(mockUser);
         when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
-        when(mockStudy.getId()).thenReturn(1L);
 
         // when
         Long result = studyCommandService.joinPublicStudy(1L, 1L);
 
         // then
-        assertThat(result).isEqualTo(1L);
+        verify(membershipService).joinMember(mockStudy, 1L);
+        assertThat(result).isEqualTo(mockStudy.getId());
     }
 
     @Test
@@ -83,10 +78,8 @@ class StudyCommandServiceTest {
         // given
         CreatePrivateStudyDto dto = new CreatePrivateStudyDto("스터디명", "", List.of(), List.of(), "설명", 10);
         Study mockStudy = mock(Study.class);
-
         when(studyRepository.save(any(Study.class))).thenReturn(mockStudy);
-        when(studyPasswordService.encodeStudyPassword(anyString())).thenReturn("password");
-        when(mockStudy.getId()).thenReturn(1L);
+        when(passwordService.encodeStudyPassword(anyString())).thenReturn("password");
 
         // when
         Long result = studyCommandService.createPrivateStudy(dto, 1L);
@@ -95,25 +88,22 @@ class StudyCommandServiceTest {
         verify(workbookRelationService).addWorkbooksToStudy(any(Study.class), anyList());
         verify(workbookRelationService).addWorkbooksToStudy(any(Study.class), anyList());
         verify(membershipService).joinLeader(any(Study.class), anyLong());
-        assertThat(result).isEqualTo(1L);
+        assertThat(result).isEqualTo(mockStudy.getId());
     }
 
     @Test
     void 비공개_스터디에_일반_사용자로_참여한다() {
         // given
         Study mockStudy = mock(Study.class);
-        User mockUser = mock(User.class);
-        when(userService.getUserWithThrow(1L)).thenReturn(mockUser);
         when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
-        when(mockStudy.getId()).thenReturn(1L);
-        when(mockStudy.getPassword()).thenReturn("encryptPassword");
-        doNothing().when(studyPasswordService).validatePrivateStudyPassword(anyString(), anyString());
 
         // when
         Long result = studyCommandService.joinPrivateStudy(1L, 1L, "password");
 
         // then
-        assertThat(result).isEqualTo(1L);
+        verify(passwordService).validatePassword("password", mockStudy.getPassword());
+        verify(membershipService).joinMember(mockStudy, 1L);
+        assertThat(result).isEqualTo(mockStudy.getId());
     }
 
     @Test
@@ -169,7 +159,7 @@ class StudyCommandServiceTest {
         EditStudyDto mockDto = mock(EditStudyDto.class);
         when(mockDto.password()).thenReturn("pass");
         when(studyDomainService.getStudyUserWithThrow(1L, 1L)).thenReturn(mockMembership);
-        when(studyPasswordService.encodeStudyPassword(anyString())).thenReturn("password");
+        when(passwordService.encodeStudyPassword(anyString())).thenReturn("password");
         when(mockMembership.getStudyId()).thenReturn(1L);
 
         // when

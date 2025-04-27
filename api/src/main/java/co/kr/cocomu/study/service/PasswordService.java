@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class StudyPasswordService {
+public class PasswordService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public void validatePrivateStudyPassword(final String password, final String encodedPassword) {
+    public void validatePassword(final String password, final String encodedPassword) {
         if (!passwordEncoder.matches(password, encodedPassword)) {
             throw new BadRequestException(StudyExceptionCode.STUDY_PASSWORD_WRONG);
         }

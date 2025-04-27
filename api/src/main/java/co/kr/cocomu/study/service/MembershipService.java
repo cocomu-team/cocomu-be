@@ -20,4 +20,13 @@ public class MembershipService {
         study.increaseCurrentUserCount();
     }
 
+    public void joinMember(final Study study, final Long userId) {
+        membershipRepository.findByUser_IdAndStudy_Id(userId, study.getId())
+            .ifPresentOrElse(Membership::reJoin, () -> {
+                final Membership newMembership = Membership.createMember(study, userId);
+                membershipRepository.save(newMembership);
+            });
+
+        study.increaseCurrentUserCount();
+    }
 }

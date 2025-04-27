@@ -46,9 +46,6 @@ public class Membership extends TimeBaseEntity {
     @Column(nullable = false)
     private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
-
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     private MembershipRole role;
@@ -56,13 +53,6 @@ public class Membership extends TimeBaseEntity {
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     private MembershipStatus status;
-
-    protected Membership(final Study study, final User user, final MembershipRole role) {
-        this.study = study;
-        this.user = user;
-        this.role = role;
-        this.status = MembershipStatus.JOIN;
-    }
 
     protected Membership(final Study study, final Long userId, final MembershipRole role) {
         this.study = study;
@@ -75,12 +65,8 @@ public class Membership extends TimeBaseEntity {
         return new Membership(study, userId, MembershipRole.LEADER);
     }
 
-    public static Membership createLeader(final Study study, final User user) {
-        return new Membership(study, user, MembershipRole.LEADER);
-    }
-
-    public static Membership createMember(final Study study, final User user) {
-        return new Membership(study, user, MembershipRole.MEMBER);
+    public static Membership createMember(final Study study, final Long userId) {
+        return new Membership(study, userId, MembershipRole.MEMBER);
     }
 
     public void leaveStudy() {
@@ -127,13 +113,11 @@ public class Membership extends TimeBaseEntity {
         study.changeToPrivate(newPassword);
     }
 
-    public Membership reJoin() {
+    public void reJoin() {
         if (this.status == MembershipStatus.JOIN) {
             throw new BadRequestException(StudyExceptionCode.ALREADY_PARTICIPATION_STUDY);
         }
         status = MembershipStatus.JOIN;
-        study.increaseCurrentUserCount();
-        return this;
     }
 
 }
