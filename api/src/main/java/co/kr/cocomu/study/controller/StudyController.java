@@ -91,18 +91,6 @@ public class StudyController implements StudyControllerDocs {
         return Api.of(StudyApiCode.GET_STUDY_INFO_SUCCESS, result);
     }
 
-    @GetMapping("/page")
-    @Deprecated
-    public Api<StudyPageDto> getStudiesPage(@AuthenticationPrincipal final Long userId) {
-        final GetAllStudyFilterDto noFilter = GetAllStudyFilterDto.filterNothing();
-        final List<LanguageDto> allLanguages = languageTagService.getAllTags();
-        final List<WorkbookDto> allWorkbooks = workbookTagService.getAllWorkbooks();
-        final AllStudyCardDto allStudyCard = studyQueryService.getAllStudyCard(noFilter, userId);
-        final StudyPageDto result = new StudyPageDto(allWorkbooks, allLanguages, allStudyCard);
-
-        return Api.of(StudyApiCode.GET_STUDY_PAGE_SUCCESS, result);
-    }
-
     @GetMapping("/{studyId}")
     public Api<StudyDetailPageDto> getStudyDetailPage(
         @PathVariable final Long studyId,

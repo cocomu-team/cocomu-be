@@ -88,13 +88,6 @@ public interface StudyControllerDocs {
     )
     Api<StudyCardDto> getStudyInfo(Long userId, Long studyId);
 
-    @Operation(summary = "스터디 리스트 페이지 조회", description = "스터디 목록 페이지를 조회하는 기능")
-    @ApiResponse(
-        responseCode = "200",
-        description = "스터디 리스트 페이지 조회에 성공했습니다."
-    )
-    Api<StudyPageDto> getStudiesPage(Long userId);
-
     @Operation(summary = "스터디 상세 페이지 조회", description = "스터디 상세 페이지를 조회하는 기능")
     @ApiResponse(
         responseCode = "200",

@@ -114,30 +114,6 @@ class StudyExecutorControllerTest extends BaseExecutorControllerTest {
     }
 
     @Test
-    void 스터디_리스트_페이지_조회가_된다() {
-        // given
-        GetAllStudyFilterDto noFilter = new GetAllStudyFilterDto(null, null, null, null, null, null);
-        List<WorkbookDto> mockWorkbooks = List.of(new WorkbookDto(1L, "백준", "이미지URL"));
-        List<LanguageDto> mockLanguages = List.of(new LanguageDto(1L, "Java", "이미지URL"));
-        AllStudyCardDto mockStudyCards = new AllStudyCardDto(10L, List.of());
-        StudyPageDto mockResult = new StudyPageDto(mockWorkbooks, mockLanguages, mockStudyCards);
-
-        when(workbookTagService.getAllWorkbooks()).thenReturn(mockWorkbooks);
-        when(languageTagService.getAllTags()).thenReturn(mockLanguages);
-        when(studyQueryService.getAllStudyCard(noFilter, null)).thenReturn(mockStudyCards);
-
-        // when
-        String path = PATH_PREFIX + "/page";
-        ValidatableMockMvcResponse response = GetRequestTemplate.executeNoAuth(path);
-
-        // then
-        Api<StudyPageDto> result = response.status(HttpStatus.OK).extract().as(new TypeRef<>() {});
-        assertThat(result.code()).isEqualTo(StudyApiCode.GET_STUDY_PAGE_SUCCESS.getCode());
-        assertThat(result.message()).isEqualTo(StudyApiCode.GET_STUDY_PAGE_SUCCESS.getMessage());
-        assertThat(result.result()).isEqualTo(mockResult);
-    }
-
-    @Test
     void 스터디_상세_정보를_조회_요청이_성공한다() {
         // given
         StudyDetailPageDto mockResult = new StudyDetailPageDto();
