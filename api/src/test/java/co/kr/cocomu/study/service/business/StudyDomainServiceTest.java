@@ -3,23 +3,21 @@ package co.kr.cocomu.study.service.business;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.common.exception.domain.NotFoundException;
-import co.kr.cocomu.study.domain.Membership;
-import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.domain.LanguageRelation;
+import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.domain.vo.StudyStatus;
-import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
+import co.kr.cocomu.study.exception.LanguageRelationExceptionCode;
 import co.kr.cocomu.study.exception.MembershipExceptionCode;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
-import co.kr.cocomu.study.exception.LanguageRelationExceptionCode;
 import co.kr.cocomu.study.repository.LanguageRelationRepository;
-import co.kr.cocomu.study.repository.StudyRepository;
 import co.kr.cocomu.study.repository.MembershipRepository;
+import co.kr.cocomu.study.repository.StudyRepository;
+import co.kr.cocomu.study.service.StudyDomainService;
 import co.kr.cocomu.tag.domain.LanguageTag;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -40,9 +38,7 @@ class StudyDomainServiceTest {
     @Test
     void 스터디_ID로_스터디를_찾을_수_있다() {
         // given
-        final CreatePublicStudyDto dto = new CreatePublicStudyDto("스터디", null, null, null, 0);
-        final Study mockStudy = Study.createPublicStudy(dto, 1L);
-
+        Study mockStudy = mock(Study.class);
         when(studyRepository.findByIdAndStatusNot(1L, StudyStatus.REMOVE)).thenReturn(Optional.of(mockStudy));
 
         // when
@@ -88,31 +84,6 @@ class StudyDomainServiceTest {
         // when & then
         assertThatCode(() -> studyDomainService.validateMembership(userId, studyId))
             .doesNotThrowAnyException();
-    }
-
-    @Test
-    void 스터디_사용자를_찾을_수_있다() {
-        // given
-        Membership mockMembership = mock(Membership.class);
-
-        when(membershipRepository.findByUser_IdAndStudy_Id(anyLong(), anyLong())).thenReturn(Optional.of(mockMembership));
-
-        // when
-        Membership result = studyDomainService.getStudyUserWithThrow(1L, 1L);
-
-        // then
-        assertThat(result).isEqualTo(mockMembership);
-    }
-
-    @Test
-    void 스터디_사용자가_없으면_예외가_발생한다() {
-        // given
-        when(membershipRepository.findByUser_IdAndStudy_Id(anyLong(), anyLong())).thenReturn(Optional.empty());
-
-        // when & then
-        assertThatThrownBy(() -> studyDomainService.getStudyUserWithThrow(1L, 1L))
-            .isInstanceOf(NotFoundException.class)
-            .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.NOT_FOUND_STUDY_USER);
     }
 
     @Test

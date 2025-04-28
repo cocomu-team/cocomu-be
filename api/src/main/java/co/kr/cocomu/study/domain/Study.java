@@ -7,10 +7,7 @@ import static co.kr.cocomu.study.domain.vo.StudyStatus.REMOVE;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.common.repository.TimeBaseEntity;
 import co.kr.cocomu.study.domain.vo.StudyStatus;
-import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
-import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,10 +16,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -59,40 +53,32 @@ public class Study extends TimeBaseEntity {
     @Column(nullable = false)
     private int totalUserCount;
 
-    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Membership> memberships = new ArrayList<>();
-
     private Study(
         final Long leaderId,
         final String name,
-        final String password,
         final String description,
-        final StudyStatus status,
         final int totalUserCount
     ) {
         this.leaderId = leaderId;
         this.name = name;
-        this.password = password;
         this.description = description;
-        this.status = status;
         this.currentUserCount = 0;
         this.totalUserCount = totalUserCount;
     }
 
-    public static Study createPublicStudy(final CreatePublicStudyDto dto, final Long leaderId) {
-        return new Study(leaderId, dto.name(), null, dto.description(), PUBLIC, dto.totalUserCount());
-    }
-
-    public static Study createPrivateStudy(
-        final CreatePrivateStudyDto dto,
-        final String password,
+    public static Study create(
+        final String name,
+        final String description,
+        final int totalUserCount,
         final Long leaderId
     ) {
-        return new Study(leaderId, dto.name(), password, dto.description(), PRIVATE, dto.totalUserCount());
+        return new Study(leaderId, name, description, totalUserCount);
     }
 
     public void increaseCurrentUserCount() {
-        validateStudyUserCount(totalUserCount);
+        if (currentUserCount >= totalUserCount) {
+            throw new BadRequestException(StudyExceptionCode.STUDY_IS_FULL);
+        }
         this.currentUserCount++;
     }
 
@@ -109,31 +95,30 @@ public class Study extends TimeBaseEntity {
         this.status = REMOVE;
     }
 
-    private void validateStudyUserCount(final int totalUserCount) {
-        if (currentUserCount >= totalUserCount) {
-            throw new BadRequestException(StudyExceptionCode.STUDY_IS_FULL);
-        }
+    public boolean isLeader(final Long userId) {
+        return leaderId.equals(userId);
     }
 
-    public void updateStudyInfo(final String name, final String description, final int totalUserCount) {
-        validateStudyUserCount(totalUserCount);
+    public void updateBasicInfo(final String name, final String description, final int totalUserCount) {
+        if (currentUserCount > totalUserCount) {
+            throw new BadRequestException(StudyExceptionCode.STUDY_IS_FULL);
+        }
         this.name = name;
         this.description = description;
         this.totalUserCount = totalUserCount;
     }
 
-    public void changeToPublic() {
-        status = PUBLIC;
-        password = null;
+    public void updatePublicStatus() {
+        this.status = PUBLIC;
+        this.password = null;
     }
 
-    public void changeToPrivate(final String newPassword) {
-        status = PRIVATE;
-        password = newPassword;
-    }
-
-    public boolean isLeader(final Long userId) {
-        return leaderId.equals(userId);
+    public void updatePrivateStatus(final String encodedPassword) {
+        if (encodedPassword == null || encodedPassword.isEmpty()) {
+            throw new BadRequestException(StudyExceptionCode.REQUIRED_STUDY_PASSWORD);
+        }
+        this.status = PRIVATE;
+        this.password = encodedPassword;
     }
 
 }

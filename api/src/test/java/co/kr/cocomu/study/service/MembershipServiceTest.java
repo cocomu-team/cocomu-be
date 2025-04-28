@@ -41,7 +41,7 @@ class MembershipServiceTest {
         // given
         Study mockStudy = mock(Study.class);
         Membership mockMembership = mock(Membership.class);
-        when(membershipRepository.findByUser_IdAndStudy_Id(anyLong(), anyLong()))
+        when(membershipRepository.findByUserIdAndStudy_Id(anyLong(), anyLong()))
             .thenReturn(Optional.of(mockMembership));
 
         // when
@@ -56,7 +56,7 @@ class MembershipServiceTest {
     void 처음_참여하는_멤버일_경우_DB에_저장하고_스터디_인원수가_증가한다() {
         // given
         Study mockStudy = mock(Study.class);
-        when(membershipRepository.findByUser_IdAndStudy_Id(anyLong(), anyLong()))
+        when(membershipRepository.findByUserIdAndStudy_Id(anyLong(), anyLong()))
             .thenReturn(Optional.empty());
 
         // when
@@ -72,7 +72,7 @@ class MembershipServiceTest {
         // given
         Study mockStudy = mock(Study.class);
         Membership mockMembership = mock(Membership.class);
-        when(membershipRepository.findByUser_IdAndStudy_Id(anyLong(), anyLong()))
+        when(membershipRepository.findByUserIdAndStudy_Id(anyLong(), anyLong()))
             .thenReturn(Optional.of(mockMembership));
 
         // when
@@ -87,7 +87,7 @@ class MembershipServiceTest {
     void 미참여_상태에서_나가려고_할_경우_예외가_발생한다() {
         // given
         Study mockStudy = mock(Study.class);
-        when(membershipRepository.findByUser_IdAndStudy_Id(anyLong(), anyLong()))
+        when(membershipRepository.findByUserIdAndStudy_Id(anyLong(), anyLong()))
             .thenReturn(Optional.empty());
 
         // when & then

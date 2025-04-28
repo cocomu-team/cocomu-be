@@ -13,7 +13,7 @@ import co.kr.cocomu.codingspace.repository.CodingSpaceRepository;
 import co.kr.cocomu.codingspace.repository.CodingSpaceTabRepository;
 import co.kr.cocomu.codingspace.repository.query.TestCaseQuery;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
-import co.kr.cocomu.study.service.business.StudyDomainService;
+import co.kr.cocomu.study.service.StudyDomainService;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

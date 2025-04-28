@@ -46,7 +46,7 @@ class PasswordServiceTest {
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
 
         // when
-        String result = passwordService.encodeStudyPassword("password");
+        String result = passwordService.encodePassword("password");
 
         // then
         assertThat(result).isEqualTo("encodedPassword");

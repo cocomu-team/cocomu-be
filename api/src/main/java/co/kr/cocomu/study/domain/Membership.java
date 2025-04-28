@@ -5,8 +5,6 @@ import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.common.repository.TimeBaseEntity;
 import co.kr.cocomu.study.domain.vo.MembershipRole;
 import co.kr.cocomu.study.domain.vo.MembershipStatus;
-import co.kr.cocomu.study.dto.request.EditStudyDto;
-import co.kr.cocomu.study.exception.MembershipExceptionCode;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -73,30 +71,8 @@ public class Membership extends TimeBaseEntity {
         status = MembershipStatus.LEFT;
     }
 
-    public Long getStudyId() {
-        return study.getId();
-    }
-
     public boolean isLeader() {
         return this.role == MembershipRole.LEADER;
-    }
-
-    private void validateLeaderRole() {
-        if (role != MembershipRole.LEADER) {
-            throw new BadRequestException(StudyExceptionCode.USER_IS_NOT_LEADER);
-        }
-    }
-
-    public void editPublicStudy(final EditStudyDto dto) {
-        validateLeaderRole();
-        study.updateStudyInfo(dto.name(), dto.description(), dto.totalUserCount());
-        study.changeToPublic();
-    }
-
-    public void editPrivateStudy(final EditStudyDto dto, final String newPassword) {
-        validateLeaderRole();
-        study.updateStudyInfo(dto.name(), dto.description(), dto.totalUserCount());
-        study.changeToPrivate(newPassword);
     }
 
     public void reJoin() {

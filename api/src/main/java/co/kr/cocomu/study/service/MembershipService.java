@@ -21,7 +21,7 @@ public class MembershipService {
     }
 
     public void joinMember(final Study study, final Long userId) {
-        membershipRepository.findByUser_IdAndStudy_Id(userId, study.getId())
+        membershipRepository.findByUserIdAndStudy_Id(userId, study.getId())
             .ifPresentOrElse(Membership::reJoin, () -> {
                 final Membership newMembership = Membership.createMember(study, userId);
                 membershipRepository.save(newMembership);
@@ -31,7 +31,7 @@ public class MembershipService {
     }
 
     public void leave(final Study study, final Long userId) {
-        membershipRepository.findByUser_IdAndStudy_Id(userId, study.getId())
+        membershipRepository.findByUserIdAndStudy_Id(userId, study.getId())
             .ifPresentOrElse(Membership::leave, () -> {
                 throw new BadRequestException(MembershipExceptionCode.NO_PARTICIPATION);
             });

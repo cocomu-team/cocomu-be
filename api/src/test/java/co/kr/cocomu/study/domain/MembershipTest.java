@@ -56,19 +56,6 @@ class MembershipTest {
     }
 
     @Test
-    void 스터디_식별자를_가져올_수_있다() {
-        // given
-        Study mockStudy = mock(Study.class);
-        Membership membership = Membership.createMember(mockStudy, 1L);
-
-        // when
-        Long studyId = membership.getStudyId();
-
-        // then
-        assertThat(studyId).isEqualTo(mockStudy.getId());
-    }
-
-    @Test
     void 스터디_리더인지_알_수_있다() {
         // given
         Study mockStudy = mock(Study.class);
@@ -92,34 +79,6 @@ class MembershipTest {
 
         // then
         assertThat(leader).isFalse();
-    }
-
-    @Test
-    void 스터디_공개_수정이_가능하다() {
-        // given
-        Study mockStudy = mock(Study.class);
-        EditStudyDto dto = mock(EditStudyDto.class);
-        Membership membership = Membership.createLeader(mockStudy, 1L);
-
-        // when
-        membership.editPublicStudy(dto);
-
-        // then
-        verify(mockStudy).changeToPublic();
-    }
-
-    @Test
-    void 스터디_비공개_수정이_가능하다() {
-        // given
-        Study mockStudy = mock(Study.class);
-        EditStudyDto dto = mock(EditStudyDto.class);
-        Membership membership = Membership.createLeader(mockStudy, 1L);
-
-        // when
-        membership.editPrivateStudy(dto, "pass");
-
-        // then
-        verify(mockStudy).changeToPrivate("pass");
     }
 
     @Test

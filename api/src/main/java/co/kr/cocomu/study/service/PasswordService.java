@@ -18,7 +18,7 @@ public class PasswordService {
         }
     }
 
-    public String encodeStudyPassword(final String password) {
+    public String encodePassword(final String password) {
         return passwordEncoder.encode(password);
     }
 

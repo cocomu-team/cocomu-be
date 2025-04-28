@@ -22,7 +22,7 @@ import co.kr.cocomu.study.dto.response.StudyCardDto;
 import co.kr.cocomu.study.dto.response.StudyMemberDto;
 import co.kr.cocomu.study.repository.LanguageRelationRepository;
 import co.kr.cocomu.study.repository.WorkbookRelationRepository;
-import co.kr.cocomu.study.service.business.StudyDomainService;
+import co.kr.cocomu.study.service.StudyDomainService;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.repository.StudyRepository;
 import co.kr.cocomu.study.repository.MembershipRepository;

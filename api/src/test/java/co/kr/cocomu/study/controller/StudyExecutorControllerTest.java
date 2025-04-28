@@ -257,7 +257,7 @@ class StudyExecutorControllerTest extends BaseExecutorControllerTest {
     void 공개_스터디로_변경하는_요청이_성공한다() {
         // given
         EditStudyDto dto = new EditStudyDto("", "", true, null, 0, List.of(), List.of());
-        when(studyCommandService.editPublicStudy(1L, 1L, dto)).thenReturn(1L);
+        when(studyCommandService.editStudy(1L, 1L, dto)).thenReturn(1L);
 
         // when
         String path = PATH_PREFIX + "/1/edit";
@@ -274,7 +274,7 @@ class StudyExecutorControllerTest extends BaseExecutorControllerTest {
     void 비공개_스터디로_변경하는_요청이_성공한다() {
         // given
         EditStudyDto dto = new EditStudyDto("", "", false, "1234", 0, List.of(), List.of());
-        when(studyCommandService.editPrivateStudy(1L, 1L, dto)).thenReturn(1L);
+        when(studyCommandService.editStudy(1L, 1L, dto)).thenReturn(1L);
 
         // when
         String path = PATH_PREFIX + "/1/edit";

@@ -12,7 +12,7 @@ import co.kr.cocomu.codingspace.repository.TestCaseRepository;
 import co.kr.cocomu.codingspace.stomp.StompSSEProducer;
 import co.kr.cocomu.tag.domain.LanguageTag;
 import co.kr.cocomu.study.domain.Study;
-import co.kr.cocomu.study.service.business.StudyDomainService;
+import co.kr.cocomu.study.service.StudyDomainService;
 import co.kr.cocomu.user.domain.User;
 import co.kr.cocomu.user.service.UserService;
 import lombok.RequiredArgsConstructor;

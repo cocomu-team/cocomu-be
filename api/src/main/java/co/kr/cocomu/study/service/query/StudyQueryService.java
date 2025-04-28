@@ -16,7 +16,7 @@ import co.kr.cocomu.study.repository.LanguageRelationRepository;
 import co.kr.cocomu.study.repository.StudyRepository;
 import co.kr.cocomu.study.repository.MembershipRepository;
 import co.kr.cocomu.study.repository.WorkbookRelationRepository;
-import co.kr.cocomu.study.service.business.StudyDomainService;
+import co.kr.cocomu.study.service.StudyDomainService;
 import co.kr.cocomu.tag.dto.WorkbookDto;
 import java.util.List;
 import java.util.Map;

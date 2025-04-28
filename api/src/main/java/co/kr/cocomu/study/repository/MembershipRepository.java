@@ -14,6 +14,6 @@ public interface MembershipRepository extends JpaRepository<Membership, Long>, M
     """)
     boolean isUserJoinedStudy(Long userId, Long studyId);
 
-    Optional<Membership> findByUser_IdAndStudy_Id(Long userId, Long studyId);
+    Optional<Membership> findByUserIdAndStudy_Id(Long userId, Long studyId);
 
 }

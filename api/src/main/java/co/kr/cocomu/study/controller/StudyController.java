@@ -165,12 +165,7 @@ public class StudyController implements StudyControllerDocs {
         @AuthenticationPrincipal final Long userId,
         @RequestBody final EditStudyDto dto
     ) {
-        if (dto.publicStudy()) {
-            final Long editedStudyId = studyCommandService.editPublicStudy(studyId, userId, dto);
-            return Api.of(StudyApiCode.EDIT_STUDY_SUCCESS, editedStudyId);
-        }
-
-        final Long editedStudyId = studyCommandService.editPrivateStudy(studyId, userId, dto);
+        final Long editedStudyId = studyCommandService.editStudy(studyId, userId, dto);
         return Api.of(StudyApiCode.EDIT_STUDY_SUCCESS, editedStudyId);
     }
 
