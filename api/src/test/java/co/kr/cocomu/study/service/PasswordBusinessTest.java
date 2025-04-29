@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
+import co.kr.cocomu.study.service.business.PasswordBusiness;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,17 +17,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
-class PasswordServiceTest {
+class PasswordBusinessTest {
 
     @Mock private PasswordEncoder passwordEncoder;
-    @InjectMocks private PasswordService passwordService;
+    @InjectMocks private PasswordBusiness passwordBusiness;
 
     @Test
     void 비밀번호_검증_성공() {
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
         // when & then
-        assertThatCode(() -> passwordService.validatePassword("password", "encodedPassword"))
+        assertThatCode(() -> passwordBusiness.validatePassword("password", "encodedPassword"))
             .doesNotThrowAnyException();
     }
 
@@ -35,7 +36,7 @@ class PasswordServiceTest {
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
 
         // when & then
-        assertThatThrownBy(() -> passwordService.validatePassword("password", "encodedPassword"))
+        assertThatThrownBy(() -> passwordBusiness.validatePassword("password", "encodedPassword"))
             .isInstanceOf(BadRequestException.class)
             .hasFieldOrPropertyWithValue("exceptionType", StudyExceptionCode.STUDY_PASSWORD_WRONG);
     }
@@ -46,7 +47,7 @@ class PasswordServiceTest {
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
 
         // when
-        String result = passwordService.encodePassword("password");
+        String result = passwordBusiness.encodePassword("password");
 
         // then
         assertThat(result).isEqualTo("encodedPassword");

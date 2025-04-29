@@ -1,14 +1,15 @@
 package co.kr.cocomu.study.service.business;
 
+import co.kr.cocomu.common.annotation.Business;
 import co.kr.cocomu.study.domain.WorkbookRelation;
 import co.kr.cocomu.tag.domain.WorkbookTag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@Service
+@Business
 @RequiredArgsConstructor
-public class WorkbookRelationDomainService {
+public class WorkbookRelationBusiness {
 
     // workbooks 에 studyWorkbooks 내 존재하지 않는 새로운 workbook 만 추출
     public List<WorkbookTag> extractNewTags(final List<WorkbookTag> tags, final List<WorkbookRelation> relations) {

@@ -1,14 +1,15 @@
 package co.kr.cocomu.study.service.business;
 
+import co.kr.cocomu.common.annotation.Business;
 import co.kr.cocomu.tag.domain.LanguageTag;
 import co.kr.cocomu.study.domain.LanguageRelation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-@Service
+@Business
 @RequiredArgsConstructor
-public class LanguageRelationDomainService {
+public class LanguageRelationBusiness {
 
     public List<LanguageTag> extractNewTags(final List<LanguageTag> tags, final List<LanguageRelation> relations) {
         return tags.stream()

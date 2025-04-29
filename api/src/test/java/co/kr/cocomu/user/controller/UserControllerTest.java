@@ -11,7 +11,7 @@ import static org.mockito.Mockito.when;
 
 import co.kr.cocomu.codingspace.dto.response.CodingSpaceDto;
 import co.kr.cocomu.codingspace.service.CodingSpaceQueryService;
-import co.kr.cocomu.common.BaseExecutorControllerTest;
+import co.kr.cocomu.common.BaseControllerTest;
 import co.kr.cocomu.common.api.Api;
 import co.kr.cocomu.common.api.NoContent;
 import co.kr.cocomu.common.template.GetRequestTemplate;
@@ -38,7 +38,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 @WebMvcTest(UserController.class)
-class UserExecutorControllerTest extends BaseExecutorControllerTest {
+class UserControllerTest extends BaseControllerTest {
 
     private static final String PATH_PREFIX = "/api/v1/users";
 

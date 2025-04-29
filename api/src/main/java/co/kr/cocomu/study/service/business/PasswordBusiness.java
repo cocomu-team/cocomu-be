@@ -1,14 +1,15 @@
-package co.kr.cocomu.study.service;
+package co.kr.cocomu.study.service.business;
 
+import co.kr.cocomu.common.annotation.Business;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-@Service
+@Business
 @RequiredArgsConstructor
-public class PasswordService {
+public class PasswordBusiness {
 
     private final PasswordEncoder passwordEncoder;
 

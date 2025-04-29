@@ -2,7 +2,6 @@ package co.kr.cocomu.codingspace.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -13,7 +12,6 @@ import co.kr.cocomu.codingspace.domain.vo.CodingSpaceStatus;
 import co.kr.cocomu.codingspace.dto.page.FeedbackPage;
 import co.kr.cocomu.codingspace.dto.page.FinishPage;
 import co.kr.cocomu.codingspace.dto.page.StartingPage;
-import co.kr.cocomu.codingspace.dto.page.StudyInformationPage;
 import co.kr.cocomu.codingspace.dto.page.WaitingPage;
 import co.kr.cocomu.codingspace.dto.request.CreateCodingSpaceDto;
 import co.kr.cocomu.codingspace.dto.request.CreateTestCaseDto;
@@ -25,7 +23,7 @@ import co.kr.cocomu.codingspace.dto.response.SpaceStatusDto;
 import co.kr.cocomu.codingspace.dto.response.TestCaseDto;
 import co.kr.cocomu.codingspace.service.CodingSpaceCommandService;
 import co.kr.cocomu.codingspace.service.CodingSpaceQueryService;
-import co.kr.cocomu.common.BaseExecutorControllerTest;
+import co.kr.cocomu.common.BaseControllerTest;
 import co.kr.cocomu.common.api.Api;
 import co.kr.cocomu.common.api.NoContent;
 import co.kr.cocomu.common.template.DeleteRequestTemplate;
@@ -41,7 +39,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 
 @WebMvcTest(CodingSpaceController.class)
-class CodingSpaceExecutorControllerTest extends BaseExecutorControllerTest {
+class CodingSpaceControllerTest extends BaseControllerTest {
 
     private static final String PATH_PREFIX = "/api/v1/coding-spaces";
 

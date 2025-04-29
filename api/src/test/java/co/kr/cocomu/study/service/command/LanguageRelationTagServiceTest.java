@@ -10,7 +10,7 @@ import co.kr.cocomu.tag.service.LanguageTagService;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.repository.LanguageRelationRepository;
 import co.kr.cocomu.study.service.LanguageRelationService;
-import co.kr.cocomu.study.service.business.LanguageRelationDomainService;
+import co.kr.cocomu.study.service.business.LanguageRelationBusiness;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +24,7 @@ class LanguageRelationTagServiceTest {
 
     @Mock private LanguageRelationRepository languageRelationRepository;
     @Mock private LanguageTagService languageTagService;
-    @Mock private LanguageRelationDomainService languageRelationDomainService;
+    @Mock private LanguageRelationBusiness languageRelationBusiness;
 
     @InjectMocks private LanguageRelationService languageRelationService;
 
@@ -53,14 +53,14 @@ class LanguageRelationTagServiceTest {
 
         List<LanguageRelation> mockLanguageRelations = List.of(mock(LanguageRelation.class));
         when(languageRelationRepository.findAllByStudyId(mockStudy.getId())).thenReturn(mockLanguageRelations);
-        when(languageRelationDomainService.extractNewTags(mockLanguageTags, mockLanguageRelations)).thenReturn(List.of());
+        when(languageRelationBusiness.extractNewTags(mockLanguageTags, mockLanguageRelations)).thenReturn(List.of());
 
         // when
         languageRelationService.changeRelationToStudy(mockStudy, languageIds);
 
         // then
-        verify(languageRelationDomainService).activateSelectedRelations(mockLanguageRelations, mockLanguageTags);
-        verify(languageRelationDomainService).deactivateUnselectedRelations(mockLanguageRelations, mockLanguageTags);
+        verify(languageRelationBusiness).activateSelectedRelations(mockLanguageRelations, mockLanguageTags);
+        verify(languageRelationBusiness).deactivateUnselectedRelations(mockLanguageRelations, mockLanguageTags);
         verify(languageRelationRepository).saveAll(List.of());
     }
 

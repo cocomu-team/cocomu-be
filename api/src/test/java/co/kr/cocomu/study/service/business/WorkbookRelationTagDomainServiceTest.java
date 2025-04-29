@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class WorkbookRelationTagDomainServiceTest {
 
     @InjectMocks
-    WorkbookRelationDomainService workbookRelationDomainService;
+    WorkbookRelationBusiness workbookRelationBusiness;
 
     @Test
     void 추가_문제집_중_기존_문제집에_포함되지_않으면_추출한다() {
@@ -33,7 +33,7 @@ class WorkbookRelationTagDomainServiceTest {
         List<WorkbookRelation> existing = List.of(existingRelation);
 
         // when
-        List<WorkbookTag> result = workbookRelationDomainService.extractNewTags(workbookTags, existing);
+        List<WorkbookTag> result = workbookRelationBusiness.extractNewTags(workbookTags, existing);
 
         // then
         assertThat(result).hasSize(1);
@@ -52,7 +52,7 @@ class WorkbookRelationTagDomainServiceTest {
         List<WorkbookRelation> existing = List.of(existingRelation);
 
         // when
-        workbookRelationDomainService.activateSelectedRelations(existing, workbookTags);
+        workbookRelationBusiness.activateSelectedRelations(existing, workbookTags);
 
         // then
         verify(existingRelation).useTag();
@@ -71,7 +71,7 @@ class WorkbookRelationTagDomainServiceTest {
         List<WorkbookRelation> existing = List.of(existingRelation);
 
         // when
-        workbookRelationDomainService.deactivateUnselectedRelations(existing, workbookTags);
+        workbookRelationBusiness.deactivateUnselectedRelations(existing, workbookTags);
 
         // then
         verify(existingRelation).unUseTag();

@@ -5,19 +5,17 @@ import co.kr.cocomu.common.api.NoContent;
 import co.kr.cocomu.study.controller.code.StudyApiCode;
 import co.kr.cocomu.study.controller.docs.StudyControllerDocs;
 import co.kr.cocomu.study.dto.page.StudyDetailPageDto;
-import co.kr.cocomu.study.dto.page.StudyPageDto;
-import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
-import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
+import co.kr.cocomu.study.dto.request.CreateStudyDto;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
 import co.kr.cocomu.study.dto.request.GetAllStudyFilterDto;
-import co.kr.cocomu.study.dto.request.JoinPrivateStudyDto;
+import co.kr.cocomu.study.dto.request.PasswordDto;
 import co.kr.cocomu.study.dto.request.StudyUserFilterDto;
 import co.kr.cocomu.study.dto.response.AllStudyCardDto;
 import co.kr.cocomu.study.dto.response.FilterOptionsDto;
 import co.kr.cocomu.study.dto.response.LanguageDto;
 import co.kr.cocomu.study.dto.response.StudyCardDto;
 import co.kr.cocomu.study.dto.response.StudyMemberDto;
-import co.kr.cocomu.study.service.command.StudyCommandService;
+import co.kr.cocomu.study.service.StudyService;
 import co.kr.cocomu.study.service.query.StudyQueryService;
 import co.kr.cocomu.tag.dto.WorkbookDto;
 import co.kr.cocomu.tag.service.LanguageTagService;
@@ -27,10 +25,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,10 +42,57 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class StudyController implements StudyControllerDocs {
 
-    private final StudyCommandService studyCommandService;
+    private final StudyService studyService;
     private final StudyQueryService studyQueryService;
     private final WorkbookTagService workbookTagService;
     private final LanguageTagService languageTagService;
+
+    @PostMapping
+    public Api<Long> create(
+        @AuthenticationPrincipal final Long userId,
+        @Valid @RequestBody final CreateStudyDto dto
+    ) {
+        final Long result = studyService.create(userId, dto);
+        return Api.of(StudyApiCode.CREATE_STUDY_SUCCESS, result);
+    }
+
+    @PostMapping("/{studyId}")
+    public Api<Long> join(
+        @AuthenticationPrincipal final Long userId,
+        @PathVariable final Long studyId,
+        @RequestBody final PasswordDto dto
+    ) {
+        final Long publicStudyId = studyService.join(userId, studyId, dto.password());
+        return Api.of(StudyApiCode.JOIN_STUDY_SUCCESS, publicStudyId);
+    }
+
+    @PatchMapping("/{studyId}")
+    public NoContent leave(
+        @PathVariable final Long studyId,
+        @AuthenticationPrincipal final Long userId
+    ) {
+        studyService.leaveMember(userId, studyId);
+        return NoContent.from(StudyApiCode.LEAVE_STUDY_SUCCESS);
+    }
+
+    @PutMapping("/{studyId}")
+    public Api<Long> edit(
+        @PathVariable final Long studyId,
+        @AuthenticationPrincipal final Long userId,
+        @RequestBody final EditStudyDto dto
+    ) {
+        final Long editedStudyId = studyService.editStudy(studyId, userId, dto);
+        return Api.of(StudyApiCode.EDIT_STUDY_SUCCESS, editedStudyId);
+    }
+
+    @DeleteMapping("/{studyId}")
+    public NoContent remove(
+        @PathVariable final Long studyId,
+        @AuthenticationPrincipal final Long userId
+    ) {
+        studyService.removeStudy(userId, studyId);
+        return NoContent.from(StudyApiCode.REMOVE_STUDY_SUCCESS);
+    }
 
     @GetMapping("/filter-options")
     public Api<FilterOptionsDto> getFilterOptions(@AuthenticationPrincipal final Long userId) {
@@ -53,24 +101,6 @@ public class StudyController implements StudyControllerDocs {
         final FilterOptionsDto result = new FilterOptionsDto(allWorkbooks, allLanguages);
 
         return Api.of(StudyApiCode.GET_FILTER_OPTIONS_SUCCESS, result);
-    }
-
-    @PostMapping("/public")
-    public Api<Long> createPublicStudy(
-        @AuthenticationPrincipal final Long userId,
-        @Valid @RequestBody final CreatePublicStudyDto dto
-    ) {
-        final Long result = studyCommandService.createPublicStudy(userId, dto);
-        return Api.of(StudyApiCode.CREATE_STUDY_SUCCESS, result);
-    }
-
-    @PostMapping("/public/{studyId}/join")
-    public Api<Long> joinPublicStudy(
-        @AuthenticationPrincipal final Long userId,
-        @PathVariable final Long studyId
-    ) {
-        final Long publicStudyId = studyCommandService.joinPublicStudy(userId, studyId);
-        return Api.of(StudyApiCode.JOIN_STUDY_SUCCESS, publicStudyId);
     }
 
     @GetMapping
@@ -100,43 +130,6 @@ public class StudyController implements StudyControllerDocs {
         return Api.of(StudyApiCode.GET_STUDY_DETAIL_SUCCESS, result);
     }
 
-    @PostMapping("/private")
-    public Api<Long> createPrivateStudy(
-        @RequestBody @Valid final CreatePrivateStudyDto dto,
-        @AuthenticationPrincipal final Long userId
-    ) {
-        final Long privateStudyId = studyCommandService.createPrivateStudy(dto, userId);
-        return Api.of(StudyApiCode.CREATE_STUDY_SUCCESS, privateStudyId);
-    }
-
-    @PostMapping("/private/{studyId}/join")
-    public Api<Long> createPrivateStudy(
-        @PathVariable final Long studyId,
-        @AuthenticationPrincipal final Long userId,
-        @Valid @RequestBody final JoinPrivateStudyDto dto
-    ) {
-        final Long publicStudyId = studyCommandService.joinPrivateStudy(userId, studyId, dto.password());
-        return Api.of(StudyApiCode.JOIN_STUDY_SUCCESS, publicStudyId);
-    }
-
-    @PostMapping("/{studyId}/leave")
-    public NoContent leaveStudy(
-        @PathVariable final Long studyId,
-        @AuthenticationPrincipal final Long userId
-    ) {
-        studyCommandService.leaveMember(userId, studyId);
-        return NoContent.from(StudyApiCode.LEAVE_STUDY_SUCCESS);
-    }
-
-    @PostMapping("/{studyId}/remove")
-    public NoContent removeStudy(
-        @PathVariable final Long studyId,
-        @AuthenticationPrincipal final Long userId
-    ) {
-        studyCommandService.removeStudy(userId, studyId);
-        return NoContent.from(StudyApiCode.REMOVE_STUDY_SUCCESS);
-    }
-
     @GetMapping("/{studyId}/members")
     public Api<List<StudyMemberDto>> getStudyMembers(
         @PathVariable final Long studyId,
@@ -145,16 +138,6 @@ public class StudyController implements StudyControllerDocs {
     ) {
         final List<StudyMemberDto> allMembers = studyQueryService.findAllMembers(userId, studyId, dto);
         return Api.of(StudyApiCode.GET_ALL_MEMBERS_SUCCESS, allMembers);
-    }
-
-    @PostMapping("/{studyId}/edit")
-    public Api<Long> editStudy(
-        @PathVariable final Long studyId,
-        @AuthenticationPrincipal final Long userId,
-        @RequestBody final EditStudyDto dto
-    ) {
-        final Long editedStudyId = studyCommandService.editStudy(studyId, userId, dto);
-        return Api.of(StudyApiCode.EDIT_STUDY_SUCCESS, editedStudyId);
     }
 
 }

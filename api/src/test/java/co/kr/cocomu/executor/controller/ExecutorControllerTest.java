@@ -6,7 +6,7 @@ import static org.mockito.Mockito.doNothing;
 
 import co.kr.cocomu.admin.config.AdminSecurityConfig;
 import co.kr.cocomu.admin.config.AdminUserConfig;
-import co.kr.cocomu.common.BaseExecutorControllerTest;
+import co.kr.cocomu.common.BaseControllerTest;
 import co.kr.cocomu.common.api.NoContent;
 import co.kr.cocomu.common.security.PasswordEncoderConfig;
 import co.kr.cocomu.common.template.PostRequestTemplate;
@@ -24,7 +24,7 @@ import org.springframework.http.HttpStatus;
 
 @WebMvcTest(ExecutorController.class)
 @Import({AdminUserConfig.class, PasswordEncoderConfig.class, AdminSecurityConfig.class})
-class ExecutorControllerTest extends BaseExecutorControllerTest {
+class ExecutorControllerTest extends BaseControllerTest {
 
     private static final String PATH_PREFIX = "/api/v1/executor";
 

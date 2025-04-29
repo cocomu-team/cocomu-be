@@ -3,7 +3,7 @@ package co.kr.cocomu.study.service;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.domain.WorkbookRelation;
 import co.kr.cocomu.study.repository.WorkbookRelationRepository;
-import co.kr.cocomu.study.service.business.WorkbookRelationDomainService;
+import co.kr.cocomu.study.service.business.WorkbookRelationBusiness;
 import co.kr.cocomu.tag.domain.WorkbookTag;
 import co.kr.cocomu.tag.service.WorkbookTagService;
 import java.util.List;
@@ -18,7 +18,7 @@ public class WorkbookRelationService {
 
     private final WorkbookRelationRepository workbookRelationRepository;
     private final WorkbookTagService workbookTagService;
-    private final WorkbookRelationDomainService workbookRelationDomainService;
+    private final WorkbookRelationBusiness workbookRelationBusiness;
 
     public void addWorkbooksToStudy(final Study study, final List<Long> tagIds) {
         final List<WorkbookTag> tags = workbookTagService.getTagsByIdIn(tagIds);
@@ -29,10 +29,10 @@ public class WorkbookRelationService {
     public void changeWorkbooksToStudy(final Study study, final List<Long> tagIds) {
         final List<WorkbookTag> tags = workbookTagService.getTagsByIdIn(tagIds);
         final List<WorkbookRelation> relations = workbookRelationRepository.findAllByStudyId(study.getId());
-        workbookRelationDomainService.activateSelectedRelations(relations, tags);
-        workbookRelationDomainService.deactivateUnselectedRelations(relations, tags);
+        workbookRelationBusiness.activateSelectedRelations(relations, tags);
+        workbookRelationBusiness.deactivateUnselectedRelations(relations, tags);
 
-        final List<WorkbookTag> newTags = workbookRelationDomainService.extractNewTags(tags, relations);
+        final List<WorkbookTag> newTags = workbookRelationBusiness.extractNewTags(tags, relations);
         final List<WorkbookRelation> newRelations = WorkbookRelation.createRelations(study, newTags);
         workbookRelationRepository.saveAll(newRelations);
     }

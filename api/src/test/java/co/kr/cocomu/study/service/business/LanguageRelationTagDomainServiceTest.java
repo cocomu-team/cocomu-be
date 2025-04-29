@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class LanguageRelationTagDomainServiceTest {
 
     @InjectMocks
-    LanguageRelationDomainService languageRelationDomainService;
+    LanguageRelationBusiness languageRelationBusiness;
 
     @Test
     void 추가_문제집_중_기존_문제집에_포함되지_않으면_추출한다() {
@@ -33,7 +33,7 @@ class LanguageRelationTagDomainServiceTest {
         List<LanguageRelation> existing = List.of(existingRelation);
 
         // when
-        List<LanguageTag> result = languageRelationDomainService.extractNewTags(languageTags, existing);
+        List<LanguageTag> result = languageRelationBusiness.extractNewTags(languageTags, existing);
 
         // then
         assertThat(result).hasSize(1);
@@ -52,7 +52,7 @@ class LanguageRelationTagDomainServiceTest {
         List<LanguageRelation> existing = List.of(existingRelation);
 
         // when
-        languageRelationDomainService.activateSelectedRelations(existing, languageTags);
+        languageRelationBusiness.activateSelectedRelations(existing, languageTags);
 
         // then
         verify(existingRelation).useTag();
@@ -71,7 +71,7 @@ class LanguageRelationTagDomainServiceTest {
         List<LanguageRelation> existing = List.of(existingRelation);
 
         // when
-        languageRelationDomainService.deactivateUnselectedRelations(existing, languageTags);
+        languageRelationBusiness.deactivateUnselectedRelations(existing, languageTags);
 
         // then
         verify(existingRelation).unUseTag();

@@ -1,17 +1,12 @@
-package co.kr.cocomu.study.service.command;
+package co.kr.cocomu.study.service;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.study.domain.Study;
-import co.kr.cocomu.study.dto.request.CreatePrivateStudyDto;
-import co.kr.cocomu.study.dto.request.CreatePublicStudyDto;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
+import co.kr.cocomu.study.dto.request.CreateStudyDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.repository.StudyRepository;
-import co.kr.cocomu.study.service.LanguageRelationService;
-import co.kr.cocomu.study.service.MembershipService;
-import co.kr.cocomu.study.service.PasswordService;
-import co.kr.cocomu.study.service.WorkbookRelationService;
-import co.kr.cocomu.study.service.StudyDomainService;
+import co.kr.cocomu.study.service.business.PasswordBusiness;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,50 +16,39 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class StudyCommandService {
+public class StudyService {
 
+    private final StudyFactory studyFactory;
     private final StudyDomainService studyDomainService;
-    private final PasswordService passwordService;
+    private final PasswordBusiness passwordBusiness;
     private final WorkbookRelationService workbookRelationService;
     private final LanguageRelationService languageRelationService;
     private final MembershipService membershipService;
     private final StudyRepository studyRepository;
 
-    public Long createPublicStudy(final Long leaderId, final CreatePublicStudyDto dto) {
-        final Study study = Study.create(dto.name(), dto.description(), dto.totalUserCount(), leaderId);
-        study.updatePublicStatus();
+    public Long create(final Long leaderId, final CreateStudyDto dto) {
+        final Study study = studyFactory.generateStudy(dto, leaderId);
 
-        workbookRelationService.addWorkbooksToStudy(study, dto.workbooks());
-        languageRelationService.addRelationToStudy(study, dto.languages());
+        if (dto.publicStudy()) {
+            study.updatePublicStatus();
+        } else {
+            final String encodedPassword = passwordBusiness.encodePassword(dto.password());
+            study.updatePrivateStatus(encodedPassword);
+        }
+
+        workbookRelationService.addWorkbooksToStudy(study, dto.workbookTagIds());
+        languageRelationService.addRelationToStudy(study, dto.languageTagIds());
         membershipService.joinLeader(study, leaderId);
-
-        final Study savedStudy = studyRepository.save(study);
-        return savedStudy.getId();
-    }
-
-    public Long createPrivateStudy(final CreatePrivateStudyDto dto, final Long leaderId) {
-        final String encodedPassword = passwordService.encodePassword(dto.password());
-        final Study study = Study.create(dto.name(), dto.description(), dto.totalUserCount(), leaderId);
-        study.updatePrivateStatus(encodedPassword);
-
-        workbookRelationService.addWorkbooksToStudy(study, dto.workbooks());
-        languageRelationService.addRelationToStudy(study, dto.languages());
-        membershipService.joinLeader(study, leaderId);
-
-        final Study savedStudy = studyRepository.save(study);
-        return savedStudy.getId();
-    }
-
-    public Long joinPublicStudy(final Long userId, final Long studyId) {
-        final Study study = studyDomainService.getStudyWithThrow(studyId);
-        membershipService.joinMember(study, userId);
+        studyRepository.save(study);
 
         return study.getId();
     }
 
-    public Long joinPrivateStudy(final Long userId, final Long studyId, final String password) {
+    public Long join(final Long userId, final Long studyId, final String password) {
         final Study study = studyDomainService.getStudyWithThrow(studyId);
-        passwordService.validatePassword(password, study.getPassword());
+        if (!study.isPublic()) {
+            passwordBusiness.validatePassword(password, study.getPassword());
+        }
         membershipService.joinMember(study, userId);
 
         return study.getId();
@@ -97,7 +81,7 @@ public class StudyCommandService {
         if (dto.publicStudy()) {
             study.updatePublicStatus();
         } else {
-            final String encodedPassword = passwordService.encodePassword(dto.password());
+            final String encodedPassword = passwordBusiness.encodePassword(dto.password());
             study.updatePrivateStatus(encodedPassword);
         }
         workbookRelationService.changeWorkbooksToStudy(study, dto.workbooks());

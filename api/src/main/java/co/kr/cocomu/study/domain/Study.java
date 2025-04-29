@@ -121,4 +121,8 @@ public class Study extends TimeBaseEntity {
         this.password = encodedPassword;
     }
 
+    public boolean isPublic() {
+        return status == PUBLIC;
+    }
+
 }

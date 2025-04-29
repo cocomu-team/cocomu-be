@@ -8,7 +8,7 @@ import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.domain.WorkbookRelation;
 import co.kr.cocomu.study.repository.WorkbookRelationRepository;
 import co.kr.cocomu.study.service.WorkbookRelationService;
-import co.kr.cocomu.study.service.business.WorkbookRelationDomainService;
+import co.kr.cocomu.study.service.business.WorkbookRelationBusiness;
 import co.kr.cocomu.tag.domain.WorkbookTag;
 import co.kr.cocomu.tag.service.WorkbookTagService;
 import java.util.List;
@@ -24,7 +24,7 @@ class WorkbookRelationTagServiceTest {
 
     @Mock private WorkbookRelationRepository workbookRelationRepository;
     @Mock private WorkbookTagService workbookTagService;
-    @Mock private WorkbookRelationDomainService workbookRelationDomainService;
+    @Mock private WorkbookRelationBusiness workbookRelationBusiness;
     @InjectMocks private WorkbookRelationService workbookRelationService;
 
     @Test
@@ -52,14 +52,14 @@ class WorkbookRelationTagServiceTest {
 
         List<WorkbookRelation> mockWorkbookRelations = List.of(mock(WorkbookRelation.class));
         when(workbookRelationRepository.findAllByStudyId(mockStudy.getId())).thenReturn(mockWorkbookRelations);
-        when(workbookRelationDomainService.extractNewTags(mockWorkbookTags, mockWorkbookRelations)).thenReturn(List.of());
+        when(workbookRelationBusiness.extractNewTags(mockWorkbookTags, mockWorkbookRelations)).thenReturn(List.of());
 
         // when
         workbookRelationService.changeWorkbooksToStudy(mockStudy, workbookIds);
 
         // then
-        verify(workbookRelationDomainService).activateSelectedRelations(mockWorkbookRelations, mockWorkbookTags);
-        verify(workbookRelationDomainService).deactivateUnselectedRelations(mockWorkbookRelations, mockWorkbookTags);
+        verify(workbookRelationBusiness).activateSelectedRelations(mockWorkbookRelations, mockWorkbookTags);
+        verify(workbookRelationBusiness).deactivateUnselectedRelations(mockWorkbookRelations, mockWorkbookTags);
         verify(workbookRelationRepository).saveAll(List.of());
     }
 

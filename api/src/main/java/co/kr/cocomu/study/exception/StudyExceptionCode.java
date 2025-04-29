@@ -19,6 +19,7 @@ public enum StudyExceptionCode implements ExceptionCode {
     STUDY_IS_FULL(3008, "스터디 최대 인원을 초과했습니다."),
     STUDY_PASSWORD_WRONG(3011, "스터디 비밀번호가 잘못됐습니다."),
     NOT_FOUND_STUDY_USER(3012, "스터디에서 사용자를 찾을 수 없습니다."),
+    NOT_SUPPLY_API(3099, "지원되지 않는 API 입니다."),
     ;
 
     private final int code;

@@ -8,13 +8,12 @@ import co.kr.cocomu.common.jwt.JwtProvider;
 import co.kr.cocomu.common.security.SecurityConfig;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.context.WebApplicationContext;
 
 @Import(SecurityConfig.class)
-public class BaseExecutorControllerTest {
+public class BaseControllerTest {
 
     @MockBean
     private JwtProvider jwtProvider;
