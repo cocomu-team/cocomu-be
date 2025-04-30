@@ -13,7 +13,7 @@ import co.kr.cocomu.codingspace.repository.CodingSpaceRepository;
 import co.kr.cocomu.codingspace.repository.CodingSpaceTabRepository;
 import co.kr.cocomu.codingspace.repository.query.TestCaseQuery;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
-import co.kr.cocomu.study.service.StudyDomainService;
+import co.kr.cocomu.study.service.StudyQueryService;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CodingSpaceQueryService {
 
-    private final StudyDomainService studyDomainService;
+    private final StudyQueryService studyQueryService;
     private final CodingSpaceRepository codingSpaceQuery;
     private final CodingSpaceTabRepository codingSpaceTabQuery;
     private final TestCaseQuery testCaseQuery;
 
     public CodingSpacesDto getCodingSpaces(final Long studyId, final Long userId, final FilterDto dto) {
-        studyDomainService.validateMembership(userId, studyId);
+        studyQueryService.validateMembership(userId, studyId);
         final List<CodingSpaceDto> codingSpaces = codingSpaceQuery.findSpacesWithFilter(userId, studyId, dto);
         final List<Long> codingSpaceIds = codingSpaces.stream().map(CodingSpaceDto::getId).toList();
         final Map<Long, List<UserDto>> usersBySpace = codingSpaceTabQuery.findUsersBySpace(codingSpaceIds);

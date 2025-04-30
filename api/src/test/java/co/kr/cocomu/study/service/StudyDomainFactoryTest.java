@@ -10,15 +10,15 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class StudyFactoryTest {
+class StudyDomainFactoryTest {
 
     @InjectMocks
-    private StudyFactory studyFactory;
+    private StudyDomainFactory studyDomainFactory;
 
     @Test
     void 스터디_객체를_생성한다() {
         CreateStudyDto dto = new CreateStudyDto("name", true, "", "", 0, null, null);
-        Study study = studyFactory.generateStudy(dto, 0L);
+        Study study = studyDomainFactory.generateStudy(dto, 0L);
         assertNotNull(study);
     }
 

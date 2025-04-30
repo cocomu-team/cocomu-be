@@ -1,15 +1,12 @@
 package co.kr.cocomu.tag.service;
 
-import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.tag.domain.WorkbookTag;
-import co.kr.cocomu.tag.exception.WorkbookTagExceptionCode;
-import co.kr.cocomu.tag.repository.WorkbookTagRepository;
 import co.kr.cocomu.tag.dto.WorkbookDto;
+import co.kr.cocomu.tag.repository.WorkbookTagRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +15,13 @@ public class WorkbookTagService {
 
     private final WorkbookTagRepository workbookTagRepository;
 
-    public List<WorkbookTag> getTagsByIdIn(final List<Long> workbookIds) {
-        final List<WorkbookTag> workbookTags = workbookTagRepository.findAllById(workbookIds);
-        if (workbookTags.size() != workbookIds.size()) {
-            throw new BadRequestException(WorkbookTagExceptionCode.INVALID_REQUEST);
+    public boolean existsAllTagIds(final List<Long> tagIds) {
+        if (tagIds == null || tagIds.isEmpty()) {
+            return false;
         }
 
-        return workbookTags;
+        final int count = workbookTagRepository.countByIdIn(tagIds);
+        return count == tagIds.size();
     }
 
     public List<WorkbookDto> getAllWorkbooks() {

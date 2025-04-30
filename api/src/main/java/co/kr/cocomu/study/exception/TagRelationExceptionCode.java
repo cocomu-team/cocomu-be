@@ -1,4 +1,4 @@
-package co.kr.cocomu.tag.exception;
+package co.kr.cocomu.study.exception;
 
 import co.kr.cocomu.common.exception.dto.ExceptionCode;
 import lombok.AllArgsConstructor;
@@ -6,9 +6,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum LanguageTagExceptionCode implements ExceptionCode {
+public enum TagRelationExceptionCode implements ExceptionCode {
 
-    INVALID_REQUEST(5101, "잘못된 요청입니다.");
+    INVALID_TAG_INFORMATION(3201, "잘못된 태그 정보입니다."),
+    ;
 
     private final int code;
     private final String message;

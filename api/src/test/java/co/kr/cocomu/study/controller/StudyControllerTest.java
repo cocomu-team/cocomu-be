@@ -14,7 +14,7 @@ import co.kr.cocomu.study.dto.page.StudyDetailPageDto;
 import co.kr.cocomu.study.dto.request.*;
 import co.kr.cocomu.study.dto.response.*;
 import co.kr.cocomu.study.service.StudyService;
-import co.kr.cocomu.study.service.query.StudyQueryService;
+import co.kr.cocomu.study.service.StudyQueryService;
 import co.kr.cocomu.tag.service.WorkbookTagService;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.module.mockmvc.response.ValidatableMockMvcResponse;
@@ -27,7 +27,6 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

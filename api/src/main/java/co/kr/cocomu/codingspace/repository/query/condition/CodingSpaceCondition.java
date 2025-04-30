@@ -99,7 +99,7 @@ public class CodingSpaceCondition {
             return null;
         }
 
-        return codingSpace.languageTag.id.in(languageIds);
+        return codingSpace.languageTagId.in(languageIds);
     }
 
 }

@@ -1,9 +1,11 @@
 package co.kr.cocomu.study.service;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
+import co.kr.cocomu.common.exception.domain.NotFoundException;
 import co.kr.cocomu.study.domain.Study;
-import co.kr.cocomu.study.dto.request.EditStudyDto;
+import co.kr.cocomu.study.domain.vo.StudyStatus;
 import co.kr.cocomu.study.dto.request.CreateStudyDto;
+import co.kr.cocomu.study.dto.request.EditStudyDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.repository.StudyRepository;
 import co.kr.cocomu.study.service.business.PasswordBusiness;
@@ -18,16 +20,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class StudyService {
 
-    private final StudyFactory studyFactory;
-    private final StudyDomainService studyDomainService;
+    private final StudyDomainFactory studyDomainFactory;
     private final PasswordBusiness passwordBusiness;
-    private final WorkbookRelationService workbookRelationService;
-    private final LanguageRelationService languageRelationService;
+    private final RelationService relationService;
     private final MembershipService membershipService;
     private final StudyRepository studyRepository;
 
+    @Transactional(readOnly = true)
+    public Study getStudyWithThrow(final Long studyId) {
+        return studyRepository.findByIdAndStatusNot(studyId, StudyStatus.REMOVE)
+            .orElseThrow(() -> new NotFoundException(StudyExceptionCode.NOT_FOUND_STUDY));
+    }
+
     public Long create(final Long leaderId, final CreateStudyDto dto) {
-        final Study study = studyFactory.generateStudy(dto, leaderId);
+        final Study study = studyDomainFactory.generateStudy(dto, leaderId);
 
         if (dto.publicStudy()) {
             study.updatePublicStatus();
@@ -36,8 +42,7 @@ public class StudyService {
             study.updatePrivateStatus(encodedPassword);
         }
 
-        workbookRelationService.addWorkbooksToStudy(study, dto.workbookTagIds());
-        languageRelationService.addRelationToStudy(study, dto.languageTagIds());
+        relationService.addTags(study, dto.workbookTagIds(), dto.languageTagIds());
         membershipService.joinLeader(study, leaderId);
         studyRepository.save(study);
 
@@ -45,7 +50,7 @@ public class StudyService {
     }
 
     public Long join(final Long userId, final Long studyId, final String password) {
-        final Study study = studyDomainService.getStudyWithThrow(studyId);
+        final Study study = getStudyWithThrow(studyId);
         if (!study.isPublic()) {
             passwordBusiness.validatePassword(password, study.getPassword());
         }
@@ -55,7 +60,7 @@ public class StudyService {
     }
 
     public void leaveMember(final Long userId, final Long studyId) {
-        final Study study = studyDomainService.getStudyWithThrow(studyId);
+        final Study study = getStudyWithThrow(studyId);
         if (study.isLeader(userId)) {
             throw new BadRequestException(StudyExceptionCode.LEADER_CAN_NOT_LEAVE);
         }
@@ -63,7 +68,7 @@ public class StudyService {
     }
 
     public void removeStudy(final Long userId, final Long studyId) {
-        final Study study = studyDomainService.getStudyWithThrow(studyId);
+        final Study study = getStudyWithThrow(studyId);
         if (!study.isLeader(userId)) {
             throw new BadRequestException(StudyExceptionCode.MEMBER_CAN_NOT_REMOVE);
         }
@@ -72,7 +77,7 @@ public class StudyService {
     }
 
     public Long editStudy(final Long studyId, final Long userId, final EditStudyDto dto) {
-        final Study study = studyDomainService.getStudyWithThrow(studyId);
+        final Study study = getStudyWithThrow(studyId);
         if (!study.isLeader(userId)) {
             throw new BadRequestException(StudyExceptionCode.MEMBER_CAN_NOT_EDIT);
         }
@@ -84,8 +89,7 @@ public class StudyService {
             final String encodedPassword = passwordBusiness.encodePassword(dto.password());
             study.updatePrivateStatus(encodedPassword);
         }
-        workbookRelationService.changeWorkbooksToStudy(study, dto.workbooks());
-        languageRelationService.changeRelationToStudy(study, dto.languages());
+        relationService.changeTags(study, dto.workbooks(), dto.languages());
 
         return study.getId();
     }

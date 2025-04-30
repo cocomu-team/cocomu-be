@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class MembershipServiceTest {
 
+    @Mock private StudyDomainFactory studyDomainFactory;
     @Mock private MembershipRepository membershipRepository;
     @InjectMocks private MembershipService membershipService;
 

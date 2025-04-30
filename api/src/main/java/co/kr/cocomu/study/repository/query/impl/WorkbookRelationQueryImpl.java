@@ -22,7 +22,7 @@ public class WorkbookRelationQueryImpl implements WorkbookRelationQuery {
     public Map<Long, List<WorkbookDto>> findTagsByStudies(final List<Long> studyIds) {
         return queryFactory.select(workbookRelation.study.id, workbookTag)
             .from(workbookRelation)
-            .join(workbookTag).on(workbookRelation.workbookTag.id.eq(workbookTag.id))
+            .join(workbookTag).on(workbookRelation.workbookTagId.eq(workbookTag.id))
             .where(
                 workbookRelation.study.id.in(studyIds),
                 workbookRelation.deleted.isFalse()
@@ -48,7 +48,7 @@ public class WorkbookRelationQueryImpl implements WorkbookRelationQuery {
                     workbookTag.imageUrl.as("imageUrl")
                 ))
             .from(workbookRelation)
-            .join(workbookTag).on(workbookRelation.workbookTag.id.eq(workbookTag.id))
+            .join(workbookTag).on(workbookRelation.workbookTagId.eq(workbookTag.id))
             .where(
                 workbookRelation.study.id.eq(studyId),
                 workbookRelation.deleted.isFalse()

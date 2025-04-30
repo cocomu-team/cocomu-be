@@ -11,11 +11,10 @@ class LanguageRelationTagTest {
     @Test
     void 스터디_언어_태그_정보가_같다() {
         // given
-        LanguageTag mockLanguageTag = mock(LanguageTag.class);
-        LanguageRelation languageRelation = new LanguageRelation(mock(Study.class), mockLanguageTag);
+        LanguageRelation languageRelation = new LanguageRelation(mock(Study.class), 1L);
 
         // when
-        boolean result = languageRelation.hasSameLTag(mockLanguageTag);
+        boolean result = languageRelation.hasSameTagId(1L);
 
         // then
         assertThat(result).isTrue();
@@ -24,11 +23,10 @@ class LanguageRelationTagTest {
     @Test
     void 스터디_언어_태그_정보가_다르다() {
         // given
-        LanguageTag mockLanguageTag = mock(LanguageTag.class);
-        LanguageRelation languageRelation = new LanguageRelation(mock(Study.class), mock(LanguageTag.class));
+        LanguageRelation languageRelation = new LanguageRelation(mock(Study.class), 2L);
 
         // when
-        boolean result = languageRelation.hasSameLTag(mockLanguageTag);
+        boolean result = languageRelation.hasSameTagId(1L);
 
         // then
         assertThat(result).isFalse();
@@ -37,7 +35,7 @@ class LanguageRelationTagTest {
     @Test
     void 스터디_언어_태그를_사용하지_않는다() {
         // given
-        LanguageRelation languageRelation = new LanguageRelation(mock(Study.class), mock(LanguageTag.class));
+        LanguageRelation languageRelation = new LanguageRelation(mock(Study.class), 1L);
 
         // when
         languageRelation.unUseTag();
@@ -49,7 +47,7 @@ class LanguageRelationTagTest {
     @Test
     void 스터디_언어_태그를_재사용한다() {
         // given
-        LanguageRelation languageRelation = new LanguageRelation(mock(Study.class), mock(LanguageTag.class));
+        LanguageRelation languageRelation = new LanguageRelation(mock(Study.class), 1L);
         languageRelation.unUseTag();
 
         // when

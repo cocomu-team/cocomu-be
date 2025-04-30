@@ -5,7 +5,7 @@ import co.kr.cocomu.codingspace.service.CodingSpaceQueryService;
 import co.kr.cocomu.common.api.Api;
 import co.kr.cocomu.common.api.NoContent;
 import co.kr.cocomu.study.dto.response.StudyCardDto;
-import co.kr.cocomu.study.service.query.StudyQueryService;
+import co.kr.cocomu.study.service.StudyQueryService;
 import co.kr.cocomu.user.controller.code.UserApiCode;
 import co.kr.cocomu.user.controller.docs.UserControllerDocs;
 import co.kr.cocomu.user.dto.response.UserInfoDto;

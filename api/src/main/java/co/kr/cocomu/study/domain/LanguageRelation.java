@@ -1,7 +1,5 @@
 package co.kr.cocomu.study.domain;
 
-import co.kr.cocomu.tag.domain.LanguageTag;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -22,37 +20,37 @@ import lombok.NoArgsConstructor;
 @Table(name = "cocomu_study_language_relation")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class LanguageRelation {
+public class LanguageRelation implements TagRelation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "study_language_relation_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Study study;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "language_tag_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private LanguageTag languageTag;
+    @Column(nullable = false)
+    private Long languageTagId;
 
-    @Column
+    @Column(nullable = false)
     private boolean deleted;
 
-    protected LanguageRelation(final Study study, final LanguageTag tag) {
+    protected LanguageRelation(final Study study, final Long tagId) {
         this.study = study;
-        this.languageTag = tag;
+        this.languageTagId = tagId;
+        this.deleted = false;
     }
 
-    public static List<LanguageRelation> createRelations(final Study study, final List<LanguageTag> tags) {
-        return tags.stream()
-            .map(tag -> new LanguageRelation(study, tag))
+    public static List<LanguageRelation> createRelations(final Study study, final List<Long> tagIds) {
+        return tagIds.stream()
+            .map(tagId -> new LanguageRelation(study, tagId))
             .toList();
     }
 
-    public boolean hasSameLTag(final LanguageTag other) {
-        return other.equals(getLanguageTag());
+    public boolean hasSameTagId(final Long other) {
+        return other.equals(languageTagId);
     }
 
     public void useTag() {

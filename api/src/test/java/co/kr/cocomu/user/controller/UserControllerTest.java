@@ -17,7 +17,7 @@ import co.kr.cocomu.common.api.NoContent;
 import co.kr.cocomu.common.template.GetRequestTemplate;
 import co.kr.cocomu.common.template.PostRequestTemplate;
 import co.kr.cocomu.study.dto.response.StudyCardDto;
-import co.kr.cocomu.study.service.query.StudyQueryService;
+import co.kr.cocomu.study.service.StudyQueryService;
 import co.kr.cocomu.user.controller.code.UserApiCode;
 import co.kr.cocomu.user.dto.request.ProfileUpdateDto;
 import co.kr.cocomu.user.dto.request.UserJoinRequest;

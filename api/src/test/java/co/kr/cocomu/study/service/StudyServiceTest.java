@@ -1,4 +1,4 @@
-package co.kr.cocomu.study.service.command;
+package co.kr.cocomu.study.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -9,17 +9,13 @@ import static org.mockito.Mockito.when;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.study.domain.Study;
+import co.kr.cocomu.study.domain.vo.StudyStatus;
 import co.kr.cocomu.study.dto.request.CreateStudyDto;
 import co.kr.cocomu.study.dto.request.EditStudyDto;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.repository.StudyRepository;
-import co.kr.cocomu.study.service.LanguageRelationService;
-import co.kr.cocomu.study.service.MembershipService;
-import co.kr.cocomu.study.service.StudyDomainService;
-import co.kr.cocomu.study.service.StudyFactory;
-import co.kr.cocomu.study.service.StudyService;
-import co.kr.cocomu.study.service.WorkbookRelationService;
 import co.kr.cocomu.study.service.business.PasswordBusiness;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,12 +26,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class StudyServiceTest {
 
     @Mock private StudyRepository studyRepository;
-    @Mock private StudyDomainService studyDomainService;
     @Mock private PasswordBusiness passwordBusiness;
-    @Mock private WorkbookRelationService workbookRelationService;
+    @Mock private RelationService relationService;
     @Mock private MembershipService membershipService;
-    @Mock private LanguageRelationService languageRelationService;
-    @Mock private StudyFactory studyFactory;
+    @Mock private StudyDomainFactory studyDomainFactory;
 
     @InjectMocks private StudyService studyService;
 
@@ -45,15 +39,14 @@ class StudyServiceTest {
         CreateStudyDto mockDto = mock(CreateStudyDto.class);
         when(mockDto.publicStudy()).thenReturn(true);
         Study mockStudy = mock(Study.class);
-        when(studyFactory.generateStudy(mockDto, 1L)).thenReturn(mockStudy);
+        when(studyDomainFactory.generateStudy(mockDto, 1L)).thenReturn(mockStudy);
 
         // when
         Long result = studyService.create(1L, mockDto);
 
         // then
         verify(mockStudy).updatePublicStatus();
-        verify(workbookRelationService).addWorkbooksToStudy(mockStudy, mockDto.workbookTagIds());
-        verify(languageRelationService).addRelationToStudy(mockStudy, mockDto.languageTagIds());
+        verify(relationService).addTags(mockStudy, mockDto.workbookTagIds(), mockDto.languageTagIds());
         verify(membershipService).joinLeader(mockStudy, 1L);
         verify(studyRepository).save(mockStudy);
         assertThat(result).isEqualTo(mockStudy.getId());
@@ -65,7 +58,7 @@ class StudyServiceTest {
         CreateStudyDto mockDto = mock(CreateStudyDto.class);
         when(mockDto.publicStudy()).thenReturn(false);
         Study mockStudy = mock(Study.class);
-        when(studyFactory.generateStudy(mockDto, 1L)).thenReturn(mockStudy);
+        when(studyDomainFactory.generateStudy(mockDto, 1L)).thenReturn(mockStudy);
         when(passwordBusiness.encodePassword(mockDto.password())).thenReturn("password");
 
         // when
@@ -73,8 +66,7 @@ class StudyServiceTest {
 
         // then
         verify(mockStudy).updatePrivateStatus("password");
-        verify(workbookRelationService).addWorkbooksToStudy(mockStudy, mockDto.workbookTagIds());
-        verify(languageRelationService).addRelationToStudy(mockStudy, mockDto.languageTagIds());
+        verify(relationService).addTags(mockStudy, mockDto.workbookTagIds(), mockDto.languageTagIds());
         verify(membershipService).joinLeader(mockStudy, 1L);
         verify(studyRepository).save(mockStudy);
         assertThat(result).isEqualTo(mockStudy.getId());
@@ -84,7 +76,7 @@ class StudyServiceTest {
     void 스터디_참여에_성공한다() {
         // given
         Study mockStudy = mock(Study.class);
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(studyRepository.findByIdAndStatusNot(1L, StudyStatus.REMOVE)).thenReturn(Optional.of(mockStudy));
         when(mockStudy.isPublic()).thenReturn(true);
 
         // when
@@ -99,7 +91,7 @@ class StudyServiceTest {
     void 비공개_스터디에_참여할_때_비밀번호_검증을_한다() {
         // given
         Study mockStudy = mock(Study.class);
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(studyRepository.findByIdAndStatusNot(1L, StudyStatus.REMOVE)).thenReturn(Optional.of(mockStudy));
         when(mockStudy.isPublic()).thenReturn(false);
 
         // when
@@ -115,7 +107,7 @@ class StudyServiceTest {
     void 스터디_리더가_아닐_경우_스터디에서_나간다() {
         // given
         Study mockStudy = mock(Study.class);
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(studyRepository.findByIdAndStatusNot(1L, StudyStatus.REMOVE)).thenReturn(Optional.of(mockStudy));
         when(mockStudy.isLeader(anyLong())).thenReturn(false);
 
         // when
@@ -129,7 +121,7 @@ class StudyServiceTest {
     void 스터디_리더일_경우_스터디에서_나갈_수_없다() {
         // given
         Study mockStudy = mock(Study.class);
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(studyRepository.findByIdAndStatusNot(1L, StudyStatus.REMOVE)).thenReturn(Optional.of(mockStudy));
         when(mockStudy.isLeader(anyLong())).thenReturn(true);
 
         // when & then
@@ -142,7 +134,7 @@ class StudyServiceTest {
     void 스터디_리더가_스터디를_삭제한다() {
         // given
         Study mockStudy = mock(Study.class);
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(studyRepository.findByIdAndStatusNot(1L, StudyStatus.REMOVE)).thenReturn(Optional.of(mockStudy));
         when(mockStudy.isLeader(1L)).thenReturn(true);
 
         // when
@@ -157,7 +149,7 @@ class StudyServiceTest {
     void 스터디_멤버가_스터디를_삭제할_수_없다() {
         // given
         Study mockStudy = mock(Study.class);
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(studyRepository.findByIdAndStatusNot(1L, StudyStatus.REMOVE)).thenReturn(Optional.of(mockStudy));
         when(mockStudy.isLeader(1L)).thenReturn(false);
 
         // when & then
@@ -173,7 +165,7 @@ class StudyServiceTest {
         when(mockStudy.isLeader(1L)).thenReturn(true);
         EditStudyDto mockDto = mock(EditStudyDto.class);
         when(mockDto.publicStudy()).thenReturn(true);
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(studyRepository.findByIdAndStatusNot(1L, StudyStatus.REMOVE)).thenReturn(Optional.of(mockStudy));
 
         // when
         Long result = studyService.editStudy(1L, 1L, mockDto);
@@ -181,8 +173,7 @@ class StudyServiceTest {
         // then
         verify(mockStudy).updateBasicInfo(mockDto.name(), mockDto.description(), mockDto.totalUserCount());
         verify(mockStudy).updatePublicStatus();
-        verify(workbookRelationService).changeWorkbooksToStudy(mockStudy, mockDto.workbooks());
-        verify(languageRelationService).changeRelationToStudy(mockStudy, mockDto.languages());
+        verify(relationService).changeTags(mockStudy, mockDto.workbooks(), mockDto.languages());
         assertThat(result).isEqualTo(mockStudy.getId());
     }
 
@@ -193,7 +184,7 @@ class StudyServiceTest {
         when(mockStudy.isLeader(1L)).thenReturn(true);
         EditStudyDto mockDto = mock(EditStudyDto.class);
         when(mockDto.publicStudy()).thenReturn(false);
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(studyRepository.findByIdAndStatusNot(1L, StudyStatus.REMOVE)).thenReturn(Optional.of(mockStudy));
         when(passwordBusiness.encodePassword(mockDto.password())).thenReturn("password");
 
         // when
@@ -202,8 +193,7 @@ class StudyServiceTest {
         // then
         verify(mockStudy).updateBasicInfo(mockDto.name(), mockDto.description(), mockDto.totalUserCount());
         verify(mockStudy).updatePrivateStatus("password");
-        verify(workbookRelationService).changeWorkbooksToStudy(mockStudy, mockDto.workbooks());
-        verify(languageRelationService).changeRelationToStudy(mockStudy, mockDto.languages());
+        verify(relationService).changeTags(mockStudy, mockDto.workbooks(), mockDto.languages());
         assertThat(result).isEqualTo(mockStudy.getId());
     }
 
@@ -213,7 +203,7 @@ class StudyServiceTest {
         Study mockStudy = mock(Study.class);
         when(mockStudy.isLeader(1L)).thenReturn(false);
         EditStudyDto mockDto = mock(EditStudyDto.class);
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(studyRepository.findByIdAndStatusNot(1L, StudyStatus.REMOVE)).thenReturn(Optional.of(mockStudy));
 
         // when & then
         assertThatThrownBy(() -> studyService.editStudy(1L, 1L, mockDto))

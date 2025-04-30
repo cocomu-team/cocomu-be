@@ -1,9 +1,7 @@
 package co.kr.cocomu.tag.service;
 
-import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.study.dto.response.LanguageDto;
 import co.kr.cocomu.tag.domain.LanguageTag;
-import co.kr.cocomu.tag.exception.LanguageTagExceptionCode;
 import co.kr.cocomu.tag.repository.LanguageTagRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,13 +15,13 @@ public class LanguageTagService {
 
     private final LanguageTagRepository languageTagRepository;
 
-    public List<LanguageTag> getTagsByIdIn(final List<Long> languageIds) {
-        final List<LanguageTag> languageTags = languageTagRepository.findAllById(languageIds);
-        if (languageTags.size() != languageIds.size()) {
-            throw new BadRequestException(LanguageTagExceptionCode.INVALID_REQUEST);
+    public boolean existsAllTagIds(final List<Long> tagIds) {
+        if (tagIds == null || tagIds.isEmpty()) {
+            return false;
         }
 
-        return languageTags;
+        final int count = languageTagRepository.countByIdIn(tagIds);
+        return count == tagIds.size();
     }
 
     public List<LanguageDto> getAllTags() {

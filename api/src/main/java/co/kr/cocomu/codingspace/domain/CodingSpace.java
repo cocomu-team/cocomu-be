@@ -59,9 +59,8 @@ public class CodingSpace {
     @JoinColumn(name = "study_id")
     private Study study;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "language_tag_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private LanguageTag languageTag;
+    @Column(nullable = false)
+    private Long languageTagId;
 
     private int codingMinutes;
     private int currentUserCount;
@@ -87,9 +86,9 @@ public class CodingSpace {
     @OneToMany(mappedBy = "codingSpace", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CodingSpaceTab> tabs = new ArrayList<>();
 
-    private CodingSpace(final CreateCodingSpaceDto dto, final Study study, LanguageTag languageTag) {
+    private CodingSpace(final CreateCodingSpaceDto dto, final Study study, final Long tagId) {
         this.study = study;
-        this.languageTag = languageTag;
+        this.languageTagId = tagId;
         this.name = dto.name();
         this.description = dto.description();
         this.workbookUrl = dto.workbookUrl();
@@ -100,10 +99,10 @@ public class CodingSpace {
     }
 
     public static CodingSpace createCodingSpace(final CreateCodingSpaceDto dto, final Study study, final User host,
-                                                final LanguageTag languageTag) {
+                                                final Long tagId) {
         validateCreateCodingSpace(dto);
 
-        final CodingSpace codingSpace = new CodingSpace(dto, study, languageTag);
+        final CodingSpace codingSpace = new CodingSpace(dto, study, tagId);
         codingSpace.increaseCurrentUserCount();
 
         final CodingSpaceTab tab = CodingSpaceTab.createHost(codingSpace, host);

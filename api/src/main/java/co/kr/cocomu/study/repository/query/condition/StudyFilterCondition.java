@@ -61,7 +61,7 @@ public class StudyFilterCondition {
             .from(languageRelation)
             .where(
                 languageRelation.study.id.eq(study.id),
-                languageRelation.languageTag.id.in(tagIds)
+                languageRelation.languageTagId.in(tagIds)
             )
             .exists();
     }
@@ -77,7 +77,7 @@ public class StudyFilterCondition {
             .from(workbookRelation)
             .where(
                 workbookRelation.study.id.eq(study.id),
-                workbookRelation.workbookTag.id.in(workbookIds)
+                workbookRelation.workbookTagId.in(workbookIds)
             )
             .exists();
     }

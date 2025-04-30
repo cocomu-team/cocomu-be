@@ -24,10 +24,12 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Table(name = "cocomu_study_membership", uniqueConstraints = @UniqueConstraint(columnNames = {"study_id", "user_id"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicUpdate
 @Getter
 @EqualsAndHashCode(callSuper = false, of = "id")
 public class Membership extends TimeBaseEntity {

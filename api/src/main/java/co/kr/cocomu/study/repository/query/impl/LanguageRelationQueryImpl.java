@@ -22,7 +22,7 @@ public class LanguageRelationQueryImpl implements LanguageRelationQuery {
     public Map<Long, List<LanguageDto>> findTagsByStudies(final List<Long> studyIds) {
         return queryFactory.select(languageRelation.study.id, languageTag)
             .from(languageRelation)
-            .join(languageTag).on(languageRelation.languageTag.id.eq(languageTag.id))
+            .join(languageTag).on(languageRelation.languageTagId.eq(languageTag.id))
             .where(
                 languageRelation.study.id.in(studyIds),
                 languageRelation.deleted.isFalse()
@@ -48,7 +48,7 @@ public class LanguageRelationQueryImpl implements LanguageRelationQuery {
                     languageTag.imageUrl.as("imageUrl")
                 ))
             .from(languageRelation)
-            .join(languageTag).on(languageRelation.languageTag.id.eq(languageTag.id))
+            .join(languageTag).on(languageRelation.languageTagId.eq(languageTag.id))
             .where(
                 languageRelation.study.id.eq(studyId),
                 languageRelation.deleted.isFalse()

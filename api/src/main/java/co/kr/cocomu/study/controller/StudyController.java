@@ -16,7 +16,7 @@ import co.kr.cocomu.study.dto.response.LanguageDto;
 import co.kr.cocomu.study.dto.response.StudyCardDto;
 import co.kr.cocomu.study.dto.response.StudyMemberDto;
 import co.kr.cocomu.study.service.StudyService;
-import co.kr.cocomu.study.service.query.StudyQueryService;
+import co.kr.cocomu.study.service.StudyQueryService;
 import co.kr.cocomu.tag.dto.WorkbookDto;
 import co.kr.cocomu.tag.service.LanguageTagService;
 import co.kr.cocomu.tag.service.WorkbookTagService;

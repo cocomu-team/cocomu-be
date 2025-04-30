@@ -28,6 +28,7 @@ public enum CodingSpaceExceptionCode implements ExceptionCode {
     EMPTY_TEST_CASE(4018, "테스트 케이스는 비어 있을 수 없습니다."),
     NON_EXISTENT_CASE(4019, "코딩 스페이스에 존재하지 않는 테스트케이스입니다."),
     CAN_NOT_REMOVE_DEFAULT_CASE(4020, "기본 테스트 케이스는 삭제할 수 없습니다."),
+    LANGUAGE_TAG_IS_NOT_IN_STUDY(4021, "스터디에 존재하지 않는 태그 정보입니다."),
     ;
 
     private final int code;

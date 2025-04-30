@@ -21,7 +21,7 @@ import co.kr.cocomu.codingspace.repository.CodingSpaceRepository;
 import co.kr.cocomu.codingspace.repository.CodingSpaceTabRepository;
 import co.kr.cocomu.codingspace.repository.query.TestCaseQuery;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
-import co.kr.cocomu.study.service.StudyDomainService;
+import co.kr.cocomu.study.service.StudyQueryService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,7 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CodingSpaceQueryServiceTest {
 
-    @Mock private StudyDomainService studyDomainService;
+    @Mock private StudyQueryService studyDomainService;
     @Mock private TestCaseQuery testCaseQuery;
     @Mock private CodingSpaceRepository codingSpaceQuery;
     @Mock private CodingSpaceTabRepository codingSpaceTabQuery;

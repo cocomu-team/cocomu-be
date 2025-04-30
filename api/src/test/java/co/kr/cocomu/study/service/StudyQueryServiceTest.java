@@ -1,4 +1,4 @@
-package co.kr.cocomu.study.service.query;
+package co.kr.cocomu.study.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -22,7 +22,6 @@ import co.kr.cocomu.study.dto.response.StudyCardDto;
 import co.kr.cocomu.study.dto.response.StudyMemberDto;
 import co.kr.cocomu.study.repository.LanguageRelationRepository;
 import co.kr.cocomu.study.repository.WorkbookRelationRepository;
-import co.kr.cocomu.study.service.StudyDomainService;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import co.kr.cocomu.study.repository.StudyRepository;
 import co.kr.cocomu.study.repository.MembershipRepository;
@@ -41,10 +40,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class StudyQueryServiceTest {
 
     @Mock private StudyRepository studyQuery;
-    @Mock private MembershipRepository studyUserQuery;
+    @Mock private MembershipRepository membershipQuery;
     @Mock private WorkbookRelationRepository workbookRelationQuery;
     @Mock private LanguageRelationRepository languageRelationQuery;
-    @Mock private StudyDomainService studyDomainService;
+    @Mock private StudyService studyService;
     @Mock private CodingSpaceQueryService codingSpaceQueryService;
 
     @InjectMocks private StudyQueryService studyQueryService;
@@ -69,7 +68,7 @@ class StudyQueryServiceTest {
         when(studyQuery.findTop12StudyCardsWithFilter(dto, 1L)).thenReturn(List.of(mockStudyCard));
         when(languageRelationQuery.findTagsByStudies(anyList())).thenReturn(languageByStudies);
         when(workbookRelationQuery.findTagsByStudies(anyList())).thenReturn(new HashMap<>());
-        when(studyUserQuery.findLeaderByStudies(anyList())).thenReturn(leaderByStudies);
+        when(membershipQuery.findLeaderByStudies(anyList())).thenReturn(leaderByStudies);
 
         // when
         AllStudyCardDto result = studyQueryService.getAllStudyCard(dto, 1L);
@@ -95,7 +94,7 @@ class StudyQueryServiceTest {
         when(studyQuery.findStudyPagesByStudyId(studyId, 1L)).thenReturn(Optional.of(mockStudyCard));
         when(languageRelationQuery.findTagsByStudyId(studyId)).thenReturn(List.of());
         when(workbookRelationQuery.findTagsByStudyId(studyId)).thenReturn(List.of());
-        when(studyUserQuery.findLeaderByStudyId(studyId)).thenReturn(mockLeader);
+        when(membershipQuery.findLeaderByStudyId(studyId)).thenReturn(mockLeader);
 
         // when
         StudyCardDto result = studyQueryService.getStudyCard(studyId, userId);
@@ -128,15 +127,14 @@ class StudyQueryServiceTest {
         List<LanguageDto> mockDto = List.of(mock(LanguageDto.class));
         StudyDetailPageDto expected = new StudyDetailPageDto(mockStudy.getId(), mockStudy.getName(), mockDto);
 
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
+        when(studyService.getStudyWithThrow(1L)).thenReturn(mockStudy);
         when(languageRelationQuery.findTagsByStudyId(1L)).thenReturn(mockDto);
+        when(membershipQuery.isUserJoinedStudy(1L, mockStudy.getId())).thenReturn(true);
 
         // when
         StudyDetailPageDto result = studyQueryService.getStudyDetailPage(1L, 1L);
 
         // then
-
-        verify(studyDomainService).validateMembership(1L, mockStudy.getId());
         assertThat(result).isEqualTo(expected);
     }
 
@@ -145,7 +143,8 @@ class StudyQueryServiceTest {
         // given
         StudyMemberDto mockDto = new StudyMemberDto();
         mockDto.setUserId(1L);
-        when(studyUserQuery.findMembers(anyLong(), any(StudyUserFilterDto.class))).thenReturn(List.of(mockDto));
+        when(membershipQuery.findMembers(anyLong(), any(StudyUserFilterDto.class))).thenReturn(List.of(mockDto));
+        when(membershipQuery.isUserJoinedStudy(1L, 1L)).thenReturn(true);
         when(codingSpaceQueryService.countJoinedSpacesByMembers(1L, List.of(1L))).thenReturn(Map.of(1L, 1L));
 
         // when
@@ -161,7 +160,7 @@ class StudyQueryServiceTest {
         when(studyQuery.findTop20UserStudyCards(1L, 1L, null)).thenReturn(List.of());
         when(languageRelationQuery.findTagsByStudies(anyList())).thenReturn(new HashMap<>());
         when(workbookRelationQuery.findTagsByStudies(anyList())).thenReturn(new HashMap<>());
-        when(studyUserQuery.findLeaderByStudies(anyList())).thenReturn(new HashMap<>());
+        when(membershipQuery.findLeaderByStudies(anyList())).thenReturn(new HashMap<>());
 
         // when
         List<StudyCardDto> result = studyQueryService.getStudyCardsByUser(1L, 1L, null);
@@ -171,7 +170,7 @@ class StudyQueryServiceTest {
         verify(studyQuery).findTop20UserStudyCards(1L, 1L, null);
         verify(languageRelationQuery).findTagsByStudies(anyList());
         verify(workbookRelationQuery).findTagsByStudies(anyList());
-        verify(studyUserQuery).findLeaderByStudies(anyList());
+        verify(membershipQuery).findLeaderByStudies(anyList());
     }
 
 }

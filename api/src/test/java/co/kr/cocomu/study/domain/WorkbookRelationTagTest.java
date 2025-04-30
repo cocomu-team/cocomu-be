@@ -11,11 +11,10 @@ class WorkbookRelationTagTest {
     @Test
     void 스터디_문제집_정보가_같다() {
         // given
-        WorkbookTag mockWorkbookTag = mock(WorkbookTag.class);
-        WorkbookRelation workbookRelation = new WorkbookRelation(mock(Study.class), mockWorkbookTag);
+        WorkbookRelation workbookRelation = new WorkbookRelation(mock(Study.class), 1L);
 
         // when
-        boolean result = workbookRelation.hasSameTag(mockWorkbookTag);
+        boolean result = workbookRelation.hasSameTagId(1L);
 
         // then
         assertThat(result).isTrue();
@@ -24,11 +23,10 @@ class WorkbookRelationTagTest {
     @Test
     void 스터디_문제집_정보가_다르다() {
         // given
-        WorkbookTag mockWorkbookTag = mock(WorkbookTag.class);
-        WorkbookRelation workbookRelation = new WorkbookRelation(mock(Study.class), mock(WorkbookTag.class));
+        WorkbookRelation workbookRelation = new WorkbookRelation(mock(Study.class), 2L);
 
         // when
-        boolean result = workbookRelation.hasSameTag(mockWorkbookTag);
+        boolean result = workbookRelation.hasSameTagId(1L);
 
         // then
         assertThat(result).isFalse();
@@ -37,7 +35,7 @@ class WorkbookRelationTagTest {
     @Test
     void 스터디_문제집_태그를_사용하지_않는다() {
         // given
-        WorkbookRelation workbookRelation = new WorkbookRelation(mock(Study.class), mock(WorkbookTag.class));
+        WorkbookRelation workbookRelation = new WorkbookRelation(mock(Study.class), 1L);
 
         // when
         workbookRelation.unUseTag();
@@ -49,7 +47,7 @@ class WorkbookRelationTagTest {
     @Test
     void 스터디_문제집_태그를_재사용한다() {
         // given
-        WorkbookRelation workbookRelation = new WorkbookRelation(mock(Study.class), mock(WorkbookTag.class));
+        WorkbookRelation workbookRelation = new WorkbookRelation(mock(Study.class), 1L);
         workbookRelation.unUseTag();
 
         // when

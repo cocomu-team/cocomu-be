@@ -1,7 +1,5 @@
 package co.kr.cocomu.study.domain;
 
-import co.kr.cocomu.tag.domain.WorkbookTag;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -24,38 +22,37 @@ import org.hibernate.annotations.DynamicUpdate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
 @Getter
-public class WorkbookRelation {
+public class WorkbookRelation implements TagRelation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "study_workbook_relation_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Study study;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "workbook_tag_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private WorkbookTag workbookTag;
+    @Column(nullable = false)
+    private Long workbookTagId;
 
     @Column(nullable = false)
     private boolean deleted;
 
-    protected WorkbookRelation(final Study study, final WorkbookTag tag) {
+    protected WorkbookRelation(final Study study, final Long tagId) {
         this.study = study;
-        this.workbookTag = tag;
+        this.workbookTagId = tagId;
         this.deleted = false;
     }
 
-    public static List<WorkbookRelation> createRelations(final Study study, final List<WorkbookTag> tags) {
-        return tags.stream()
-            .map(tag -> new WorkbookRelation(study, tag))
+    public static List<WorkbookRelation> createRelations(final Study study, final List<Long> tagIds) {
+        return tagIds.stream()
+            .map(tagId -> new WorkbookRelation(study, tagId))
             .toList();
     }
 
-    public boolean hasSameTag(final WorkbookTag other) {
-        return other.equals(getWorkbookTag());
+    public boolean hasSameTagId(final Long tagId) {
+        return tagId.equals(workbookTagId);
     }
 
     public void useTag() {
