@@ -6,7 +6,7 @@ import co.kr.cocomu.study.domain.TagRelation;
 import co.kr.cocomu.study.domain.WorkbookRelation;
 import co.kr.cocomu.study.repository.LanguageRelationRepository;
 import co.kr.cocomu.study.repository.WorkbookRelationRepository;
-import co.kr.cocomu.study.service.business.RelationBusiness;
+import co.kr.cocomu.study.business.RelationBusiness;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

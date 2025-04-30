@@ -1,4 +1,4 @@
-package co.kr.cocomu.study.service.business;
+package co.kr.cocomu.study.business;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
+import co.kr.cocomu.study.business.PasswordBusiness;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

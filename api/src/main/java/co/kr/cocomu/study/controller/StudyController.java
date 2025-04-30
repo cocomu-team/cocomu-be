@@ -62,7 +62,7 @@ public class StudyController implements StudyControllerDocs {
         @PathVariable final Long studyId,
         @RequestBody final PasswordDto dto
     ) {
-        final Long publicStudyId = studyService.join(userId, studyId, dto.password());
+        final Long publicStudyId = studyService.join(userId, studyId, dto);
         return Api.of(StudyApiCode.JOIN_STUDY_SUCCESS, publicStudyId);
     }
 

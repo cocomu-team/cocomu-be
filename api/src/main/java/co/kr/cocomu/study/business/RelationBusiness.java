@@ -1,4 +1,4 @@
-package co.kr.cocomu.study.service.business;
+package co.kr.cocomu.study.business;
 
 import co.kr.cocomu.common.annotation.Business;
 import co.kr.cocomu.common.exception.domain.BadRequestException;

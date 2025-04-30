@@ -12,6 +12,7 @@ import co.kr.cocomu.study.domain.Membership;
 import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.exception.MembershipExceptionCode;
 import co.kr.cocomu.study.repository.MembershipRepository;
+import co.kr.cocomu.study.factory.StudyFactory;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class MembershipServiceTest {
 
-    @Mock private StudyDomainFactory studyDomainFactory;
+    @Mock private StudyFactory studyFactory;
     @Mock private MembershipRepository membershipRepository;
     @InjectMocks private MembershipService membershipService;
 

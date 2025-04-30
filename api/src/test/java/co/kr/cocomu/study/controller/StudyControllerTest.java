@@ -61,7 +61,7 @@ class StudyControllerTest extends BaseControllerTest {
     void 스터디_참여_요청이_성공한다() {
         // given
         PasswordDto dto = new PasswordDto(null);
-        when(studyService.join(1L, 1L, null)).thenReturn(1L);
+        when(studyService.join(1L, 1L, dto)).thenReturn(1L);
 
         // when
         String path = PATH_PREFIX + "/1";

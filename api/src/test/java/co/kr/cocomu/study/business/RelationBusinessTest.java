@@ -1,4 +1,4 @@
-package co.kr.cocomu.study.service.business;
+package co.kr.cocomu.study.business;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import co.kr.cocomu.common.exception.domain.BadRequestException;
+import co.kr.cocomu.study.business.RelationBusiness;
 import co.kr.cocomu.study.domain.TagRelation;
 import co.kr.cocomu.study.exception.TagRelationExceptionCode;
 import co.kr.cocomu.tag.service.LanguageTagService;
@@ -24,7 +25,8 @@ class RelationBusinessTest {
 
     @Mock private WorkbookTagService workbookTagService;
     @Mock private LanguageTagService languageTagService;
-    @InjectMocks RelationBusiness relationBusiness;
+    @InjectMocks
+    RelationBusiness relationBusiness;
 
     @Test
     void 문제집_태그_도메인에서_태그_정보가_모두_존재한다() {

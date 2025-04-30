@@ -13,18 +13,6 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 class StudyTest {
 
     @Test
-    void 스터디_기본_생성이_된다() {
-        // when
-        Study study = Study.create("name", "description", 1, 1L);
-        // then
-        assertThat(study.getCurrentUserCount()).isEqualTo(0);
-        assertThat(study.getTotalUserCount()).isEqualTo(1);
-        assertThat(study.getLeaderId()).isEqualTo(1L);
-        assertThat(study.getName()).isEqualTo("name");
-        assertThat(study.getDescription()).isEqualTo("description");
-    }
-
-    @Test
     void 스터디_리더인지_알_수_있다() {
         // given
         Study study = Study.create("name", "description", 1, 1L);

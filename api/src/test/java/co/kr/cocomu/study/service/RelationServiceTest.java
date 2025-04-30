@@ -10,7 +10,7 @@ import co.kr.cocomu.study.domain.Study;
 import co.kr.cocomu.study.domain.WorkbookRelation;
 import co.kr.cocomu.study.repository.LanguageRelationRepository;
 import co.kr.cocomu.study.repository.WorkbookRelationRepository;
-import co.kr.cocomu.study.service.business.RelationBusiness;
+import co.kr.cocomu.study.business.RelationBusiness;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
