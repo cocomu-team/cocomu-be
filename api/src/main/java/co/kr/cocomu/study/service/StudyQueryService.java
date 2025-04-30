@@ -1,24 +1,24 @@
 package co.kr.cocomu.study.service;
 
 import co.kr.cocomu.codingspace.service.CodingSpaceQueryService;
+import co.kr.cocomu.common.exception.domain.BadRequestException;
 import co.kr.cocomu.common.exception.domain.NotFoundException;
-import co.kr.cocomu.study.domain.Language;
 import co.kr.cocomu.study.domain.Study;
-import co.kr.cocomu.study.domain.Workbook;
+import co.kr.cocomu.study.dto.page.StudyDetailPageDto;
 import co.kr.cocomu.study.dto.request.GetAllStudyFilterDto;
 import co.kr.cocomu.study.dto.request.StudyUserFilterDto;
 import co.kr.cocomu.study.dto.response.AllStudyCardDto;
 import co.kr.cocomu.study.dto.response.LanguageDto;
 import co.kr.cocomu.study.dto.response.LeaderDto;
 import co.kr.cocomu.study.dto.response.StudyCardDto;
-import co.kr.cocomu.study.dto.page.StudyDetailPageDto;
 import co.kr.cocomu.study.dto.response.StudyMemberDto;
-import co.kr.cocomu.study.dto.response.WorkbookDto;
+import co.kr.cocomu.study.exception.MembershipExceptionCode;
 import co.kr.cocomu.study.exception.StudyExceptionCode;
-import co.kr.cocomu.study.repository.jpa.LanguageRepository;
-import co.kr.cocomu.study.repository.jpa.StudyRepository;
-import co.kr.cocomu.study.repository.jpa.StudyUserRepository;
-import co.kr.cocomu.study.repository.jpa.WorkbookRepository;
+import co.kr.cocomu.study.repository.LanguageRelationRepository;
+import co.kr.cocomu.study.repository.StudyRepository;
+import co.kr.cocomu.study.repository.MembershipRepository;
+import co.kr.cocomu.study.repository.WorkbookRelationRepository;
+import co.kr.cocomu.tag.dto.WorkbookDto;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -30,12 +30,22 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class StudyQueryService {
 
-    private final StudyDomainService studyDomainService;
+    private final StudyService studyService;
     private final CodingSpaceQueryService codingSpaceQueryService;
+    private final WorkbookRelationRepository workbookRelationQuery;
+    private final LanguageRelationRepository languageRelationQuery;
     private final StudyRepository studyQuery;
-    private final StudyUserRepository studyUserQuery;
-    private final WorkbookRepository workbookQuery;
-    private final LanguageRepository languageQuery;
+    private final MembershipRepository membershipQuery;
+
+    public void validateMembership(final Long userId, final Long studyId) {
+        if (!membershipQuery.isUserJoinedStudy(userId, studyId)) {
+            throw new BadRequestException(MembershipExceptionCode.NO_PARTICIPATION);
+        }
+    }
+
+    public boolean existsLanguageTagInStudy(final Long studyId, final Long tagId) {
+        return languageRelationQuery.existsByStudy_IdAndLanguageTagIdAndDeletedIsFalse(studyId, tagId);
+    }
 
     public AllStudyCardDto getAllStudyCard(final GetAllStudyFilterDto dto, final Long userId) {
         final Long totalStudyCount = studyQuery.countStudyCardsWithFilter(dto, userId);
@@ -49,37 +59,24 @@ public class StudyQueryService {
     public StudyCardDto getStudyCard(final Long studyId, final Long userId) {
         return studyQuery.findStudyPagesByStudyId(studyId, userId)
             .map(studyPage -> {
-                studyPage.setLanguages(languageQuery.findLanguageByStudyId(studyId));
-                studyPage.setWorkbooks(workbookQuery.findWorkbookByStudyId(studyId));
-                studyPage.setLeader(studyUserQuery.findLeaderByStudyId(studyId));
+                studyPage.setLanguages(languageRelationQuery.findTagsByStudyId(studyId));
+                studyPage.setWorkbooks(workbookRelationQuery.findTagsByStudyId(studyId));
+                studyPage.setLeader(membershipQuery.findLeaderByStudyId(studyId));
                 return studyPage;
             })
             .orElseThrow(() -> new NotFoundException(StudyExceptionCode.NOT_FOUND_STUDY));
     }
 
-    public List<WorkbookDto> getAllWorkbooks() {
-        final List<Workbook> workbooks = workbookQuery.findAll();
-        return workbooks.stream()
-            .map(Workbook::toDto)
-            .toList();
-    }
-
-    public List<LanguageDto> getAllLanguages() {
-        final List<Language> languages = languageQuery.findAll();
-        return languages.stream()
-            .map(Language::toDto)
-            .toList();
-    }
-
     public StudyDetailPageDto getStudyDetailPage(final Long studyId, final Long userId) {
-        final Study study = studyDomainService.getStudyWithThrow(studyId);
-        studyDomainService.validateStudyMembership(userId, study.getId());
-        return StudyDetailPageDto.from(study);
+        final Study study = studyService.getStudyWithThrow(studyId);
+        validateMembership(userId, study.getId());
+        final List<LanguageDto> languages = languageRelationQuery.findTagsByStudyId(studyId);
+        return new StudyDetailPageDto(study.getId(), study.getName(), languages);
     }
 
     public List<StudyMemberDto> findAllMembers(final Long userId, final Long studyId, final StudyUserFilterDto dto) {
-        studyDomainService.validateStudyMembership(userId, studyId);
-        final List<StudyMemberDto> members = studyUserQuery.findMembers(studyId, dto);
+        validateMembership(userId, studyId);
+        final List<StudyMemberDto> members = membershipQuery.findMembers(studyId, dto);
 
         final List<Long> memberIds = members.stream().map(StudyMemberDto::getUserId).toList();
         final Map<Long, Long> spaceCounts = codingSpaceQueryService.countJoinedSpacesByMembers(studyId, memberIds);
@@ -100,14 +97,14 @@ public class StudyQueryService {
     }
 
     private void setStudyInformation(final List<Long> studyIds, final List<StudyCardDto> studyPages) {
-        final Map<Long, List<LanguageDto>> languageByStudies = languageQuery.findLanguageByStudies(studyIds);
-        final Map<Long, List<WorkbookDto>> workbookByStudies = workbookQuery.findWorkbookByStudies(studyIds);
-        final Map<Long, LeaderDto> LeaderByStudies = studyUserQuery.findLeaderByStudies(studyIds);
+        final Map<Long, List<LanguageDto>> languageTags = languageRelationQuery.findTagsByStudies(studyIds);
+        final Map<Long, List<WorkbookDto>> workbookTags = workbookRelationQuery.findTagsByStudies(studyIds);
+        final Map<Long, LeaderDto> leaders = membershipQuery.findLeaderByStudies(studyIds);
 
         for (StudyCardDto studyPage: studyPages) {
-            studyPage.setLanguages(languageByStudies.getOrDefault(studyPage.getId(), List.of()));
-            studyPage.setWorkbooks(workbookByStudies.getOrDefault(studyPage.getId(), List.of()));
-            studyPage.setLeader(LeaderByStudies.get(studyPage.getId()));
+            studyPage.setLanguages(languageTags.getOrDefault(studyPage.getId(), List.of()));
+            studyPage.setWorkbooks(workbookTags.getOrDefault(studyPage.getId(), List.of()));
+            studyPage.setLeader(leaders.get(studyPage.getId()));
         }
     }
 

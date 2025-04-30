@@ -1,12 +1,12 @@
 package co.kr.cocomu.study.repository.query.condition;
 
+import static co.kr.cocomu.study.domain.QLanguageRelation.languageRelation;
+import static co.kr.cocomu.study.domain.QMembership.membership;
 import static co.kr.cocomu.study.domain.QStudy.study;
-import static co.kr.cocomu.study.domain.QStudyLanguage.studyLanguage;
-import static co.kr.cocomu.study.domain.QStudyUser.studyUser;
-import static co.kr.cocomu.study.domain.QStudyWorkbook.studyWorkbook;
+import static co.kr.cocomu.study.domain.QWorkbookRelation.workbookRelation;
 
+import co.kr.cocomu.study.domain.vo.MembershipStatus;
 import co.kr.cocomu.study.domain.vo.StudyStatus;
-import co.kr.cocomu.study.domain.vo.StudyUserStatus;
 import co.kr.cocomu.study.dto.request.GetAllStudyFilterDto;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -18,8 +18,8 @@ public class StudyFilterCondition {
 
     public static Predicate[] buildStudyFilterCondition(final GetAllStudyFilterDto filter, final Long userId) {
         return new Predicate[] {
-            getLanguageCondition(filter.languages()),
-            getWorkbookCondition(filter.workbooks()),
+            getLanguageRelationCondition(filter.languages()),
+            getWorkbookRelationCondition(filter.workbooks()),
             getStatusCondition(filter.status()),
             getJoinableCondition(filter.joinable(), userId),
             getSearchCondition(filter.keyword())
@@ -33,11 +33,11 @@ public class StudyFilterCondition {
         }
 
         return JPAExpressions.selectOne()
-            .from(studyUser)
+            .from(membership)
             .where(
-                studyUser.study.eq(study),
-                studyUser.user.id.eq(userId),
-                studyUser.status.eq(StudyUserStatus.JOIN)
+                membership.study.eq(study),
+                membership.userId.eq(userId),
+                membership.status.eq(MembershipStatus.JOIN)
             )
             .notExists();
     }
@@ -50,34 +50,34 @@ public class StudyFilterCondition {
         return study.id.lt(lastIndex);
     }
 
-    // 1. studyLanguage 정보에서 조건에 만족하는 studyId들을 가져오기
-    private static BooleanExpression getLanguageCondition(final List<Long> languageIds) {
-        if (languageIds == null || languageIds.isEmpty()) {
+    // 1. languageRelation 정보에서 조건에 만족하는 studyId들을 가져오기
+    private static BooleanExpression getLanguageRelationCondition(final List<Long> tagIds) {
+        if (tagIds == null || tagIds.isEmpty()) {
             return null;
         }
 
         return JPAExpressions
             .selectOne()
-            .from(studyLanguage)
+            .from(languageRelation)
             .where(
-                studyLanguage.study.id.eq(study.id),
-                studyLanguage.language.id.in(languageIds)
+                languageRelation.study.id.eq(study.id),
+                languageRelation.languageTagId.in(tagIds)
             )
             .exists();
     }
 
-    // 2. studyWorkbook 정보에서 조건에 만족하는 studyId들을 가져오기
-    private static BooleanExpression getWorkbookCondition(final List<Long> workbookIds) {
+    // 2. workbookRelation 정보에서 조건에 만족하는 studyId들을 가져오기
+    private static BooleanExpression getWorkbookRelationCondition(final List<Long> workbookIds) {
         if (workbookIds == null || workbookIds.isEmpty()) {
             return null;
         }
 
         return JPAExpressions
             .selectOne()
-            .from(studyWorkbook)
+            .from(workbookRelation)
             .where(
-                studyWorkbook.study.id.eq(study.id),
-                studyWorkbook.workbook.id.in(workbookIds)
+                workbookRelation.study.id.eq(study.id),
+                workbookRelation.workbookTagId.in(workbookIds)
             )
             .exists();
     }
@@ -96,11 +96,11 @@ public class StudyFilterCondition {
             return null;
         }
         return JPAExpressions.selectOne()
-            .from(studyUser)
+            .from(membership)
             .where(
-                studyUser.study.eq(study),
-                studyUser.user.id.eq(userId),
-                studyUser.status.eq(StudyUserStatus.JOIN)
+                membership.study.eq(study),
+                membership.userId.eq(userId),
+                membership.status.eq(MembershipStatus.JOIN)
             )
             .notExists()
             .and(study.currentUserCount.lt(study.totalUserCount));

@@ -3,18 +3,16 @@ package co.kr.cocomu.codingspace.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import co.kr.cocomu.codingspace.domain.vo.CodingSpaceStatus;
-import co.kr.cocomu.codingspace.domain.vo.TabStatus;
 import co.kr.cocomu.codingspace.domain.vo.TestCaseType;
 import co.kr.cocomu.codingspace.dto.request.CreateCodingSpaceDto;
 import co.kr.cocomu.codingspace.dto.request.CreateTestCaseDto;
 import co.kr.cocomu.codingspace.exception.CodingSpaceExceptionCode;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
-import co.kr.cocomu.study.domain.Language;
 import co.kr.cocomu.study.domain.Study;
+import co.kr.cocomu.tag.domain.LanguageTag;
 import co.kr.cocomu.user.domain.User;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,14 +24,14 @@ class CodingSpaceTest {
     Study mockStudy;
     User mockUser;
     User otherUser;
-    Language mockLanguage;
+    LanguageTag mockLanguageTag;
 
     @BeforeEach
     void setUp() {
         mockStudy = mock(Study.class);
-        mockLanguage = mock(Language.class);
         mockUser = mock(User.class);
         otherUser = mock(User.class);
+        mockLanguageTag = mock(LanguageTag.class);
     }
 
 
@@ -46,7 +44,7 @@ class CodingSpaceTest {
         when(dto.testcases()).thenReturn(List.of(testCase));
 
         // when
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
 
         // then
         assertThat(codingSpace.getStatus()).isEqualTo(CodingSpaceStatus.WAITING);
@@ -61,10 +59,9 @@ class CodingSpaceTest {
         CreateTestCaseDto testCase = mock(CreateTestCaseDto.class);
         when(dto.totalUserCount()).thenReturn(2);
         when(dto.testcases()).thenReturn(List.of(testCase));
-        when(mockStudy.getLanguage(1L)).thenReturn(mockLanguage);
 
         // when
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
 
         // then
         assertThat(codingSpace.getCurrentUserCount()).isEqualTo(1);
@@ -80,7 +77,7 @@ class CodingSpaceTest {
         when(dto.testcases()).thenReturn(List.of(testCase));
 
         // when & then
-        assertThatThrownBy(() -> CodingSpace.createCodingSpace(dto, null, null))
+        assertThatThrownBy(() -> CodingSpace.createCodingSpace(dto, null, null, 1L))
             .isInstanceOf(BadRequestException.class)
             .hasFieldOrPropertyWithValue("exceptionType", CodingSpaceExceptionCode.MAX_USER_COUNT_IS_FOUR);
     }
@@ -94,7 +91,7 @@ class CodingSpaceTest {
         when(dto.testcases()).thenReturn(List.of(testCase));
 
         // when & then
-        assertThatThrownBy(() -> CodingSpace.createCodingSpace(dto, null, null))
+        assertThatThrownBy(() -> CodingSpace.createCodingSpace(dto, null, null, 1L))
             .isInstanceOf(BadRequestException.class)
             .hasFieldOrPropertyWithValue("exceptionType", CodingSpaceExceptionCode.MIN_USER_COUNT_IS_TWO);
     }
@@ -107,7 +104,7 @@ class CodingSpaceTest {
         when(dto.testcases()).thenReturn(List.of());
 
         // when & then
-        assertThatThrownBy(() -> CodingSpace.createCodingSpace(dto, null, null))
+        assertThatThrownBy(() -> CodingSpace.createCodingSpace(dto, null, null, 1L))
             .isInstanceOf(BadRequestException.class)
             .hasFieldOrPropertyWithValue("exceptionType", CodingSpaceExceptionCode.EMPTY_TEST_CASE);
     }
@@ -119,9 +116,8 @@ class CodingSpaceTest {
         CreateTestCaseDto testCase = mock(CreateTestCaseDto.class);
         when(dto.totalUserCount()).thenReturn(2);
         when(dto.testcases()).thenReturn(List.of(testCase));
-        when(mockStudy.getLanguage(1L)).thenReturn(mockLanguage);
 
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
         int currentCount = codingSpace.getCurrentUserCount();
 
         // when
@@ -139,9 +135,8 @@ class CodingSpaceTest {
         CreateTestCaseDto testCase = mock(CreateTestCaseDto.class);
         when(dto.totalUserCount()).thenReturn(2);
         when(dto.testcases()).thenReturn(List.of(testCase));
-        when(mockStudy.getLanguage(1L)).thenReturn(mockLanguage);
 
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
         codingSpace.joinUser(otherUser);
 
         // when & then
@@ -158,7 +153,7 @@ class CodingSpaceTest {
         when(dto.totalUserCount()).thenReturn(2);
         when(dto.testcases()).thenReturn(List.of(testCase));
 
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
 
         codingSpace.joinUser(otherUser);
         codingSpace.getTabs().forEach(CodingSpaceTab::enterTab);
@@ -177,9 +172,8 @@ class CodingSpaceTest {
         CreateTestCaseDto testCase = mock(CreateTestCaseDto.class);
         when(dto.totalUserCount()).thenReturn(2);
         when(dto.testcases()).thenReturn(List.of(testCase));
-        when(mockStudy.getLanguage(1L)).thenReturn(mockLanguage);
 
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
         codingSpace.joinUser(otherUser);
         User otherUser2 = mock(User.class);
 
@@ -197,7 +191,7 @@ class CodingSpaceTest {
         when(dto.totalUserCount()).thenReturn(2);
         when(dto.testcases()).thenReturn(List.of(testCase));
 
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
         codingSpace.joinUser(mock(User.class));
         codingSpace.getTabs().forEach(CodingSpaceTab::enterTab);
 
@@ -217,7 +211,7 @@ class CodingSpaceTest {
         when(dto.totalUserCount()).thenReturn(2);
         when(dto.testcases()).thenReturn(List.of(testCase));
 
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
         codingSpace.joinUser(mock(User.class));
         codingSpace.getTabs().forEach(CodingSpaceTab::enterTab);
         codingSpace.start();
@@ -235,7 +229,7 @@ class CodingSpaceTest {
         when(dto.totalUserCount()).thenReturn(2);
         when(dto.testcases()).thenReturn(List.of(testCase));
 
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
 
         // when & then
         assertThatThrownBy(codingSpace::start)
@@ -251,7 +245,7 @@ class CodingSpaceTest {
         when(dto.totalUserCount()).thenReturn(2);
         when(dto.testcases()).thenReturn(List.of(testCase));
 
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
         codingSpace.joinUser(mock(User.class));
         codingSpace.getTabs().forEach(CodingSpaceTab::enterTab);
         codingSpace.start();
@@ -272,7 +266,7 @@ class CodingSpaceTest {
         when(dto.totalUserCount()).thenReturn(2);
         when(dto.testcases()).thenReturn(List.of(testCase));
 
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
 
         // when & then
         assertThatThrownBy(codingSpace::startFeedBack)
@@ -288,7 +282,7 @@ class CodingSpaceTest {
         when(dto.totalUserCount()).thenReturn(2);
         when(dto.testcases()).thenReturn(List.of(testCase));
 
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
         codingSpace.joinUser(mock(User.class));
         codingSpace.getTabs().forEach(CodingSpaceTab::enterTab);
         codingSpace.start();
@@ -309,7 +303,7 @@ class CodingSpaceTest {
         when(dto.totalUserCount()).thenReturn(2);
         when(dto.testcases()).thenReturn(List.of(testCase));
 
-        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser);
+        CodingSpace codingSpace = CodingSpace.createCodingSpace(dto, mockStudy, mockUser, 1L);
         codingSpace.joinUser(mock(User.class));
         codingSpace.getTabs().forEach(CodingSpaceTab::enterTab);
         codingSpace.start();

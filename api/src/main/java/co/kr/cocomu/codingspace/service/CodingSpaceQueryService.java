@@ -7,15 +7,13 @@ import co.kr.cocomu.codingspace.dto.page.WaitingPage;
 import co.kr.cocomu.codingspace.dto.request.FilterDto;
 import co.kr.cocomu.codingspace.dto.response.CodingSpaceDto;
 import co.kr.cocomu.codingspace.dto.response.CodingSpacesDto;
-import co.kr.cocomu.codingspace.dto.response.LanguageDto;
 import co.kr.cocomu.codingspace.dto.response.UserDto;
 import co.kr.cocomu.codingspace.exception.CodingSpaceExceptionCode;
 import co.kr.cocomu.codingspace.repository.CodingSpaceRepository;
 import co.kr.cocomu.codingspace.repository.CodingSpaceTabRepository;
 import co.kr.cocomu.codingspace.repository.query.TestCaseQuery;
 import co.kr.cocomu.common.exception.domain.BadRequestException;
-import co.kr.cocomu.study.domain.Study;
-import co.kr.cocomu.study.service.StudyDomainService;
+import co.kr.cocomu.study.service.StudyQueryService;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -27,23 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CodingSpaceQueryService {
 
-    private final StudyDomainService studyDomainService;
+    private final StudyQueryService studyQueryService;
     private final CodingSpaceRepository codingSpaceQuery;
     private final CodingSpaceTabRepository codingSpaceTabQuery;
     private final TestCaseQuery testCaseQuery;
 
-    public List<LanguageDto> getStudyLanguages(final Long userId, final Long studyId) {
-        final Study study = studyDomainService.getStudyWithThrow(studyId);
-        studyDomainService.validateStudyMembership(userId, studyId);
-
-        return study.getLanguages()
-            .stream()
-            .map(LanguageDto::from)
-            .toList();
-    }
-
     public CodingSpacesDto getCodingSpaces(final Long studyId, final Long userId, final FilterDto dto) {
-        studyDomainService.validateStudyMembership(userId, studyId);
+        studyQueryService.validateMembership(userId, studyId);
         final List<CodingSpaceDto> codingSpaces = codingSpaceQuery.findSpacesWithFilter(userId, studyId, dto);
         final List<Long> codingSpaceIds = codingSpaces.stream().map(CodingSpaceDto::getId).toList();
         final Map<Long, List<UserDto>> usersBySpace = codingSpaceTabQuery.findUsersBySpace(codingSpaceIds);

@@ -1,6 +1,6 @@
 package co.kr.cocomu.study.repository.query.impl;
+import static co.kr.cocomu.study.domain.QMembership.membership;
 import static co.kr.cocomu.study.domain.QStudy.study;
-import static co.kr.cocomu.study.domain.QStudyUser.studyUser;
 import static co.kr.cocomu.study.repository.query.condition.StudyFilterCondition.getLastIndexCondition;
 import static co.kr.cocomu.study.repository.query.condition.StudyFilterCondition.isUserJoined;
 
@@ -47,9 +47,13 @@ public class StudyQueryRepositoryImpl implements StudyQueryRepository {
     @Override
     public List<StudyCardDto> findTop20UserStudyCards(final Long userId, final Long viewerId, final Long lastIndex) {
         return buildStudyPageForm(viewerId)
-            .from(studyUser)
-            .join(studyUser.study, study)
-            .where(getLastIndexCondition(lastIndex), studyUser.user.id.eq(userId), study.status.ne(StudyStatus.REMOVE))
+            .from(membership)
+            .join(membership.study, study)
+            .where(
+                getLastIndexCondition(lastIndex),
+                membership.userId.eq(userId),
+                study.status.ne(StudyStatus.REMOVE)
+            )
             .orderBy(study.id.desc())
             .limit(STUDY_SCROLL_SIZE)
             .fetch();

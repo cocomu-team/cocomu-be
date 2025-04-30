@@ -11,12 +11,12 @@ import co.kr.cocomu.admin.dto.request.CreateLanguageRequest;
 import co.kr.cocomu.admin.dto.request.CreateWorkbookRequest;
 import co.kr.cocomu.admin.exception.AdminExceptionCode;
 import co.kr.cocomu.common.exception.domain.NotFoundException;
-import co.kr.cocomu.study.domain.Language;
-import co.kr.cocomu.study.domain.Workbook;
+import co.kr.cocomu.tag.domain.LanguageTag;
+import co.kr.cocomu.tag.domain.WorkbookTag;
 import co.kr.cocomu.study.dto.response.LanguageDto;
-import co.kr.cocomu.study.dto.response.WorkbookDto;
-import co.kr.cocomu.study.repository.jpa.LanguageRepository;
-import co.kr.cocomu.study.repository.jpa.WorkbookRepository;
+import co.kr.cocomu.tag.dto.WorkbookDto;
+import co.kr.cocomu.tag.repository.LanguageTagRepository;
+import co.kr.cocomu.tag.repository.WorkbookTagRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,8 +28,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class AdminServiceTest {
 
-    @Mock private LanguageRepository languageRepository;
-    @Mock private WorkbookRepository workbookRepository;
+    @Mock private LanguageTagRepository languageTagRepository;
+    @Mock private WorkbookTagRepository workbookTagRepository;
 
     @InjectMocks private AdminService adminService;
 
@@ -37,10 +37,10 @@ class AdminServiceTest {
     void 문제집이_추가가_된다() {
         // given
         CreateWorkbookRequest dto = new CreateWorkbookRequest("백준", "이미지URL");
-        Workbook savedWorkbook = Workbook.of("백준", "이미지URL");
-        ReflectionTestUtils.setField(savedWorkbook, "id", 1L);
+        WorkbookTag savedWorkbookTag = WorkbookTag.of("백준", "이미지URL");
+        ReflectionTestUtils.setField(savedWorkbookTag, "id", 1L);
 
-        given(workbookRepository.save(any(Workbook.class))).willReturn(savedWorkbook);
+        given(workbookTagRepository.save(any(WorkbookTag.class))).willReturn(savedWorkbookTag);
 
         // when
         WorkbookDto result = adminService.addWorkbook(dto);
@@ -53,10 +53,10 @@ class AdminServiceTest {
     void 언어가_추가_된다() {
         // given
         CreateLanguageRequest dto = new CreateLanguageRequest("자바", "이미지URL");
-        Language savedLanguage = Language.of("자바", "이미지URL");
-        ReflectionTestUtils.setField(savedLanguage, "id", 1L);
+        LanguageTag savedLanguageTag = LanguageTag.of("자바", "이미지URL");
+        ReflectionTestUtils.setField(savedLanguageTag, "id", 1L);
 
-        given(languageRepository.save(any(Language.class))).willReturn(savedLanguage);
+        given(languageTagRepository.save(any(LanguageTag.class))).willReturn(savedLanguageTag);
 
         // when
         LanguageDto result = adminService.addLanguage(dto);
@@ -68,20 +68,20 @@ class AdminServiceTest {
     @Test
     void 문제집이_삭제된다() {
         // given
-        Workbook workBook = Workbook.of("백준", "이미지 URL");
-        given(workbookRepository.findById(anyLong())).willReturn(Optional.of(workBook));
+        WorkbookTag workBook = WorkbookTag.of("백준", "이미지 URL");
+        given(workbookTagRepository.findById(anyLong())).willReturn(Optional.of(workBook));
 
         // when
         adminService.deleteWorkbook(1L);
 
         // then
-        verify(workbookRepository).delete(workBook);
+        verify(workbookTagRepository).delete(workBook);
     }
 
     @Test
     void 존재하지_않는_문제집_삭제시_예외가_발생한다() {
         // given
-        given(workbookRepository.findById(anyLong())).willReturn(Optional.empty());
+        given(workbookTagRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> adminService.deleteWorkbook(1L))
@@ -92,20 +92,20 @@ class AdminServiceTest {
     @Test
     void 언어가_삭제된다() {
         // given
-        Language language = Language.of("자바", "이미지URL");
-        given(languageRepository.findById(anyLong())).willReturn(Optional.of(language));
+        LanguageTag languageTag = LanguageTag.of("자바", "이미지URL");
+        given(languageTagRepository.findById(anyLong())).willReturn(Optional.of(languageTag));
 
         // when
         adminService.deleteLanguage(1L);
 
         // then
-        verify(languageRepository).delete(language);
+        verify(languageTagRepository).delete(languageTag);
     }
 
     @Test
     void 존재하지_않는_언어_삭제시_예외가_발생한다() {
         // given
-        given(languageRepository.findById(anyLong())).willReturn(Optional.empty());
+        given(languageTagRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> adminService.deleteLanguage(1L))

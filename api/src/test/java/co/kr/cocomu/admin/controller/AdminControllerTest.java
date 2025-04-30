@@ -11,13 +11,13 @@ import co.kr.cocomu.admin.dto.request.CreateLanguageRequest;
 import co.kr.cocomu.admin.dto.request.CreateWorkbookRequest;
 import co.kr.cocomu.admin.service.AdminService;
 import co.kr.cocomu.admin.uploader.AdminImageUploader;
-import co.kr.cocomu.common.BaseExecutorControllerTest;
+import co.kr.cocomu.common.BaseControllerTest;
 import co.kr.cocomu.common.api.Api;
 import co.kr.cocomu.common.api.NoContent;
 import co.kr.cocomu.common.template.DeleteRequestTemplate;
 import co.kr.cocomu.common.template.PostRequestTemplate;
 import co.kr.cocomu.study.dto.response.LanguageDto;
-import co.kr.cocomu.study.dto.response.WorkbookDto;
+import co.kr.cocomu.tag.dto.WorkbookDto;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.module.mockmvc.response.ValidatableMockMvcResponse;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @WebMvcTest(AdminController.class)
 @WithMockUser(roles = "ADMIN")
-class AdminControllerTest extends BaseExecutorControllerTest {
+class AdminControllerTest extends BaseControllerTest {
 
     private static final String PATH_PREFIX = "/api/v1/admin";
     @MockBean private AdminService adminService;

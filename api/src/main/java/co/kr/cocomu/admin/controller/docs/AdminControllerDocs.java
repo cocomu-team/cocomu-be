@@ -6,7 +6,7 @@ import co.kr.cocomu.common.api.Api;
 import co.kr.cocomu.common.api.NoContent;
 import co.kr.cocomu.common.exception.dto.ExceptionResponse;
 import co.kr.cocomu.study.dto.response.LanguageDto;
-import co.kr.cocomu.study.dto.response.WorkbookDto;
+import co.kr.cocomu.tag.dto.WorkbookDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

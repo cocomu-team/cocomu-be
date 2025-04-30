@@ -1,8 +1,7 @@
 package co.kr.cocomu.study.dto.response;
 
-import co.kr.cocomu.study.domain.vo.StudyRole;
+import co.kr.cocomu.study.domain.vo.MembershipRole;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.xml.bind.annotation.XmlAnyAttribute;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +24,7 @@ public class StudyMemberDto {
     @Schema(description = "참여한 코딩 스페이스 수", example = "1")
     private Long joinedSpaceCount;
     @Schema(description = "스터디 권한")
-    private StudyRole role;
+    private MembershipRole role;
     @Schema(description = "스터디 가입 일자")
     private LocalDateTime joinedDate;
 

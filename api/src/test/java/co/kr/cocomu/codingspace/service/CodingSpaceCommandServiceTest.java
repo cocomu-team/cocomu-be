@@ -1,11 +1,11 @@
 package co.kr.cocomu.codingspace.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,11 +16,15 @@ import co.kr.cocomu.codingspace.domain.vo.CodingSpaceStatus;
 import co.kr.cocomu.codingspace.dto.request.CreateCodingSpaceDto;
 import co.kr.cocomu.codingspace.dto.request.CreateTestCaseDto;
 import co.kr.cocomu.codingspace.dto.response.TestCaseDto;
+import co.kr.cocomu.codingspace.exception.CodingSpaceExceptionCode;
+import co.kr.cocomu.codingspace.repository.CodingSpaceRepository;
 import co.kr.cocomu.codingspace.repository.TestCaseRepository;
 import co.kr.cocomu.codingspace.stomp.StompSSEProducer;
-import co.kr.cocomu.codingspace.repository.CodingSpaceRepository;
+import co.kr.cocomu.common.exception.domain.BadRequestException;
+import co.kr.cocomu.study.service.StudyQueryService;
+import co.kr.cocomu.study.service.StudyService;
+import co.kr.cocomu.tag.domain.LanguageTag;
 import co.kr.cocomu.study.domain.Study;
-import co.kr.cocomu.study.service.StudyDomainService;
 import co.kr.cocomu.user.domain.User;
 import co.kr.cocomu.user.service.UserService;
 import java.util.List;
@@ -34,7 +38,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class CodingSpaceCommandServiceTest {
 
-    @Mock private StudyDomainService studyDomainService;
+    @Mock private StudyQueryService studyQueryService;
+    @Mock private StudyService studyService;
     @Mock private CodingSpaceRepository codingSpaceRepository;
     @Mock private TestCaseRepository testCaseRepository;
     @Mock private CodingSpaceDomainService codingSpaceDomainService;
@@ -57,18 +62,36 @@ class CodingSpaceCommandServiceTest {
     @Test
     void 코딩_스페이스를_생성한다() {
         // given
-        CreateCodingSpaceDto dto = mock(CreateCodingSpaceDto.class);
-        CreateTestCaseDto testCase = mock(CreateTestCaseDto.class);
-        when(dto.studyId()).thenReturn(1L);
-        when(dto.totalUserCount()).thenReturn(2);
-        when(dto.testcases()).thenReturn(List.of(testCase));
-        코딩_스페이스_생성_스텁();
+        CreateCodingSpaceDto mockDto = mock(CreateCodingSpaceDto.class);
+        List<CreateTestCaseDto> mockTestCases = List.of(mock(CreateTestCaseDto.class));
+        when(mockDto.totalUserCount()).thenReturn(2);
+        when(mockDto.testcases()).thenReturn(mockTestCases);
+        when(studyService.getStudyWithThrow(mockDto.studyId())).thenReturn(mockStudy);
+        when(userService.getUserWithThrow(1L)).thenReturn(mockUser);
+        when(studyQueryService.existsLanguageTagInStudy(mockDto.studyId(), mockDto.languageId()))
+            .thenReturn(true);
+        when(codingSpaceRepository.save(any(CodingSpace.class))).thenReturn(mockCodingSpace);
 
         // when
-        Long result = codingSpaceCommandService.createCodingSpace(dto, 1L);
+        Long result = codingSpaceCommandService.createCodingSpace(mockDto, 1L);
 
         // then
-        assertThat(result).isEqualTo(1L);
+        assertThat(result).isEqualTo(mockCodingSpace.getId());
+    }
+
+    @Test
+    void 코딩_스페이스를_생성시_태그_정보가_스터디에_없으면_예외가_발생한다() {
+        // given
+        CreateCodingSpaceDto mockDto = mock(CreateCodingSpaceDto.class);
+        when(studyQueryService.existsLanguageTagInStudy(mockDto.studyId(), mockDto.languageId()))
+            .thenReturn(false);
+
+        // when & then
+        assertThatThrownBy(() -> codingSpaceCommandService.createCodingSpace(mockDto, 1L))
+            .isInstanceOf(BadRequestException.class)
+            .hasFieldOrPropertyWithValue("exceptionType", CodingSpaceExceptionCode.LANGUAGE_TAG_IS_NOT_IN_STUDY);
+
+        verify(studyQueryService).validateMembership(1L, mockDto.studyId());
     }
 
     @Test
@@ -225,17 +248,6 @@ class CodingSpaceCommandServiceTest {
     * ========================== SET STUB ==========================
     * */
 
-    private void 코딩_스페이스_생성_스텁() {
-        when(mockStudy.getId()).thenReturn(1L);
-        when(mockUser.getId()).thenReturn(1L);
-        when(mockCodingSpace.getId()).thenReturn(1L);
-
-        when(studyDomainService.getStudyWithThrow(1L)).thenReturn(mockStudy);
-        when(userService.getUserWithThrow(1L)).thenReturn(mockUser);
-        doNothing().when(studyDomainService).validateStudyMembership(1L, 1L);
-        when(codingSpaceRepository.save(any(CodingSpace.class))).thenReturn(mockCodingSpace);
-    }
-
     private void 코딩_스페이스_참여_스텁() {
         when(mockStudy.getId()).thenReturn(1L);
         when(mockUser.getId()).thenReturn(1L);
@@ -245,7 +257,7 @@ class CodingSpaceCommandServiceTest {
 
         when(codingSpaceDomainService.getCodingSpaceWithThrow(1L)).thenReturn(mockCodingSpace);
         when(userService.getUserWithThrow(1L)).thenReturn(mockUser);
-        doNothing().when(studyDomainService).validateStudyMembership(1L, 1L);
+        doNothing().when(studyQueryService).validateMembership(1L, 1L);
     }
 
 }
